@@ -1,0 +1,348 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vela="using:Vela.Avalonia.Controls"
+        x:Class="Vela.Avalonia.Gallery.MainWindow"
+        Title="Vela.Avalonia — Performance-First Desktop UI"
+        Width="1160"
+        Height="780"
+        MinWidth="860"
+        MinHeight="620"
+        Background="{DynamicResource VelaBackgroundBrush}"
+        Foreground="{DynamicResource VelaForegroundBrush}"
+        FontFamily="Inter, sans-serif">
+
+  <Window.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="16" />
+      <Setter Property="Padding" Value="22" />
+    </Style>
+    <Style Selector="TextBlock.pageTitle">
+      <Setter Property="FontSize" Value="22" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.pageSubtitle">
+      <Setter Property="FontSize" Value="13.5" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.cardTitle">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.cardDesc">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel>
+    <!-- Live Page-Switch Performance Telemetry Bar -->
+    <Border DockPanel.Dock="Bottom"
+            Height="32"
+            Background="{DynamicResource VelaSidebarBackgroundBrush}"
+            BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+            BorderThickness="0,1,0,0"
+            Padding="16,0">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Border x:Name="TelemetryDot"
+                  Width="7"
+                  Height="7"
+                  CornerRadius="99"
+                  Background="{DynamicResource VelaSuccessBrush}" />
+          <TextBlock x:Name="TelemetryText"
+                     Text="Ready · PageCacheMode: KeepAlive · Transition: Instant"
+                     FontSize="12"
+                     Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+        </StackPanel>
+
+        <TextBlock x:Name="TelemetryHint"
+                   Grid.Column="2"
+                   Text="Tip: Visit Heavy Stress (500 nodes) and compare KeepAlive vs None"
+                   FontSize="12"
+                   Foreground="{DynamicResource VelaTextMutedBrush}"
+                   VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+
+    <vela:VelaNavigationView x:Name="RootNav"
+                             DisplayMode="Left"
+                             IsPaneOpen="True"
+                             IsSearchVisible="False"
+                             PageCacheMode="KeepAlive"
+                             MaxCachedPages="4"
+                             PageTransitionMode="Instant"
+                             SelectedIndex="0"
+                             PageSwitched="OnPageSwitched">
+      <!-- Quiet, minimal brand header -->
+      <vela:VelaNavigationView.Header>
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <TextBlock Text="Vela" FontSize="15" FontWeight="SemiBold" />
+          <TextBlock Text="12.2" FontSize="12" Foreground="{DynamicResource VelaTextMutedBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+      </vela:VelaNavigationView.Header>
+
+      <!-- Quiet minimal footer -->
+      <vela:VelaNavigationView.Footer>
+        <vela:VelaSwitch x:Name="DarkModeSwitch"
+                         Content="Dark mode"
+                         Margin="4,0"
+                         IsCheckedChanged="OnDarkModeChanged" />
+      </vela:VelaNavigationView.Footer>
+
+      <!-- Page 1: Navigation Performance & Settings -->
+      <vela:VelaNavItem Header="Navigation"
+                        Category="Performance Shell Cache"
+                        Icon="{DynamicResource VelaIconCompass}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Navigation &amp; Switching Performance" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Restrained monochrome chrome backed by VelaPageDeck: lazy page instantiation, O(1) KeepAlive/LRU visual-tree caching, zero idle Measure/Arrange on hidden pages, and optional render-thread Compositor fades." />
+              </StackPanel>
+
+              <Border Classes="card">
+                <StackPanel Spacing="18">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="cardTitle" Text="Page Switching Engine" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Switch cache policy and transition mode, then bounce between tabs (especially Heavy Stress) while watching the bottom latency bar." />
+                  </StackPanel>
+
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="24" LineSpacing="16">
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="PageCacheMode" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                      <vela:VelaSegmentedControl x:Name="CacheModeSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnCacheModeChanged">
+                        <x:String>KeepAlive</x:String>
+                        <x:String>LRU (Max 3)</x:String>
+                        <x:String>None (Rebuild)</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="PageTransitionMode" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TransitionModeSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTransitionModeChanged">
+                        <x:String>Instant (0ms)</x:String>
+                        <x:String>Compositor Fade</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+                  </WrapPanel>
+
+                  <StackPanel Orientation="Horizontal" Spacing="12">
+                    <vela:VelaButton Variant="Secondary"
+                                     Size="Small"
+                                     Content="Clear Inactive Cache"
+                                     Click="OnClearCacheClick" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <TextBlock Classes="cardTitle" Text="Layout &amp; Appearance" />
+
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="24" LineSpacing="14">
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="Display Mode" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                      <vela:VelaSegmentedControl x:Name="DisplayModeSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnDisplayModeChanged">
+                        <x:String>Left Sidebar</x:String>
+                        <x:String>Top Navbar</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="Options" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                      <StackPanel Orientation="Horizontal" Spacing="16">
+                        <vela:VelaSwitch x:Name="PaneOpenSwitch"
+                                         Content="Expanded"
+                                         IsChecked="True"
+                                         IsCheckedChanged="OnPaneOpenSwitchChanged" />
+                        <vela:VelaSwitch x:Name="SearchVisibleSwitch"
+                                         Content="Search filter"
+                                         IsChecked="False"
+                                         IsCheckedChanged="OnSearchVisibleChanged" />
+                        <vela:VelaSwitch x:Name="ReducedMotionSwitch"
+                                         Content="Reduced motion"
+                                         IsCheckedChanged="OnReducedMotionChanged" />
+                      </StackPanel>
+                    </StackPanel>
+                  </WrapPanel>
+
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="Accent (Controls &amp; Charts)" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                    <StackPanel x:Name="AccentSwatchesPanel" Orientation="Horizontal" Spacing="8" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 2: Heavy Stress Benchmark (Lazy constructed via PageFactory in code-behind!) -->
+      <vela:VelaNavItem x:Name="StressNavItem"
+                        Header="Heavy Stress"
+                        Category="Benchmark Performance 500 Nodes"
+                        Icon="{DynamicResource VelaIconSparkles}"
+                        Badge="500" />
+
+      <!-- Page 3: Actions & Toggles -->
+      <vela:VelaNavItem Header="Actions &amp; Toggles"
+                        Category="Buttons Switch Segmented"
+                        Icon="{DynamicResource VelaIconComponents}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Actions &amp; Toggles" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Restrained surfaces paired with physical press responses, width morphing, and gliding shared highlights." />
+              </StackPanel>
+
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <TextBlock Classes="cardTitle" Text="VelaButton" />
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10">
+                    <vela:VelaButton Variant="Primary" Content="Primary" />
+                    <vela:VelaButton Variant="Secondary" Content="Secondary" />
+                    <vela:VelaButton Variant="Ghost" Content="Ghost" />
+                    <vela:VelaButton Variant="Danger" Content="Danger" />
+                    <vela:VelaButton Variant="Secondary" Content="Disabled" IsEnabled="False" />
+                  </WrapPanel>
+
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <vela:VelaButton x:Name="MorphActionButton"
+                                     Variant="Primary"
+                                     Content="Save changes"
+                                     Click="OnMorphButtonClick" />
+                    <vela:VelaButton Variant="Secondary" Size="Small" Content="Small" />
+                    <vela:VelaButton Variant="Secondary" Size="Large" Content="Large" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaSegmentedControl" />
+                    <vela:VelaSegmentedControl x:Name="PlanSegmented"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnPlanSelectionChanged">
+                      <x:String>Monthly</x:String>
+                      <x:String>Quarterly</x:String>
+                      <x:String>Yearly · Save 20%</x:String>
+                    </vela:VelaSegmentedControl>
+                    <TextBlock x:Name="PlanStatusText"
+                               Text="Active plan: Monthly — flexible billing, cancel anytime."
+                               FontSize="13"
+                               Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="10">
+                    <TextBlock Classes="cardTitle" Text="VelaSwitch" />
+                    <vela:VelaSwitch Content="Spring physics enabled" IsChecked="True" />
+                    <vela:VelaSwitch Content="Hardware composition" IsChecked="True" />
+                    <vela:VelaSwitch Content="Auto-sync OKLCH tokens" IsChecked="False" />
+                    <vela:VelaSwitch Content="Disabled state" IsChecked="True" IsEnabled="False" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 4: Elastic Sliders -->
+      <vela:VelaNavItem Header="Elastic Sliders"
+                        Category="Inputs Physics Gestures"
+                        Icon="{DynamicResource VelaIconSliders}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="VelaElasticSlider" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Rubber-band over-stretch past limits, magnetic detents, and velocity-driven swaying readout bubble." />
+              </StackPanel>
+
+              <Border Classes="card" ClipToBounds="False">
+                <StackPanel Spacing="32" ClipToBounds="False">
+                  <vela:VelaElasticSlider x:Name="VolumeSlider"
+                                          Label="Master Volume"
+                                          Minimum="0"
+                                          Maximum="100"
+                                          Value="64"
+                                          Step="1"
+                                          ValueSuffix="%" />
+
+                  <vela:VelaElasticSlider x:Name="DetentSlider"
+                                          Label="Canvas Zoom (Magnetic Detents)"
+                                          Minimum="0"
+                                          Maximum="200"
+                                          Value="100"
+                                          Step="5"
+                                          ValueSuffix="%" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 5: Data & Charts -->
+      <vela:VelaNavItem Header="Data &amp; Charts"
+                        Category="Donut Visualization Analytics"
+                        Icon="{DynamicResource VelaIconChart}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="VelaDonutChart" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Parallel-gapped rounded annular sectors drawn directly via StreamGeometry with live spring morphing." />
+              </StackPanel>
+
+              <Border Classes="card">
+                <StackPanel Spacing="20">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="cardTitle" Text="Traffic &amp; Revenue" VerticalAlignment="Center" />
+                    <vela:VelaSegmentedControl x:Name="ChartDatasetSegmented"
+                                               Grid.Column="1"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnChartDatasetChanged">
+                      <x:String>Q1 Traffic</x:String>
+                      <x:String>Q2 Traffic</x:String>
+                      <x:String>Revenue Mix</x:String>
+                    </vela:VelaSegmentedControl>
+                  </Grid>
+
+                  <vela:VelaDonutChart x:Name="ShowcaseDonut"
+                                       HorizontalAlignment="Center"
+                                       RingSize="228"
+                                       Thickness="28"
+                                       TotalLabel="Q1 visits" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+    </vela:VelaNavigationView>
+  </DockPanel>
+</Window>

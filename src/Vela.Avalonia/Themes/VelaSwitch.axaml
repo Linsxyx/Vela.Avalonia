@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaSwitch}" TargetType="controls:VelaSwitch">
+    <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightMd}" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Orientation="Horizontal" Spacing="12" Background="Transparent" VerticalAlignment="Center">
+          <Grid Width="42" Height="24" VerticalAlignment="Center">
+            <Border x:Name="PART_TrackOff"
+                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    Background="{DynamicResource VelaControlTrackBrush}">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="Background" Duration="0:0:0.16" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+
+            <Border x:Name="PART_TrackOn"
+                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    Background="{DynamicResource VelaControlOnBrush}"
+                    Opacity="0" />
+
+            <Canvas Margin="3" ClipToBounds="False">
+              <Border x:Name="PART_Thumb"
+                      Width="18"
+                      Height="18"
+                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      Background="{DynamicResource VelaControlThumbBrush}"
+                      BoxShadow="{DynamicResource VelaControlThumbShadow}">
+                <Border.Transitions>
+                  <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.24" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+            </Canvas>
+          </Grid>
+
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            VerticalAlignment="Center"
+                            IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_TrackOff">
+      <Setter Property="Background" Value="{DynamicResource VelaControlTrackHoverBrush}" />
+    </Style>
+    <Style Selector="^:checked /template/ Border#PART_Thumb">
+      <Setter Property="Background" Value="{DynamicResource VelaControlThumbOnBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Vela.Avalonia</PackageId>
+    <Version>0.1.0-alpha.1</Version>
+    <Authors>Vela.Avalonia Contributors</Authors>
+    <Description>Motion-first, desktop-craft Avalonia 12 UI component library blending Arc UI physics with sleek desktop aesthetics.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+</Project>

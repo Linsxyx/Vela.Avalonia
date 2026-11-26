@@ -1,0 +1,82 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaElasticSlider}" TargetType="controls:VelaElasticSlider">
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6" ClipToBounds="False">
+          <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+            <TextBlock Text="{TemplateBinding Label}"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource VelaForegroundBrush}"
+                       VerticalAlignment="Center" />
+            <TextBlock x:Name="PART_Readout"
+                       Grid.Column="1"
+                       Text="{TemplateBinding FormattedValue}"
+                       Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                       IsVisible="{TemplateBinding ShowValue}"
+                       VerticalAlignment="Center" />
+          </Grid>
+
+          <Grid x:Name="PART_HitArea"
+                Height="{DynamicResource VelaControlHeightMd}"
+                Background="Transparent"
+                Cursor="Hand"
+                ClipToBounds="False">
+
+            <Border x:Name="PART_Bubble"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="0,-32,0,0"
+                    MinHeight="28"
+                    Padding="12,0"
+                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    Background="{DynamicResource VelaForegroundBrush}"
+                    BoxShadow="{DynamicResource VelaShadowRaised}"
+                    IsHitTestVisible="False"
+                    ZIndex="10">
+              <TextBlock Text="{TemplateBinding FormattedValue}"
+                         Foreground="{DynamicResource VelaBackgroundBrush}"
+                         FontSize="{DynamicResource VelaTextSm}"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center" />
+            </Border>
+
+            <Grid Margin="12,0" Height="8" VerticalAlignment="Center" ClipToBounds="False">
+              <Border x:Name="PART_Track"
+                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      Background="{DynamicResource VelaControlTrackBrush}"
+                      ClipToBounds="True">
+                <Border x:Name="PART_Fill"
+                        HorizontalAlignment="Left"
+                        CornerRadius="{DynamicResource VelaRadiusPill}"
+                        Background="{DynamicResource VelaControlFillBrush}" />
+              </Border>
+              <Canvas x:Name="PART_Ticks" IsHitTestVisible="False" />
+            </Grid>
+
+            <Border x:Name="PART_Thumb"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Width="24"
+                    Height="24"
+                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    Background="{DynamicResource VelaControlThumbBrush}"
+                    BoxShadow="{DynamicResource VelaControlThumbShadow}"
+                    IsHitTestVisible="False" />
+          </Grid>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

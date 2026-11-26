@@ -1,0 +1,163 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaButton}" TargetType="controls:VelaButton">
+    <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightMd}" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusControl}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}"
+                BoxShadow="0 0 0 0 Transparent">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.16" />
+              <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              <DoubleTransition Property="Opacity" Duration="0:0:0.16" />
+              <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.16" />
+            </Transitions>
+          </Border.Transitions>
+
+          <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <controls:VelaMorphSlotPanel x:Name="PART_LabelSlot"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center">
+              <controls:VelaMorphSlotPanel.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.16" />
+                </Transitions>
+              </controls:VelaMorphSlotPanel.Transitions>
+              <ContentPresenter x:Name="PART_ContentMeasure"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+            </controls:VelaMorphSlotPanel>
+
+            <Arc x:Name="PART_Spinner"
+                 Width="16"
+                 Height="16"
+                 StartAngle="0"
+                 SweepAngle="265"
+                 Stroke="{TemplateBinding Foreground}"
+                 StrokeThickness="1.75"
+                 StrokeLineCap="Round"
+                 IsVisible="False"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 RenderTransformOrigin="50%,50%">
+              <Arc.RenderTransform>
+                <RotateTransform />
+              </Arc.RenderTransform>
+            </Arc>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:sm">
+      <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightSm}" />
+      <Setter Property="Padding" Value="12,0" />
+    </Style>
+    <Style Selector="^:md">
+      <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightMd}" />
+      <Setter Property="Padding" Value="16,0" />
+    </Style>
+    <Style Selector="^:lg">
+      <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightLg}" />
+      <Setter Property="Padding" Value="20,0" />
+    </Style>
+
+    <Style Selector="^:primary">
+      <Setter Property="Background" Value="{DynamicResource VelaForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:primary:pointerover /template/ Border#PART_Border">
+      <Setter Property="Opacity" Value="0.91" />
+      <Setter Property="BoxShadow" Value="{DynamicResource VelaShadowResting}" />
+    </Style>
+    <Style Selector="^:primary:pressed /template/ Border#PART_Border">
+      <Setter Property="Opacity" Value="0.84" />
+    </Style>
+    <Style Selector="^:primary:disabled /template/ Border#PART_Border">
+      <Setter Property="Opacity" Value="0.52" />
+    </Style>
+
+    <Style Selector="^:secondary">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+    <Style Selector="^:secondary:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource VelaShadowResting}" />
+    </Style>
+    <Style Selector="^:secondary:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+
+    <Style Selector="^:ghost">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^:ghost:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:ghost:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:ghost:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+    </Style>
+
+    <Style Selector="^:danger">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaDangerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+    <Style Selector="^:danger:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:danger:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource VelaDangerMutedBrush}" />
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+
+    <Style Selector="^:loading">
+      <Setter Property="Cursor" Value="Wait" />
+    </Style>
+    <Style Selector="^:loading /template/ controls|VelaMorphSlotPanel#PART_LabelSlot">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:loading /template/ Arc#PART_Spinner">
+      <Setter Property="IsVisible" Value="True" />
+      <Style.Animations>
+        <Animation Duration="0:0:0.7" IterationCount="INFINITE">
+          <KeyFrame Cue="0%"><Setter Property="RotateTransform.Angle" Value="0" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="RotateTransform.Angle" Value="360" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

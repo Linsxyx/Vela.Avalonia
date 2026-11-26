@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Vela.Avalonia/Vela.Avalonia.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Vela.Avalonia.Gallery/Vela.Avalonia.Gallery.csproj" />
+  </Folder>
+</Solution>

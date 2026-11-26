@@ -1,0 +1,18 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Vela.Avalonia.VelaTheme">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Vela.Avalonia/Icons/VelaIcons.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Tokens/VelaDesignTokens.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Tokens/VelaColorTokens.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaButton.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSwitch.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSegmentedControl.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaElasticSlider.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaNavigationView.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>
