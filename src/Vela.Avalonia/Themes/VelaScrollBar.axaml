@@ -5,7 +5,13 @@
   <ControlTheme x:Key="VelaScrollThumbTheme" TargetType="Thumb">
     <Setter Property="Background" Value="{DynamicResource VelaBorderStrongBrush}" />
     <Setter Property="CornerRadius" Value="999" />
-    <Setter Property="Opacity" Value="0.55" />
+    <Setter Property="Opacity" Value="0.45" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.16" />
+        <BrushTransition Property="Background" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
     <Setter Property="Template">
       <ControlTemplate>
         <Border Background="{TemplateBinding Background}"
@@ -13,7 +19,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover">
-      <Setter Property="Opacity" Value="0.88" />
+      <Setter Property="Opacity" Value="0.85" />
     </Style>
     <Style Selector="^:pressed">
       <Setter Property="Background" Value="{DynamicResource VelaTextSecondaryBrush}" />

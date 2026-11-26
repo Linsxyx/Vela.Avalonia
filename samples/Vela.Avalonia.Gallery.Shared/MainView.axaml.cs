@@ -409,6 +409,15 @@ public partial class MainView : UserControl
         });
         CommandPalette.Commands.Add(new VelaCommandItem
         {
+            Title = "Go to Desktop Kit",
+            Description = "SettingsGroup, Stepper, Avatar, EmptyState, Copy, Split, Breadcrumb, Pagination",
+            Group = "Navigation",
+            Icon = Icon("VelaIconSettings"),
+            Shortcut = "G D",
+            Execute = () => RootNav.SelectedIndex = 11,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
             Title = "Toggle Dark Mode",
             Description = "Switch Light and Dark OKLCH themes",
             Group = "Appearance",
@@ -918,5 +927,182 @@ public partial class MainView : UserControl
     {
         ShowcaseDonut.TotalLabel = DatasetLabels[index];
         ShowcaseDonut.Data = Datasets[index];
+    }
+
+    // ─── Desktop Kit (Batch 1) Handlers ──────────────────────────────────
+
+    private int _avatarStatusIdx;
+    private int _emptyStateIdx;
+    private static readonly string[] ExtraBreadcrumbFolders = ["Themes", "VelaStepper.axaml", "Templates", "Part_Host"];
+
+    private void OnDemoCopied(object? sender, EventArgs e)
+        => ToastHost.Show("Copied to clipboard", "Ready to paste anywhere.", VelaToastTone.Success);
+
+    private void OnSettingsDiagnosticsClick(object? sender, EventArgs e)
+        => ToastHost.Show("Diagnostics", "All 60fps spring runners idle · 0 shader warnings.", VelaToastTone.Info);
+
+    private void OnStepperOrientationChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DemoStepper is null || StepperOrientationSegmented is null) return;
+        DemoStepper.Orientation = StepperOrientationSegmented.SelectedIndex == 1
+            ? VelaStepperOrientation.Vertical
+            : VelaStepperOrientation.Horizontal;
+    }
+
+    private void OnDemoStepSelected(object? sender, int index)
+        => ToastHost.Show($"Returned to Step {index + 1}", DemoStepper.Steps[index].Title ?? string.Empty, VelaToastTone.Neutral);
+
+    private void OnStepperPrevClick(object? sender, RoutedEventArgs e)
+    {
+        if (DemoStepper.CurrentStep > 0)
+            DemoStepper.CurrentStep--;
+    }
+
+    private void OnStepperNextClick(object? sender, RoutedEventArgs e)
+    {
+        if (DemoStepper.CurrentStep < DemoStepper.Steps.Count)
+            DemoStepper.CurrentStep++;
+    }
+
+    private void OnStepperErrorToggleClick(object? sender, RoutedEventArgs e)
+    {
+        var idx = Math.Clamp(DemoStepper.CurrentStep, 0, DemoStepper.Steps.Count - 1);
+        var step = DemoStepper.Steps[idx];
+        step.ErrorText = string.IsNullOrEmpty(step.ErrorText) ? "Signing certificate expired" : null;
+    }
+
+    private void OnStepperCompleteAllClick(object? sender, RoutedEventArgs e)
+    {
+        foreach (var s in DemoStepper.Steps)
+            s.ErrorText = null;
+        DemoStepper.CurrentStep = DemoStepper.Steps.Count;
+    }
+
+    private void OnSplitPrimaryClick(object? sender, RoutedEventArgs e)
+    {
+        SplitActionStatus.Text = $"Executed primary action: \"{PrimarySplitButton.Content}\"";
+        ToastHost.Show("Split Action Fired", PrimarySplitButton.Content?.ToString() ?? string.Empty, VelaToastTone.Success);
+    }
+
+    private void OnSplitModeProd(object? sender, EventArgs e)
+    {
+        PrimarySplitButton.Content = "Deploy now";
+        SplitActionStatus.Text = "Primary action switched to Production deploy.";
+    }
+
+    private void OnSplitModeStaging(object? sender, EventArgs e)
+    {
+        PrimarySplitButton.Content = "Deploy staging";
+        SplitActionStatus.Text = "Primary action morphed width to \"Deploy staging\".";
+    }
+
+    private void OnSplitModeDownload(object? sender, EventArgs e)
+    {
+        PrimarySplitButton.Content = "Download";
+        SplitActionStatus.Text = "Primary action morphed width to \"Download\".";
+    }
+
+    private void OnSplitModeRollback(object? sender, EventArgs e)
+        => ToastHost.Show("Rollback queued", "Reverting to previous stable artifact.", VelaToastTone.Danger);
+
+    private void OnSplitShareClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("Share sheet", "Opened workspace sharing options.", VelaToastTone.Info);
+
+    private void OnSplitCopyLink(object? sender, EventArgs e)
+        => ToastHost.Show("Link copied", "https://vela.dev/gallery/desktop-kit", VelaToastTone.Success);
+
+    private void OnSplitExportMd(object? sender, EventArgs e)
+        => ToastHost.Show("Markdown exported", "Saved summary to clipboard.", VelaToastTone.Neutral);
+
+    private void OnCycleAvatarStatusClick(object? sender, RoutedEventArgs e)
+    {
+        var statuses = new[]
+        {
+            VelaAvatarStatus.Online,
+            VelaAvatarStatus.Busy,
+            VelaAvatarStatus.Away,
+            VelaAvatarStatus.Offline,
+            VelaAvatarStatus.None,
+        };
+        _avatarStatusIdx = (_avatarStatusIdx + 1) % statuses.Length;
+        StatusDemoAvatar.Status = statuses[_avatarStatusIdx];
+    }
+
+    private void OnCycleEmptyStateClick(object? sender, RoutedEventArgs e)
+    {
+        _emptyStateIdx = (_emptyStateIdx + 1) % 3;
+        Geometry? Res(string key) => this.TryFindResource(key, ActualThemeVariant, out var r) && r is Geometry g ? g : null;
+
+        switch (_emptyStateIdx)
+        {
+            case 0:
+                DemoEmptyState.Icon = Res("VelaIconInbox");
+                DemoEmptyState.Title = "Inbox is clear";
+                DemoEmptyState.Description = "New deployment reviews, mentions, and CI summaries will appear right here.";
+                break;
+            case 1:
+                DemoEmptyState.Icon = Res("VelaIconSearch");
+                DemoEmptyState.Title = "No matching records";
+                DemoEmptyState.Description = "Try widening your date filter or clearing active tags to see all workspace items.";
+                break;
+            default:
+                DemoEmptyState.Icon = Res("VelaIconCheckCircle");
+                DemoEmptyState.Title = "All checks passed";
+                DemoEmptyState.Description = "Zero warnings, zero failed assertions, and every package is up to date.";
+                break;
+        }
+    }
+
+    private void OnEmptyStateActionClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("Workflow created", "Initialized default desktop CI pipeline.", VelaToastTone.Success);
+
+    private void OnBreadcrumbItemClicked(object? sender, VelaBreadcrumbItem item)
+    {
+        var idx = DemoBreadcrumb.Items.IndexOf(item);
+        if (idx < 0) return;
+        while (DemoBreadcrumb.Items.Count > idx + 1)
+            DemoBreadcrumb.Items.RemoveAt(DemoBreadcrumb.Items.Count - 1);
+    }
+
+    private void OnBreadcrumbDrillClick(object? sender, RoutedEventArgs e)
+    {
+        var depth = DemoBreadcrumb.Items.Count - 3;
+        if (depth >= ExtraBreadcrumbFolders.Length)
+        {
+            ToastHost.Show("Max demo depth", "Click any ancestor crumb to jump back up.", VelaToastTone.Info);
+            return;
+        }
+
+        DemoBreadcrumb.Items.Add(new VelaBreadcrumbItem
+        {
+            Label = ExtraBreadcrumbFolders[Math.Max(0, depth)],
+        });
+    }
+
+    private void OnDemoPageChanged(object? sender, int page)
+        => UpdatePaginationSummary();
+
+    private void OnPaginationTotalChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DemoPagination is null || PaginationTotalSegmented is null) return;
+        DemoPagination.TotalPages = PaginationTotalSegmented.SelectedIndex switch
+        {
+            0 => 5,
+            2 => 24,
+            _ => 12,
+        };
+        if (DemoPagination.CurrentPage > DemoPagination.TotalPages)
+            DemoPagination.CurrentPage = DemoPagination.TotalPages;
+        UpdatePaginationSummary();
+    }
+
+    private void UpdatePaginationSummary()
+    {
+        if (DemoPagination is null || PaginationSummaryText is null) return;
+        var page = DemoPagination.CurrentPage;
+        var total = DemoPagination.TotalPages;
+        var start = (page - 1) * 10 + 1;
+        var end = page * 10;
+        PaginationSummaryText.Text = $"Showing items {start}–{end} of {total * 10} (Page {page} of {total})";
     }
 }

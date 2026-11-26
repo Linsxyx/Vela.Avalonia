@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaPagination}" TargetType="controls:VelaPagination">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <!-- Previous Button -->
+          <Button x:Name="PART_Prev"
+                  Theme="{DynamicResource VelaIconButtonTheme}"
+                  Width="34"
+                  Height="34"
+                  CornerRadius="10"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  Background="{DynamicResource VelaSurfaceBrush}">
+            <PathIcon Width="14"
+                      Height="14"
+                      Data="{DynamicResource VelaIconChevronLeft}"
+                      Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+          </Button>
+
+          <!-- Page Buttons + Gliding Active Pill -->
+          <Grid x:Name="PART_Track" VerticalAlignment="Center">
+            <Canvas IsHitTestVisible="False">
+              <Border x:Name="PART_Indicator"
+                      CornerRadius="10"
+                      Background="{DynamicResource VelaAccentBrush}"
+                      Opacity="0"
+                      IsHitTestVisible="False" />
+            </Canvas>
+            <StackPanel x:Name="PART_PagesHost"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Center" />
+          </Grid>
+
+          <!-- Next Button -->
+          <Button x:Name="PART_Next"
+                  Theme="{DynamicResource VelaIconButtonTheme}"
+                  Width="34"
+                  Height="34"
+                  CornerRadius="10"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  Background="{DynamicResource VelaSurfaceBrush}">
+            <PathIcon Width="14"
+                      Height="14"
+                      Data="{DynamicResource VelaIconChevronRight}"
+                      Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+          </Button>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^ /template/ Button#PART_Prev:disabled, ^ /template/ Button#PART_Next:disabled">
+      <Setter Property="Opacity" Value="0.38" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,126 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaSettingsGroup}" TargetType="controls:VelaSettingsGroup">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="10">
+          <!-- Optional Section Header -->
+          <Grid ColumnDefinitions="*,Auto"
+                IsVisible="{TemplateBinding Header, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <StackPanel Spacing="2" Margin="4,0">
+              <TextBlock Text="{TemplateBinding Header}"
+                         FontSize="14"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource VelaForegroundBrush}" />
+              <TextBlock Text="{TemplateBinding Description}"
+                         FontSize="12.5"
+                         Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                         TextWrapping="Wrap"
+                         IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+            <ContentPresenter Grid.Column="1"
+                              Content="{TemplateBinding HeaderAction}"
+                              VerticalAlignment="Center" />
+          </Grid>
+
+          <!-- Clean Rounded Card Surface -->
+          <Border Background="{DynamicResource VelaSurfaceBrush}"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  CornerRadius="16"
+                  ClipToBounds="True"
+                  BoxShadow="{DynamicResource VelaShadowResting}">
+            <StackPanel x:Name="PART_RowsHost" />
+          </Border>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaSettingsRow}" TargetType="controls:VelaSettingsRow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="16,13" />
+    <Setter Property="MinHeight" Value="54" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}"
+                MinHeight="{TemplateBinding MinHeight}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.14" />
+            </Transitions>
+          </Border.Transitions>
+
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="14">
+            <!-- Optional Leading Icon Tile -->
+            <Border Grid.Column="0"
+                    Width="32"
+                    Height="32"
+                    CornerRadius="9"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="1"
+                    VerticalAlignment="Center"
+                    IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <PathIcon Width="15"
+                        Height="15"
+                        Data="{TemplateBinding Icon}"
+                        Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+            </Border>
+
+            <!-- Title + Subtitle -->
+            <StackPanel Grid.Column="1"
+                        Spacing="2"
+                        VerticalAlignment="Center">
+              <TextBlock Text="{TemplateBinding Title}"
+                         FontSize="13.5"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource VelaForegroundBrush}"
+                         TextTrimming="CharacterEllipsis" />
+              <TextBlock Text="{TemplateBinding Description}"
+                         FontSize="12"
+                         Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                         TextWrapping="Wrap"
+                         IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+
+            <!-- Trailing Action / Control Slot -->
+            <ContentPresenter Grid.Column="2"
+                              Content="{TemplateBinding Content}"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Right" />
+
+            <!-- Optional Disclosure Chevron -->
+            <PathIcon Grid.Column="3"
+                      Width="14"
+                      Height="14"
+                      Margin="-4,0,0,0"
+                      Data="{DynamicResource VelaIconChevronRight}"
+                      Foreground="{DynamicResource VelaTextMutedBrush}"
+                      VerticalAlignment="Center"
+                      IsVisible="{TemplateBinding ShowChevron}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:clickable:pointerover /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:clickable:pressed /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.48" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

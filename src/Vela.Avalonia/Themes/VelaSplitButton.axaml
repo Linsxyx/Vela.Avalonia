@@ -1,0 +1,181 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <!-- Bare internal button segment for VelaSplitButton halves -->
+  <ControlTheme x:Key="VelaSplitSegmentButtonTheme" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Bg"
+                Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.14" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaSplitButton}" TargetType="controls:VelaSplitButton">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <Border x:Name="PART_Shell"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  MinHeight="{TemplateBinding MinHeight}"
+                  BorderThickness="1"
+                  ClipToBounds="True">
+            <Grid ColumnDefinitions="Auto,1,Auto">
+              <!-- Primary Action Half -->
+              <Button x:Name="PART_PrimaryButton"
+                      Grid.Column="0"
+                      Theme="{DynamicResource VelaSplitSegmentButtonTheme}"
+                      MinHeight="{TemplateBinding MinHeight}"
+                      Padding="14,0"
+                      FontSize="13.5"
+                      FontWeight="Medium">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <PathIcon x:Name="PART_LeadingIcon"
+                            Width="15"
+                            Height="15"
+                            Data="{TemplateBinding LeadingIcon}"
+                            VerticalAlignment="Center"
+                            IsVisible="{TemplateBinding LeadingIcon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                  <controls:VelaMorphSlotPanel VerticalAlignment="Center">
+                    <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                  </controls:VelaMorphSlotPanel>
+                </StackPanel>
+              </Button>
+
+              <!-- Hairline Separator -->
+              <Border x:Name="PART_Divider" Grid.Column="1" Width="1" />
+
+              <!-- Dropdown Trigger Half -->
+              <Button x:Name="PART_MenuTrigger"
+                      Grid.Column="2"
+                      Theme="{DynamicResource VelaSplitSegmentButtonTheme}"
+                      MinHeight="{TemplateBinding MinHeight}"
+                      Width="34"
+                      Padding="0">
+                <PathIcon x:Name="PART_Chevron"
+                          Width="14"
+                          Height="14"
+                          Data="{DynamicResource VelaIconChevronDown}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+              </Button>
+            </Grid>
+          </Border>
+
+          <Popup x:Name="PART_Popup"
+                 WindowManagerAddShadowHint="False"
+                 IsOpen="{TemplateBinding IsOpen, Mode=TwoWay}"
+                 PlacementTarget="PART_Shell"
+                 Placement="BottomEdgeAlignedRight"
+                 VerticalOffset="6"
+                 IsLightDismissEnabled="True">
+            <controls:VelaPopupSurface Margin="6,2,6,16"
+                                       MinWidth="{TemplateBinding MenuMinWidth}"
+                                       Padding="5"
+                                       CornerRadius="14"
+                                       BorderThickness="1"
+                                       Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                                       BorderBrush="{DynamicResource VelaBorderBrush}"
+                                       BoxShadow="{DynamicResource VelaShadowFloating}">
+              <Grid x:Name="PART_MenuTrack">
+                <Canvas IsHitTestVisible="False">
+                  <Border x:Name="PART_Highlight"
+                          CornerRadius="10"
+                          Background="{DynamicResource VelaSurfaceMutedBrush}"
+                          IsHitTestVisible="False" />
+                </Canvas>
+                <StackPanel x:Name="PART_ItemsHost" Spacing="1" />
+              </Grid>
+            </controls:VelaPopupSurface>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Primary Variant -->
+    <Style Selector="^:primary /template/ Border#PART_Shell">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+    <Style Selector="^:primary /template/ Button#PART_PrimaryButton">
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentForegroundBrush}" />
+    </Style>
+    <Style Selector="^:primary /template/ PathIcon#PART_LeadingIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentForegroundBrush}" />
+    </Style>
+    <Style Selector="^:primary /template/ PathIcon#PART_Chevron">
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentForegroundBrush}" />
+    </Style>
+    <Style Selector="^:primary /template/ Border#PART_Divider">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentForegroundBrush}" />
+      <Setter Property="Opacity" Value="0.22" />
+    </Style>
+    <Style Selector="^:primary /template/ Button#PART_PrimaryButton:pointerover">
+      <Setter Property="Background" Value="#1EFFFFFF" />
+    </Style>
+    <Style Selector="^:primary /template/ Button#PART_PrimaryButton:pressed">
+      <Setter Property="Background" Value="#2E000000" />
+    </Style>
+    <Style Selector="^:primary /template/ Button#PART_MenuTrigger:pointerover">
+      <Setter Property="Background" Value="#1EFFFFFF" />
+    </Style>
+    <Style Selector="^:primary:open /template/ Button#PART_MenuTrigger">
+      <Setter Property="Background" Value="#24FFFFFF" />
+    </Style>
+
+    <!-- Secondary Variant -->
+    <Style Selector="^:secondary /template/ Border#PART_Shell">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ Button#PART_PrimaryButton">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ PathIcon#PART_LeadingIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ PathIcon#PART_Chevron">
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ Border#PART_Divider">
+      <Setter Property="Background" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ Button#PART_PrimaryButton:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ Button#PART_PrimaryButton:pressed">
+      <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    </Style>
+    <Style Selector="^:secondary /template/ Button#PART_MenuTrigger:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:secondary:open /template/ Button#PART_MenuTrigger">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

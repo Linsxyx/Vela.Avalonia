@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaAvatar}" TargetType="controls:VelaAvatar">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+          <Border x:Name="PART_Circle"
+                  CornerRadius="999"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                  BorderThickness="1"
+                  ClipToBounds="True">
+            <Panel>
+              <TextBlock x:Name="PART_Initials"
+                         Text="{TemplateBinding ComputedInitials}"
+                         FontWeight="SemiBold"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource VelaForegroundBrush}" />
+              <Image x:Name="PART_Image"
+                     Source="{TemplateBinding Source}"
+                     Stretch="UniformToFill"
+                     IsVisible="{TemplateBinding Source, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            </Panel>
+          </Border>
+
+          <!-- Presence status indicator dot -->
+          <Border x:Name="PART_StatusDot"
+                  Width="11"
+                  Height="11"
+                  CornerRadius="999"
+                  BorderBrush="{DynamicResource VelaSurfaceBrush}"
+                  BorderThickness="2"
+                  Background="{DynamicResource VelaSuccessBrush}"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:has-image /template/ TextBlock#PART_Initials">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaAvatarGroup}" TargetType="controls:VelaAvatarGroup">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel x:Name="PART_Host"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

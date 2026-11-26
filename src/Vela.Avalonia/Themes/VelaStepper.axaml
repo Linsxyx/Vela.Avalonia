@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaStepper}" TargetType="controls:VelaStepper">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="PART_Host" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

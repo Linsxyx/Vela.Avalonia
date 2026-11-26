@@ -1300,6 +1300,303 @@
           </ScrollViewer>
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
+
+      <!-- Page 12: Desktop Essentials Kit -->
+      <vela:VelaNavItem Header="Desktop Kit"
+                        Category="Settings Stepper Avatar EmptyState Copy Split Breadcrumb Pagination"
+                        Icon="{DynamicResource VelaIconSettings}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="24" MaxWidth="900">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Desktop Essentials Kit" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Practical high-frequency desktop primitives built on Vela's OKLCH tokens and physical spring engine: grouped settings cards, multi-step wizards, avatars, empty states, copy &amp; split actions, breadcrumbs, and gliding pagination." />
+              </StackPanel>
+
+              <!-- 1. VelaSettingsGroup & VelaSettingsRow -->
+              <vela:VelaSettingsGroup Header="Workspace Preferences"
+                                      Description="Clean macOS / Arc-inspired grouped preference rows with automatic hairline dividers.">
+                <vela:VelaSettingsGroup.HeaderAction>
+                  <vela:VelaBadge Tone="Success" IsPill="True" Content="Synced" />
+                </vela:VelaSettingsGroup.HeaderAction>
+
+                <vela:VelaSettingsRow Icon="{DynamicResource VelaIconGlobe}"
+                                      Title="Workspace Endpoint"
+                                      Description="Copy your workspace API URL for CLI or CI integrations.">
+                  <vela:VelaCopyButton CopyText="https://api.vela.dev/v1/workspaces/studio"
+                                       Label="Copy endpoint"
+                                       Copied="OnDemoCopied" />
+                </vela:VelaSettingsRow>
+
+                <vela:VelaSettingsRow Icon="{DynamicResource VelaIconBell}"
+                                      Title="Desktop Notifications"
+                                      Description="Show non-intrusive toast notifications when builds finish.">
+                  <vela:VelaSwitch IsChecked="True" />
+                </vela:VelaSettingsRow>
+
+                <vela:VelaSettingsRow Icon="{DynamicResource VelaIconShield}"
+                                      Title="Hardware Acceleration"
+                                      Description="Use Skia GPU backdrop shaders for Liquid Glass surfaces.">
+                  <vela:VelaSelect SelectedIndex="0" Width="168">
+                    <x:String>Automatic (GPU)</x:String>
+                    <x:String>High Contrast</x:String>
+                    <x:String>Software Safe</x:String>
+                  </vela:VelaSelect>
+                </vela:VelaSettingsRow>
+
+                <vela:VelaSettingsRow Icon="{DynamicResource VelaIconSettings}"
+                                      Title="Advanced Diagnostics"
+                                      Description="Inspect frame budgets, cache hit rates, and shader telemetry."
+                                      IsClickable="True"
+                                      ShowChevron="True"
+                                      Click="OnSettingsDiagnosticsClick">
+                  <TextBlock Text="Healthy"
+                             FontSize="12.5"
+                             Foreground="{DynamicResource VelaTextMutedBrush}"
+                             VerticalAlignment="Center" />
+                </vela:VelaSettingsRow>
+              </vela:VelaSettingsGroup>
+
+              <!-- 2. VelaStepper -->
+              <Border Classes="card">
+                <StackPanel Spacing="18">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaStepper" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Spring-filling connector rails with sequential stagger, checkmark pop-in, error highlight, and click-to-return on completed steps." />
+                    </StackPanel>
+                    <vela:VelaSegmentedControl x:Name="StepperOrientationSegmented"
+                                               Grid.Column="1"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnStepperOrientationChanged">
+                      <x:String>Horizontal</x:String>
+                      <x:String>Vertical</x:String>
+                    </vela:VelaSegmentedControl>
+                  </Grid>
+
+                  <vela:VelaStepper x:Name="DemoStepper"
+                                    CurrentStep="1"
+                                    StepSelected="OnDemoStepSelected">
+                    <vela:VelaStepperItem Title="Account" Description="Verify workspace identity" />
+                    <vela:VelaStepperItem Title="Environment" Description="Configure target runtime" />
+                    <vela:VelaStepperItem Title="Security" Description="Generate signing keys" />
+                    <vela:VelaStepperItem Title="Deploy" Description="Publish production build" />
+                  </vela:VelaStepper>
+
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10">
+                    <vela:VelaButton Variant="Secondary" Size="Small" Content="Previous" Click="OnStepperPrevClick" />
+                    <vela:VelaButton Variant="Primary" Size="Small" Content="Next Step" Click="OnStepperNextClick" />
+                    <vela:VelaButton Variant="Ghost" Size="Small" Content="Toggle Error" Click="OnStepperErrorToggleClick" />
+                    <vela:VelaButton Variant="Ghost" Size="Small" Content="Complete All" Click="OnStepperCompleteAllClick" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+
+              <!-- 3. VelaCopyButton & VelaSplitButton -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="16">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaCopyButton" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Writes directly to the system clipboard with spring icon swap and smooth width morphing via VelaMorphSlotPanel." />
+                    </StackPanel>
+
+                    <Border Background="{DynamicResource VelaSurfaceMutedBrush}"
+                            BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="12,8">
+                      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <TextBlock Text="dotnet add package Vela.Avalonia"
+                                   FontFamily="JetBrains Mono, Menlo, Consolas, monospace"
+                                   FontSize="12.5"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" />
+                        <vela:VelaCopyButton Grid.Column="1"
+                                             CopyText="dotnet add package Vela.Avalonia"
+                                             IconOnly="True"
+                                             Variant="Plain"
+                                             Copied="OnDemoCopied" />
+                      </Grid>
+                    </Border>
+
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10">
+                      <vela:VelaCopyButton CopyText="vela_live_9f8a2c4b71e0"
+                                           Label="Copy API key"
+                                           Copied="OnDemoCopied" />
+                      <vela:VelaCopyButton CopyText="Vela.Avalonia 12.2"
+                                           Label="Copy"
+                                           Variant="Plain"
+                                           Copied="OnDemoCopied" />
+                    </WrapPanel>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="16">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaSplitButton" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Joined primary action + chevron menu trigger with gliding spring hover pill and width-morphing primary label." />
+                    </StackPanel>
+
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="12" LineSpacing="12">
+                      <vela:VelaSplitButton x:Name="PrimarySplitButton"
+                                            Variant="Primary"
+                                            LeadingIcon="{DynamicResource VelaIconRocket}"
+                                            Content="Deploy now"
+                                            Click="OnSplitPrimaryClick">
+                        <vela:VelaMenuItem Header="Deploy to Production"
+                                           Icon="{DynamicResource VelaIconRocket}"
+                                           Shortcut="⌘⏎"
+                                           Click="OnSplitModeProd" />
+                        <vela:VelaMenuItem Header="Deploy to Staging"
+                                           Icon="{DynamicResource VelaIconGlobe}"
+                                           Shortcut="⇧⌘⏎"
+                                           Click="OnSplitModeStaging" />
+                        <vela:VelaMenuItem Header="Download Bundle"
+                                           Icon="{DynamicResource VelaIconDownload}"
+                                           Click="OnSplitModeDownload" />
+                        <vela:VelaMenuItem IsSeparator="True" />
+                        <vela:VelaMenuItem Header="Rollback Release"
+                                           Icon="{DynamicResource VelaIconTrash}"
+                                           IsDestructive="True"
+                                           Click="OnSplitModeRollback" />
+                      </vela:VelaSplitButton>
+
+                      <vela:VelaSplitButton Variant="Secondary"
+                                            LeadingIcon="{DynamicResource VelaIconShare}"
+                                            Content="Share"
+                                            Click="OnSplitShareClick">
+                        <vela:VelaMenuItem Header="Copy Share Link"
+                                           Icon="{DynamicResource VelaIconCopy}"
+                                           Click="OnSplitCopyLink" />
+                        <vela:VelaMenuItem Header="Export Markdown"
+                                           Icon="{DynamicResource VelaIconEdit}"
+                                           Click="OnSplitExportMd" />
+                      </vela:VelaSplitButton>
+                    </WrapPanel>
+
+                    <TextBlock x:Name="SplitActionStatus"
+                               Text="Click the primary half to execute, or pick a mode from the chevron menu."
+                               FontSize="12"
+                               Foreground="{DynamicResource VelaTextMutedBrush}"
+                               TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- 4. VelaAvatar, VelaAvatarGroup & VelaEmptyState -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="18">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaAvatar &amp; VelaAvatarGroup" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Auto-computed initials, tonal palettes, spring-popping presence dots, and overlapping avatar stacks with hover lift." />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                      <vela:VelaAvatar x:Name="StatusDemoAvatar" DisplayName="Ada Lovelace" Size="Large" Tone="Accent" Status="Online" />
+                      <vela:VelaAvatar DisplayName="Grace Hopper" Size="Medium" Tone="Teal" Status="Away" />
+                      <vela:VelaAvatar DisplayName="Alan Turing" Size="Medium" Tone="Sky" Status="Busy" />
+                      <vela:VelaAvatar DisplayName="Linus Torvalds" Size="Small" Tone="Violet" Status="Offline" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="Active Collaborators (hover stack)"
+                                 FontSize="12"
+                                 Foreground="{DynamicResource VelaTextMutedBrush}" />
+                      <vela:VelaAvatarGroup MaxVisible="4" Size="Medium">
+                        <vela:VelaAvatar DisplayName="Elena Vance" Tone="Accent" />
+                        <vela:VelaAvatar DisplayName="Marcus Chen" Tone="Teal" />
+                        <vela:VelaAvatar DisplayName="Sofia Lind" Tone="Rose" />
+                        <vela:VelaAvatar DisplayName="Kenji Sato" Tone="Sky" />
+                        <vela:VelaAvatar DisplayName="Nadia Omar" Tone="Amber" />
+                        <vela:VelaAvatar DisplayName="Liam Park" Tone="Violet" />
+                      </vela:VelaAvatarGroup>
+                    </StackPanel>
+
+                    <vela:VelaButton Variant="Secondary" Size="Small" Content="Cycle Presence Status" Click="OnCycleAvatarStatusClick" />
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card" Padding="18">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="cardTitle" Text="VelaEmptyState" VerticalAlignment="Center" />
+                      <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="Switch State" Click="OnCycleEmptyStateClick" />
+                    </Grid>
+                    <vela:VelaEmptyState x:Name="DemoEmptyState"
+                                         Icon="{DynamicResource VelaIconInbox}"
+                                         Title="Inbox is clear"
+                                         Description="New deployment reviews, mentions, and CI summaries will appear right here.">
+                      <vela:VelaButton Variant="Secondary" Size="Small" Content="Create Workflow" Click="OnEmptyStateActionClick" />
+                    </vela:VelaEmptyState>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- 5. VelaBreadcrumb & VelaPagination -->
+              <Border Classes="card">
+                <StackPanel Spacing="20">
+                  <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Spacing="2">
+                        <TextBlock Classes="cardTitle" Text="VelaBreadcrumb" />
+                        <TextBlock Classes="cardDesc"
+                                   Text="Click any ancestor segment to navigate up, or drill deeper to watch new segments slide in." />
+                      </StackPanel>
+                      <vela:VelaButton Grid.Column="1" Variant="Secondary" Size="Small" Content="+ Drill Deeper" Click="OnBreadcrumbDrillClick" />
+                    </Grid>
+
+                    <Border Background="{DynamicResource VelaSurfaceMutedBrush}"
+                            BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="10,6">
+                      <vela:VelaBreadcrumb x:Name="DemoBreadcrumb" ItemClicked="OnBreadcrumbItemClicked">
+                        <vela:VelaBreadcrumbItem Label="Workspace" Icon="{DynamicResource VelaIconHome}" />
+                        <vela:VelaBreadcrumbItem Label="Vela.Avalonia" Icon="{DynamicResource VelaIconFolder}" />
+                        <vela:VelaBreadcrumbItem Label="Controls" />
+                      </vela:VelaBreadcrumb>
+                    </Border>
+                  </StackPanel>
+
+                  <Border Height="1" Background="{DynamicResource VelaBorderSubtleBrush}" />
+
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                      <StackPanel Spacing="2">
+                        <TextBlock Classes="cardTitle" Text="VelaPagination" />
+                        <TextBlock x:Name="PaginationSummaryText"
+                                   Classes="cardDesc"
+                                   Text="Showing items 1–10 of 120 (Page 1 of 12)" />
+                      </StackPanel>
+                      <vela:VelaSegmentedControl x:Name="PaginationTotalSegmented"
+                                                 Grid.Column="1"
+                                                 SelectedIndex="1"
+                                                 SelectionChanged="OnPaginationTotalChanged">
+                        <x:String>5 pages</x:String>
+                        <x:String>12 pages</x:String>
+                        <x:String>24 pages</x:String>
+                      </vela:VelaSegmentedControl>
+                    </Grid>
+
+                    <vela:VelaPagination x:Name="DemoPagination"
+                                         CurrentPage="1"
+                                         TotalPages="12"
+                                         PageChanged="OnDemoPageChanged" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
         </vela:VelaNavigationView>
           </DockPanel>
         </vela:VelaDialogHost>

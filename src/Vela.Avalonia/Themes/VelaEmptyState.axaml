@@ -1,0 +1,61 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaEmptyState}" TargetType="controls:VelaEmptyState">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Padding" Value="28,36" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource VelaSurfaceBrush}"
+                BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="{TemplateBinding Padding}">
+          <StackPanel Spacing="14"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      MaxWidth="360">
+            <Border x:Name="PART_IconBadge"
+                    Width="48"
+                    Height="48"
+                    CornerRadius="14"
+                    HorizontalAlignment="Center"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="1">
+              <PathIcon x:Name="PART_Icon"
+                        Width="21"
+                        Height="21"
+                        Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+            </Border>
+
+            <StackPanel x:Name="PART_CopyStack" Spacing="5">
+              <TextBlock Text="{TemplateBinding Title}"
+                         FontSize="15.5"
+                         FontWeight="SemiBold"
+                         TextAlignment="Center"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource VelaForegroundBrush}" />
+              <TextBlock Text="{TemplateBinding Description}"
+                         FontSize="13"
+                         LineHeight="19"
+                         TextAlignment="Center"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                         IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+
+            <ContentPresenter Content="{TemplateBinding ActionContent}"
+                              HorizontalAlignment="Center"
+                              Margin="0,4,0,0"
+                              IsVisible="{TemplateBinding ActionContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

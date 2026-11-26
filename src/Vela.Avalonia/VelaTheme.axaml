@@ -35,6 +35,14 @@
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSegmentedControl.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaElasticSlider.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaNavigationView.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSettingsGroup.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaStepper.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAvatar.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaEmptyState.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaCopyButton.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSplitButton.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBreadcrumb.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPagination.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

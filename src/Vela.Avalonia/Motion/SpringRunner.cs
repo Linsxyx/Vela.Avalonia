@@ -14,6 +14,8 @@ public sealed class SpringRunner
     private bool _scheduled;
     private TimeSpan? _lastFrame;
 
+    public bool IsRunning => _scheduled;
+
     public SpringRunner(Visual owner, Func<double, bool> onTick)
     {
         _owner = owner;

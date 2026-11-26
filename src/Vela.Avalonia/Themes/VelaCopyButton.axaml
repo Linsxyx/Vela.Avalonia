@@ -1,0 +1,88 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaCopyButton}" TargetType="controls:VelaCopyButton">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="11,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Button x:Name="PART_Button"
+                Theme="{DynamicResource VelaIconButtonTheme}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                MinHeight="{TemplateBinding MinHeight}"
+                Padding="{TemplateBinding Padding}"
+                Foreground="{TemplateBinding Foreground}"
+                Cursor="Hand">
+          <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+            <Panel Width="15" Height="15" VerticalAlignment="Center">
+              <PathIcon x:Name="PART_CopyIcon"
+                        Width="14"
+                        Height="14"
+                        Data="{DynamicResource VelaIconCopy}"
+                        Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+              <PathIcon x:Name="PART_CheckIcon"
+                        Width="14"
+                        Height="14"
+                        Data="{DynamicResource VelaIconCheck}"
+                        Foreground="{DynamicResource VelaSuccessBrush}"
+                        Opacity="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+            </Panel>
+
+            <controls:VelaMorphSlotPanel x:Name="PART_LabelSlot"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{TemplateBinding IconOnly, Converter={x:Static BoolConverters.Not}}">
+              <TextBlock x:Name="PART_Label"
+                         Text="{TemplateBinding DisplayLabel}"
+                         FontSize="13"
+                         FontWeight="Medium"
+                         Foreground="{TemplateBinding Foreground}"
+                         VerticalAlignment="Center" />
+            </controls:VelaMorphSlotPanel>
+          </StackPanel>
+        </Button>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:icon-only">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Width" Value="34" />
+      <Setter Property="Height" Value="34" />
+    </Style>
+
+    <Style Selector="^:plain">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Button#PART_Button">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+
+    <Style Selector="^:plain:pointerover /template/ Button#PART_Button">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:copied /template/ TextBlock#PART_Label">
+      <Setter Property="Foreground" Value="{DynamicResource VelaSuccessBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
