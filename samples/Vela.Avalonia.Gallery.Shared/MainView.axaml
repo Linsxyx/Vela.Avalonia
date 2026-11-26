@@ -73,6 +73,9 @@
 
     <vela:VelaNavigationView x:Name="RootNav"
                              DisplayMode="Left"
+                             PaneVariant="Standard"
+                             ShowTopBar="True"
+                             BrandTitle="Vela Studio"
                              IsPaneOpen="True"
                              IsSearchVisible="False"
                              PageCacheMode="KeepAlive"
@@ -80,21 +83,172 @@
                              PageTransitionMode="Instant"
                              SelectedIndex="0"
                              PageSwitched="OnPageSwitched">
-      <!-- Quiet, minimal brand header -->
+      <!-- Arc App Rail brand header (expanded) -->
       <vela:VelaNavigationView.Header>
-        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <TextBlock Text="Vela" FontSize="15" FontWeight="SemiBold" />
-          <TextBlock Text="12.2" FontSize="12" Foreground="{DynamicResource VelaTextMutedBrush}" VerticalAlignment="Center" />
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <Border Width="30"
+                  Height="30"
+                  CornerRadius="9"
+                  Background="{DynamicResource VelaForegroundBrush}">
+            <TextBlock Text="V"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource VelaBackgroundBrush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Spacing="1" VerticalAlignment="Center">
+            <TextBlock Text="Vela Studio"
+                       FontSize="13.5"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource VelaForegroundBrush}" />
+            <TextBlock Text="Avalonia 12.2 · OKLCH"
+                       FontSize="11.5"
+                       Foreground="{DynamicResource VelaTextMutedBrush}" />
+          </StackPanel>
         </StackPanel>
       </vela:VelaNavigationView.Header>
 
-      <!-- Quiet minimal footer -->
+      <!-- Compact icon-rail emblem (visible when collapsed to 60px) -->
+      <vela:VelaNavigationView.CompactHeader>
+        <Border Width="30"
+                Height="30"
+                CornerRadius="9"
+                Background="{DynamicResource VelaForegroundBrush}">
+          <TextBlock Text="V"
+                     FontSize="14"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource VelaBackgroundBrush}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center" />
+        </Border>
+      </vela:VelaNavigationView.CompactHeader>
+
+      <!-- Arc TopBar trailing slot: quick ⌘K search pill + collaborator AvatarGroup -->
+      <vela:VelaNavigationView.TopBarContent>
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <Button Theme="{DynamicResource VelaIconButtonTheme}"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                  BorderThickness="1"
+                  CornerRadius="9"
+                  Height="30"
+                  Padding="10,0"
+                  Click="OnOpenCommandPaletteClick">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <PathIcon Width="12.5"
+                        Height="12.5"
+                        Data="{DynamicResource VelaIconSearch}"
+                        Foreground="{DynamicResource VelaTextMutedBrush}" />
+              <TextBlock Text="Quick jump..."
+                         FontSize="12"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         VerticalAlignment="Center" />
+              <Border CornerRadius="5"
+                      Padding="5,1"
+                      Background="{DynamicResource VelaSurfaceBrush}"
+                      BorderBrush="{DynamicResource VelaBorderBrush}"
+                      BorderThickness="1">
+                <TextBlock Text="⌘K"
+                           FontSize="10.5"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+              </Border>
+            </StackPanel>
+          </Button>
+
+          <vela:VelaAvatarGroup MaxVisible="3" Size="Small" Overlap="8">
+            <vela:VelaAvatar DisplayName="Emma Collins" Tone="Rose" />
+            <vela:VelaAvatar DisplayName="Marcus Chen" Tone="Teal" />
+            <vela:VelaAvatar DisplayName="Kenji Sato" Tone="Violet" />
+            <vela:VelaAvatar DisplayName="Ada Lovelace" Tone="Sky" />
+          </vela:VelaAvatarGroup>
+        </StackPanel>
+      </vela:VelaNavigationView.TopBarContent>
+
+      <!-- Sticky bottom utility nav items (pinned above footer divider, like Arc App Rail Settings) -->
+      <vela:VelaNavigationView.FooterItems>
+        <vela:VelaNavItem Header="Shell Settings"
+                          Category="Settings Theme Sidebar Appearance"
+                          Icon="{DynamicResource VelaIconSettings}">
+          <vela:VelaNavItem.PageContent>
+            <ScrollViewer Padding="32,28">
+              <StackPanel Spacing="22" MaxWidth="780">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="pageTitle" Text="Shell &amp; Sidebar Settings" />
+                  <TextBlock Classes="pageSubtitle"
+                             Text="Configure the App Rail sidebar variant, chrome bar, search filter, and global motion preferences." />
+                </StackPanel>
+
+                <vela:VelaSettingsGroup Header="Sidebar Chrome"
+                                        Description="Customize VelaNavigationView's layout and surface treatment live.">
+                  <vela:VelaSettingsRow Icon="{DynamicResource VelaIconSidebar}"
+                                        Title="Sidebar Style"
+                                        Description="Switch between flush Standard rail, inset Floating card, and translucent Frosted glass.">
+                    <vela:VelaSegmentedControl x:Name="SettingsPaneVariantSegmented"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnPaneVariantChanged">
+                      <x:String>Standard</x:String>
+                      <x:String>Floating</x:String>
+                      <x:String>Frosted</x:String>
+                    </vela:VelaSegmentedControl>
+                  </vela:VelaSettingsRow>
+
+                  <vela:VelaSettingsRow Icon="{DynamicResource VelaIconLayers}"
+                                        Title="Content Top Bar"
+                                        Description="Show the Arc App Rail top header with sidebar toggle, auto-breadcrumb, and trailing actions.">
+                    <vela:VelaSwitch x:Name="TopBarVisibleSwitch"
+                                     IsChecked="True"
+                                     IsCheckedChanged="OnTopBarVisibleChanged" />
+                  </vela:VelaSettingsRow>
+
+                  <vela:VelaSettingsRow Icon="{DynamicResource VelaIconSearch}"
+                                        Title="Inline Sidebar Filter"
+                                        Description="Show a live filter box inside the sidebar that searches both top-level items and nested tree children.">
+                    <vela:VelaSwitch x:Name="SettingsSearchSwitch"
+                                     IsChecked="False"
+                                     IsCheckedChanged="OnSettingsSearchSwitchChanged" />
+                  </vela:VelaSettingsRow>
+                </vela:VelaSettingsGroup>
+              </StackPanel>
+            </ScrollViewer>
+          </vela:VelaNavItem.PageContent>
+        </vela:VelaNavItem>
+      </vela:VelaNavigationView.FooterItems>
+
+      <!-- Separated Profile / Account Footer (expanded) -->
       <vela:VelaNavigationView.Footer>
-        <vela:VelaSwitch x:Name="DarkModeSwitch"
-                         Content="Dark mode"
-                         Margin="4,0"
-                         IsCheckedChanged="OnDarkModeChanged" />
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="4,0">
+          <vela:VelaAvatar DisplayName="Emma Collins"
+                           Size="Small"
+                           Tone="Accent"
+                           Status="Online" />
+          <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+            <TextBlock Text="Emma Collins"
+                       FontSize="12.5"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource VelaForegroundBrush}"
+                       TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="Product designer"
+                       FontSize="11"
+                       Foreground="{DynamicResource VelaTextMutedBrush}"
+                       TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+          <vela:VelaSwitch x:Name="DarkModeSwitch"
+                           Grid.Column="2"
+                           VerticalAlignment="Center"
+                           ToolTip.Tip="Toggle Dark Mode"
+                           IsCheckedChanged="OnDarkModeChanged" />
+        </Grid>
       </vela:VelaNavigationView.Footer>
+
+      <!-- Compact Icon Rail Footer (collapsed 60px) -->
+      <vela:VelaNavigationView.CompactFooter>
+        <vela:VelaAvatar DisplayName="Emma Collins"
+                         Size="Small"
+                         Tone="Accent"
+                         Status="Online" />
+      </vela:VelaNavigationView.CompactFooter>
 
       <!-- Page 1: Navigation Performance & Settings -->
       <vela:VelaNavItem Header="Navigation"
@@ -161,6 +315,17 @@
                                                  SelectionChanged="OnDisplayModeChanged">
                         <x:String>Left Sidebar</x:String>
                         <x:String>Top Navbar</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="Sidebar Style" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                      <vela:VelaSegmentedControl x:Name="PaneVariantSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnPaneVariantChanged">
+                        <x:String>Standard</x:String>
+                        <x:String>Floating</x:String>
+                        <x:String>Frosted</x:String>
                       </vela:VelaSegmentedControl>
                     </StackPanel>
 
@@ -523,6 +688,12 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
+      <vela:VelaNavSectionHeader Header="Workspace" />
+
+      <!-- Collapsible Tree Group (with 1px vertical guide line like Arc App Rail "Projects") -->
+      <vela:VelaNavItem Header="Components"
+                        Icon="{DynamicResource VelaIconFolder}"
+                        IsExpanded="True">
       <!-- Page 4: Pickers, Cards & Metrics (Phase 6!) -->
       <vela:VelaNavItem Header="Pickers &amp; Cards"
                         Category="RadioCards TagInput Calendar DatePicker MetricCard Material"
@@ -1056,12 +1227,13 @@
           </ScrollViewer>
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
+      </vela:VelaNavItem>
 
       <!-- Page 5: Heavy Stress Benchmark (Lazy constructed via PageFactory in code-behind!) -->
       <vela:VelaNavItem x:Name="StressNavItem"
                         Header="Heavy Stress"
                         Category="Benchmark Performance 500 Nodes"
-                        Icon="{DynamicResource VelaIconSparkles}"
+                        Icon="{DynamicResource VelaIconTrendingUp}"
                         Badge="500" />
 
       <!-- Page 3: Actions & Toggles -->
@@ -1168,6 +1340,8 @@
           </ScrollViewer>
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
+
+      <vela:VelaNavSectionHeader Header="Studio &amp; Data" />
 
       <!-- Page 11: Data & Charts (Independent Vela.Avalonia.Charts Sub-Package!) -->
       <vela:VelaNavItem Header="Data &amp; Charts"

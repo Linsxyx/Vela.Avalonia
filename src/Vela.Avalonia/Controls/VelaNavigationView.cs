@@ -1,11 +1,16 @@
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Metadata;
 using Avalonia.Threading;
 using Vela.Avalonia.Motion;
 
@@ -17,12 +22,64 @@ public enum VelaNavigationDisplayMode
     Top,
 }
 
+public enum VelaNavigationPaneVariant
+{
+    Standard,
+    Floating,
+    Frosted,
+}
+
 /// <summary>
-/// A navigation destination inside <see cref="VelaNavigationView"/>.
-/// Supports both inline <see cref="PageContent"/> and lazy <see cref="PageFactory"/> for fast startup.
+/// Quiet section heading inside <see cref="VelaNavigationView"/> (e.g. "Workspace", "Pinned").
+/// Smoothly crossfades into a centered hairline divider when the sidebar collapses to icon rail mode.
 /// </summary>
-[PseudoClasses(":compact", ":top", ":has-badge")]
-public class VelaNavItem : ListBoxItem
+[PseudoClasses(":compact")]
+public class VelaNavSectionHeader : TemplatedControl
+{
+    public static readonly StyledProperty<string?> HeaderProperty =
+        AvaloniaProperty.Register<VelaNavSectionHeader, string?>(nameof(Header));
+
+    public static readonly DirectProperty<VelaNavSectionHeader, double> LabelOpacityProperty =
+        AvaloniaProperty.RegisterDirect<VelaNavSectionHeader, double>(nameof(LabelOpacity), o => o.LabelOpacity);
+
+    public static readonly DirectProperty<VelaNavSectionHeader, double> DividerOpacityProperty =
+        AvaloniaProperty.RegisterDirect<VelaNavSectionHeader, double>(nameof(DividerOpacity), o => o.DividerOpacity);
+
+    public string? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
+
+    private double _labelOpacity = 1.0;
+    public double LabelOpacity
+    {
+        get => _labelOpacity;
+        internal set => SetAndRaise(LabelOpacityProperty, ref _labelOpacity, value);
+    }
+
+    private double _dividerOpacity;
+    public double DividerOpacity
+    {
+        get => _dividerOpacity;
+        internal set => SetAndRaise(DividerOpacityProperty, ref _dividerOpacity, value);
+    }
+
+    protected override Type StyleKeyOverride => typeof(VelaNavSectionHeader);
+
+    internal void SetLayoutMode(bool isCompact, bool isTop, double openProgress)
+    {
+        IsVisible = !isTop;
+        PseudoClasses.Set(":compact", isCompact);
+        var p = Math.Clamp(openProgress, 0.0, 1.0);
+        LabelOpacity = p;
+        DividerOpacity = (1.0 - p) * 0.75;
+    }
+}
+
+/// <summary>
+/// Hierarchical navigation destination or collapsible folder group inside <see cref="VelaNavigationView"/>.
+/// Supports inline <see cref="PageContent"/>, lazy <see cref="PageFactory"/>, quiet right-aligned <see cref="Badge"/>,
+/// and nested <see cref="Children"/> rendered with a vertical tree guide line and spring collapse animation.
+/// </summary>
+[PseudoClasses(":selected", ":compact", ":top", ":has-badge", ":has-icon", ":has-children", ":expanded", ":child", ":footer-item")]
+public class VelaNavItem : TemplatedControl
 {
     public static readonly StyledProperty<string?> HeaderProperty =
         AvaloniaProperty.Register<VelaNavItem, string?>(nameof(Header));
@@ -42,8 +99,20 @@ public class VelaNavItem : ListBoxItem
     public static readonly StyledProperty<string?> CategoryProperty =
         AvaloniaProperty.Register<VelaNavItem, string?>(nameof(Category));
 
+    public static readonly StyledProperty<bool> IsExpandedProperty =
+        AvaloniaProperty.Register<VelaNavItem, bool>(nameof(IsExpanded), true, defaultBindingMode: BindingMode.TwoWay);
+
+    public static readonly StyledProperty<bool> IsSelectedProperty =
+        AvaloniaProperty.Register<VelaNavItem, bool>(nameof(IsSelected), false, defaultBindingMode: BindingMode.TwoWay);
+
     public static readonly DirectProperty<VelaNavItem, double> LabelOpacityProperty =
         AvaloniaProperty.RegisterDirect<VelaNavItem, double>(nameof(LabelOpacity), o => o.LabelOpacity);
+
+    public static readonly DirectProperty<VelaNavItem, bool> HasChildrenProperty =
+        AvaloniaProperty.RegisterDirect<VelaNavItem, bool>(nameof(HasChildren), o => o.HasChildren);
+
+    public static readonly DirectProperty<VelaNavItem, bool> EffectiveExpandedProperty =
+        AvaloniaProperty.RegisterDirect<VelaNavItem, bool>(nameof(EffectiveExpanded), o => o.EffectiveExpanded);
 
     public string? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
     public Geometry? Icon { get => GetValue(IconProperty); set => SetValue(IconProperty, value); }
@@ -51,6 +120,13 @@ public class VelaNavItem : ListBoxItem
     public object? PageContent { get => GetValue(PageContentProperty); set => SetValue(PageContentProperty, value); }
     public Func<object?>? PageFactory { get => GetValue(PageFactoryProperty); set => SetValue(PageFactoryProperty, value); }
     public string? Category { get => GetValue(CategoryProperty); set => SetValue(CategoryProperty, value); }
+    public bool IsExpanded { get => GetValue(IsExpandedProperty); set => SetValue(IsExpandedProperty, value); }
+    public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
+
+    [Content]
+    public ObservableCollection<VelaNavItem> Children { get; } = new();
+
+    public event EventHandler? Click;
 
     private double _labelOpacity = 1.0;
     public double LabelOpacity
@@ -59,54 +135,248 @@ public class VelaNavItem : ListBoxItem
         internal set => SetAndRaise(LabelOpacityProperty, ref _labelOpacity, value);
     }
 
+    private bool _hasChildren;
+    public bool HasChildren
+    {
+        get => _hasChildren;
+        private set => SetAndRaise(HasChildrenProperty, ref _hasChildren, value);
+    }
+
+    private bool _effectiveExpanded;
+    public bool EffectiveExpanded
+    {
+        get => _effectiveExpanded;
+        private set => SetAndRaise(EffectiveExpandedProperty, ref _effectiveExpanded, value);
+    }
+
+    internal VelaNavigationView? Owner { get; set; }
+    internal VelaNavItem? ParentItem { get; set; }
+    internal string? SectionTitle { get; set; }
+    internal bool IsFooterItem { get; set; }
+    internal bool IsNavigable => PageContent is not null || PageFactory is not null || Children.Count == 0;
+
     protected override Type StyleKeyOverride => typeof(VelaNavItem);
+
+    private readonly SpringChannel _chevronAngle = new(0.0, VelaMotionTokens.Springs.Snappy);
+    private readonly SpringRunner _runner;
+    private Border? _rowBorder;
+    private PathIcon? _chevronIcon;
+    private RotateTransform? _chevronRotate;
+    private StackPanel? _childrenHost;
+    private bool _isCompact;
+    private bool _isTop;
 
     static VelaNavItem()
     {
         BadgeProperty.Changed.AddClassHandler<VelaNavItem>((item, _) =>
             item.PseudoClasses.Set(":has-badge", item.Badge is not null));
+        IconProperty.Changed.AddClassHandler<VelaNavItem>((item, _) =>
+            item.PseudoClasses.Set(":has-icon", item.Icon is not null));
         HeaderProperty.Changed.AddClassHandler<VelaNavItem>((item, _) => item.SyncCompactTooltip());
+        IsSelectedProperty.Changed.AddClassHandler<VelaNavItem>((item, _) =>
+            item.PseudoClasses.Set(":selected", item.IsSelected));
+        IsExpandedProperty.Changed.AddClassHandler<VelaNavItem>((item, _) => item.OnExpandedChanged());
+    }
+
+    public VelaNavItem()
+    {
+        _runner = new SpringRunner(this, OnTick);
+        Children.CollectionChanged += OnChildrenChanged;
+    }
+
+    internal Control? GetIndicatorTarget() => _rowBorder ?? (Control)this;
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+
+        if (_rowBorder is not null)
+            _rowBorder.PointerPressed -= OnRowPointerPressed;
+
+        _rowBorder = e.NameScope.Find<Border>("PART_RowBorder");
+        _chevronIcon = e.NameScope.Find<PathIcon>("PART_Chevron");
+        _childrenHost = e.NameScope.Find<StackPanel>("PART_ChildrenHost");
+
+        if (_chevronIcon is not null)
+        {
+            var initialAngle = IsExpanded ? 0.0 : -90.0;
+            _chevronAngle.Jump(initialAngle);
+            _chevronRotate = new RotateTransform(initialAngle);
+            _chevronIcon.RenderTransformOrigin = RelativePoint.Center;
+            _chevronIcon.RenderTransform = _chevronRotate;
+        }
+
+        if (_rowBorder is not null)
+            _rowBorder.PointerPressed += OnRowPointerPressed;
+
+        SyncChildrenHost();
+        PseudoClasses.Set(":has-icon", Icon is not null);
+        PseudoClasses.Set(":has-badge", Badge is not null);
+        UpdateExpandedState(animate: false);
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _runner.Stop();
+    }
+
+    private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SyncChildrenHost();
+        Owner?.RebuildNavIndex();
+    }
+
+    internal void SyncChildrenHost()
+    {
+        HasChildren = Children.Count > 0;
+        PseudoClasses.Set(":has-children", HasChildren);
+        PseudoClasses.Set(":child", ParentItem is not null);
+        PseudoClasses.Set(":footer-item", IsFooterItem);
+
+        if (_childrenHost is null)
+            return;
+
+        _childrenHost.Children.Clear();
+        foreach (var child in Children)
+        {
+            if (child.Parent is Panel oldP)
+                oldP.Children.Remove(child);
+            child.ParentItem = this;
+            child.Owner = Owner;
+            child.SectionTitle = SectionTitle;
+            child.IsFooterItem = IsFooterItem;
+            child.PseudoClasses.Set(":child", true);
+            child.SetLayoutMode(_isCompact, _isTop, LabelOpacity);
+            _childrenHost.Children.Add(child);
+        }
+
+        UpdateExpandedState(animate: false);
+    }
+
+    private void OnRowPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!IsEnabled) return;
+        if (!e.GetCurrentPoint(_rowBorder ?? (Visual)this).Properties.IsLeftButtonPressed)
+            return;
+
+        Click?.Invoke(this, EventArgs.Empty);
+
+        if (HasChildren && !IsNavigable)
+        {
+            if (Owner is not null && !Owner.IsPaneOpen && Owner.DisplayMode == VelaNavigationDisplayMode.Left)
+            {
+                Owner.IsPaneOpen = true;
+                IsExpanded = true;
+            }
+            else
+            {
+                IsExpanded = !IsExpanded;
+            }
+            e.Handled = true;
+            return;
+        }
+
+        if (HasChildren && IsNavigable)
+        {
+            IsExpanded = !IsExpanded;
+        }
+
+        Owner?.SelectNavItem(this);
+        e.Handled = true;
+    }
+
+    private void OnExpandedChanged()
+    {
+        UpdateExpandedState(animate: true);
+        Owner?.ScheduleIndicatorSync();
+    }
+
+    private void UpdateExpandedState(bool animate)
+    {
+        var expanded = HasChildren && IsExpanded && !_isCompact && !_isTop;
+        EffectiveExpanded = expanded;
+        PseudoClasses.Set(":expanded", expanded);
+
+        var targetAngle = IsExpanded ? 0.0 : -90.0;
+        if (!animate || VelaMotionOptions.ReducedMotion)
+        {
+            _chevronAngle.Jump(targetAngle);
+            if (_chevronRotate is not null) _chevronRotate.Angle = targetAngle;
+            return;
+        }
+
+        _chevronAngle.SetTarget(targetAngle, VelaMotionTokens.Springs.Snappy);
+        _runner.Wake();
+    }
+
+    private bool OnTick(double dt)
+    {
+        var active = _chevronAngle.Step(dt);
+        if (_chevronRotate is not null)
+            _chevronRotate.Angle = _chevronAngle.Value;
+        return active;
     }
 
     internal void SetLayoutMode(bool isCompact, bool isTop, double labelOpacity)
     {
+        _isCompact = isCompact;
+        _isTop = isTop;
         PseudoClasses.Set(":compact", isCompact);
         PseudoClasses.Set(":top", isTop);
+        PseudoClasses.Set(":child", ParentItem is not null);
+        PseudoClasses.Set(":footer-item", IsFooterItem);
         LabelOpacity = isTop ? 1.0 : labelOpacity;
         SyncCompactTooltip();
+        UpdateExpandedState(animate: false);
+
+        foreach (var child in Children)
+            child.SetLayoutMode(isCompact, isTop, labelOpacity);
     }
 
     private void SyncCompactTooltip()
     {
-        var isCompact = PseudoClasses.Contains(":compact");
-        ToolTip.SetTip(this, isCompact ? Header : null);
+        ToolTip.SetTip(this, _isCompact ? Header : null);
     }
 }
 
 /// <summary>
-/// Performance-first, restrained desktop navigation shell:
+/// Arc App Rail-inspired, performance-first desktop navigation shell:
 /// - Powered by <see cref="VelaPageDeck"/> for O(1) KeepAlive / LRU page caching (zero visual-tree teardown on switch)
-/// - Lazy page instantiation via <see cref="VelaNavItem.PageFactory"/> or <see cref="PageFactory"/>
-/// - Optional zero-UI-thread GPU Compositor fade (default: Instant 0ms switching)
-/// - Clean neutral monochrome aesthetic with dual Left / Top display modes and zero-reflow collapse
+/// - Section headers (<see cref="VelaNavSectionHeader"/>), collapsible nested tree groups (<see cref="VelaNavItem.Children"/>)
+///   with 1px vertical guide lines, quiet right-aligned counters, sticky bottom <see cref="FooterItems"/>, and separated profile <see cref="Footer"/>
+/// - Optional sleek TopBar (<see cref="ShowTopBar"/>) with sidebar toggle, auto-generated <see cref="VelaBreadcrumb"/>, and right-side <see cref="TopBarContent"/>
+/// - Dual Left / Top display modes, Standard / Floating / Frosted pane variants, and smooth zero-reflow collapse to 60px icon rail
 /// </summary>
-[PseudoClasses(":left", ":top", ":open", ":compact")]
-public class VelaNavigationView : ListBox
+[PseudoClasses(":left", ":top", ":open", ":compact", ":floating", ":frosted", ":topbar")]
+public class VelaNavigationView : TemplatedControl
 {
     public static readonly StyledProperty<VelaNavigationDisplayMode> DisplayModeProperty =
         AvaloniaProperty.Register<VelaNavigationView, VelaNavigationDisplayMode>(nameof(DisplayMode), VelaNavigationDisplayMode.Left);
+
+    public static readonly StyledProperty<VelaNavigationPaneVariant> PaneVariantProperty =
+        AvaloniaProperty.Register<VelaNavigationView, VelaNavigationPaneVariant>(nameof(PaneVariant), VelaNavigationPaneVariant.Standard);
 
     public static readonly StyledProperty<bool> IsPaneOpenProperty =
         AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(IsPaneOpen), true, defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly StyledProperty<double> OpenPaneLengthProperty =
-        AvaloniaProperty.Register<VelaNavigationView, double>(nameof(OpenPaneLength), 228.0);
+        AvaloniaProperty.Register<VelaNavigationView, double>(nameof(OpenPaneLength), 244.0);
 
     public static readonly StyledProperty<double> CompactPaneLengthProperty =
         AvaloniaProperty.Register<VelaNavigationView, double>(nameof(CompactPaneLength), 60.0);
 
     public static readonly StyledProperty<bool> IsPaneToggleVisibleProperty =
         AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(IsPaneToggleVisible), true);
+
+    public static readonly StyledProperty<bool> ShowTopBarProperty =
+        AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(ShowTopBar), true);
+
+    public static readonly StyledProperty<string?> BrandTitleProperty =
+        AvaloniaProperty.Register<VelaNavigationView, string?>(nameof(BrandTitle), "Vela");
+
+    public static readonly StyledProperty<object?> TopBarContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(TopBarContent));
 
     public static readonly StyledProperty<bool> IsSearchVisibleProperty =
         AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(IsSearchVisible), false);
@@ -117,11 +387,23 @@ public class VelaNavigationView : ListBox
     public static readonly StyledProperty<object?> HeaderProperty =
         AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(Header));
 
+    public static readonly StyledProperty<object?> CompactHeaderProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(CompactHeader));
+
     public static readonly StyledProperty<object?> FooterProperty =
         AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(Footer));
 
+    public static readonly StyledProperty<object?> CompactFooterProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(CompactFooter));
+
     public static readonly StyledProperty<object?> ContentProperty =
         AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(Content));
+
+    public static readonly StyledProperty<VelaNavItem?> SelectedItemProperty =
+        AvaloniaProperty.Register<VelaNavigationView, VelaNavItem?>(nameof(SelectedItem), null, defaultBindingMode: BindingMode.TwoWay);
+
+    public static readonly StyledProperty<int> SelectedIndexProperty =
+        AvaloniaProperty.Register<VelaNavigationView, int>(nameof(SelectedIndex), 0, defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly StyledProperty<VelaPageCacheMode> PageCacheModeProperty =
         AvaloniaProperty.Register<VelaNavigationView, VelaPageCacheMode>(nameof(PageCacheMode), VelaPageCacheMode.KeepAlive);
@@ -139,27 +421,39 @@ public class VelaNavigationView : ListBox
         AvaloniaProperty.Register<VelaNavigationView, Func<object, object?>?>(nameof(PageFactory));
 
     public VelaNavigationDisplayMode DisplayMode { get => GetValue(DisplayModeProperty); set => SetValue(DisplayModeProperty, value); }
+    public VelaNavigationPaneVariant PaneVariant { get => GetValue(PaneVariantProperty); set => SetValue(PaneVariantProperty, value); }
     public bool IsPaneOpen { get => GetValue(IsPaneOpenProperty); set => SetValue(IsPaneOpenProperty, value); }
     public double OpenPaneLength { get => GetValue(OpenPaneLengthProperty); set => SetValue(OpenPaneLengthProperty, value); }
     public double CompactPaneLength { get => GetValue(CompactPaneLengthProperty); set => SetValue(CompactPaneLengthProperty, value); }
     public bool IsPaneToggleVisible { get => GetValue(IsPaneToggleVisibleProperty); set => SetValue(IsPaneToggleVisibleProperty, value); }
+    public bool ShowTopBar { get => GetValue(ShowTopBarProperty); set => SetValue(ShowTopBarProperty, value); }
+    public string? BrandTitle { get => GetValue(BrandTitleProperty); set => SetValue(BrandTitleProperty, value); }
+    public object? TopBarContent { get => GetValue(TopBarContentProperty); set => SetValue(TopBarContentProperty, value); }
     public bool IsSearchVisible { get => GetValue(IsSearchVisibleProperty); set => SetValue(IsSearchVisibleProperty, value); }
     public string? SearchText { get => GetValue(SearchTextProperty); set => SetValue(SearchTextProperty, value); }
     public object? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
+    public object? CompactHeader { get => GetValue(CompactHeaderProperty); set => SetValue(CompactHeaderProperty, value); }
     public object? Footer { get => GetValue(FooterProperty); set => SetValue(FooterProperty, value); }
+    public object? CompactFooter { get => GetValue(CompactFooterProperty); set => SetValue(CompactFooterProperty, value); }
     public object? Content { get => GetValue(ContentProperty); set => SetValue(ContentProperty, value); }
+    public VelaNavItem? SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+    public int SelectedIndex { get => GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
     public VelaPageCacheMode PageCacheMode { get => GetValue(PageCacheModeProperty); set => SetValue(PageCacheModeProperty, value); }
     public int MaxCachedPages { get => GetValue(MaxCachedPagesProperty); set => SetValue(MaxCachedPagesProperty, value); }
     public VelaPageTransitionMode PageTransitionMode { get => GetValue(PageTransitionModeProperty); set => SetValue(PageTransitionModeProperty, value); }
     public IDataTemplate? PageTemplate { get => GetValue(PageTemplateProperty); set => SetValue(PageTemplateProperty, value); }
     public Func<object, object?>? PageFactory { get => GetValue(PageFactoryProperty); set => SetValue(PageFactoryProperty, value); }
 
+    [Content]
+    public ObservableCollection<Control> Items { get; } = new();
+
+    public ObservableCollection<VelaNavItem> FooterItems { get; } = new();
+
     public event EventHandler<VelaPageSwitchMetrics>? PageSwitched;
 
     protected override Type StyleKeyOverride => typeof(VelaNavigationView);
 
-    // Lightweight spring channels (only for sidebar collapse & active pill; page switching itself runs with 0 UI-thread animation!)
-    private readonly SpringChannel _paneWidthSpring = new(228.0, VelaMotionTokens.Springs.Snappy);
+    private readonly SpringChannel _paneWidthSpring = new(244.0, VelaMotionTokens.Springs.Snappy);
     private readonly SpringChannel _openProgressSpring = new(1.0, VelaMotionTokens.Springs.Snappy);
     private readonly SpringChannel _searchFoldSpring = new(0.0, VelaMotionTokens.Springs.Snappy);
     private readonly SpringChannel _indX = new(0.0, VelaMotionTokens.Springs.Snappy);
@@ -168,15 +462,24 @@ public class VelaNavigationView : ListBox
     private readonly SpringChannel _indH = new(0.0, VelaMotionTokens.Springs.Snappy);
     private readonly SpringRunner _runner;
 
+    private readonly List<VelaNavItem> _navigableItems = new();
+    private bool _syncingSelection;
+
     // Template parts
     private Border? _paneBorder;
     private Panel? _navTrack;
+    private StackPanel? _itemsHost;
+    private StackPanel? _footerItemsHost;
     private Border? _activeIndicator;
-    private Button? _toggleButton;
+    private Button? _paneToggleButton;
+    private Button? _topBarToggleButton;
     private PathIcon? _toggleIcon;
     private Panel? _headerHost;
+    private Panel? _compactHeaderHost;
     private Panel? _searchFold;
     private Panel? _footerHost;
+    private Panel? _compactFooterHost;
+    private VelaBreadcrumb? _topBreadcrumb;
     private VelaPageDeck? _pageDeck;
 
     private TranslateTransform? _indTranslate;
@@ -184,66 +487,67 @@ public class VelaNavigationView : ListBox
 
     private bool _initialized;
     private bool _hasPositionedIndicator;
-    private int _positionedIndex = -1;
+    private VelaNavItem? _positionedItem;
 
     static VelaNavigationView()
     {
-        SelectionModeProperty.OverrideDefaultValue<VelaNavigationView>(SelectionMode.Single | SelectionMode.AlwaysSelected);
         DisplayModeProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnDisplayModeChanged());
+        PaneVariantProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnPaneVariantChanged());
+        ShowTopBarProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        BrandTitleProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdateTopBreadcrumb());
         IsPaneOpenProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnPaneOpenChanged());
         IsSearchVisibleProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnSearchVisibleChanged());
         OpenPaneLengthProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnPaneOpenChanged());
         CompactPaneLengthProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnPaneOpenChanged());
         SearchTextProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.ApplySearchFilter());
         ContentProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.ActivateCurrentPage());
-        SelectedIndexProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnSelectionChangedInternal());
-        SelectedItemProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.ActivateCurrentPage());
+        SelectedIndexProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnSelectedIndexChanged());
+        SelectedItemProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnSelectedItemChanged());
     }
 
     public VelaNavigationView()
     {
         _runner = new SpringRunner(this, OnMotionTick);
+        Items.CollectionChanged += OnCollectionsChanged;
+        FooterItems.CollectionChanged += OnCollectionsChanged;
         UpdatePseudoClasses();
     }
 
     public void ClearInactivePageCache() => _pageDeck?.ClearInactiveCache();
 
-    protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)
-        => new VelaNavItem();
-
-    protected override bool NeedsContainerOverride(object? item, int index, out object? recycleKey)
-        => NeedsContainer<VelaNavItem>(item, out recycleKey);
-
-    protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
+    internal void SelectNavItem(VelaNavItem item)
     {
-        base.PrepareContainerForItemOverride(container, item, index);
-        if (container is VelaNavItem navItem)
-        {
-            var isTop = DisplayMode == VelaNavigationDisplayMode.Top;
-            var isCompact = !isTop && !IsPaneOpen;
-            navItem.SetLayoutMode(isCompact, isTop, _openProgressSpring.Value);
-        }
+        if (!item.IsNavigable)
+            return;
+
+        SelectedItem = item;
+    }
+
+    internal void ScheduleIndicatorSync()
+    {
+        Dispatcher.UIThread.Post(() => UpdateIndicator(animate: true), DispatcherPriority.Loaded);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
 
-        if (_navTrack is not null)
-            _navTrack.LayoutUpdated -= OnNavTrackLayoutUpdated;
-        if (_toggleButton is not null)
-            _toggleButton.Click -= OnTogglePaneClick;
-        if (_pageDeck is not null)
-            _pageDeck.PageSwitched -= OnDeckPageSwitched;
+        DetachTemplateHandlers();
 
         _paneBorder = e.NameScope.Find<Border>("PART_Pane");
         _navTrack = e.NameScope.Find<Panel>("PART_NavTrack");
+        _itemsHost = e.NameScope.Find<StackPanel>("PART_ItemsHost");
+        _footerItemsHost = e.NameScope.Find<StackPanel>("PART_FooterItemsHost");
         _activeIndicator = e.NameScope.Find<Border>("PART_ActiveIndicator");
-        _toggleButton = e.NameScope.Find<Button>("PART_PaneToggle");
+        _paneToggleButton = e.NameScope.Find<Button>("PART_PaneToggle");
+        _topBarToggleButton = e.NameScope.Find<Button>("PART_TopBarToggle");
         _toggleIcon = e.NameScope.Find<PathIcon>("PART_ToggleIcon");
         _headerHost = e.NameScope.Find<Panel>("PART_HeaderHost");
+        _compactHeaderHost = e.NameScope.Find<Panel>("PART_CompactHeaderHost");
         _searchFold = e.NameScope.Find<Panel>("PART_SearchFold");
         _footerHost = e.NameScope.Find<Panel>("PART_FooterHost");
+        _compactFooterHost = e.NameScope.Find<Panel>("PART_CompactFooterHost");
+        _topBreadcrumb = e.NameScope.Find<VelaBreadcrumb>("PART_TopBreadcrumb");
         _pageDeck = e.NameScope.Find<VelaPageDeck>("PART_PageDeck");
 
         if (_activeIndicator is not null)
@@ -260,14 +564,10 @@ public class VelaNavigationView : ListBox
             _toggleIcon.RenderTransform = _toggleRotate;
         }
 
-        if (_toggleButton is not null)
-            _toggleButton.Click += OnTogglePaneClick;
-
-        if (_navTrack is not null)
-            _navTrack.LayoutUpdated += OnNavTrackLayoutUpdated;
-
-        if (_pageDeck is not null)
-            _pageDeck.PageSwitched += OnDeckPageSwitched;
+        if (_paneToggleButton is not null) _paneToggleButton.Click += OnTogglePaneClick;
+        if (_topBarToggleButton is not null) _topBarToggleButton.Click += OnTogglePaneClick;
+        if (_navTrack is not null) _navTrack.LayoutUpdated += OnNavTrackLayoutUpdated;
+        if (_pageDeck is not null) _pageDeck.PageSwitched += OnDeckPageSwitched;
 
         var initialWidth = IsPaneOpen ? OpenPaneLength : CompactPaneLength;
         _paneWidthSpring.Jump(initialWidth);
@@ -276,12 +576,15 @@ public class VelaNavigationView : ListBox
 
         _initialized = true;
         _hasPositionedIndicator = false;
-        _positionedIndex = -1;
+        _positionedItem = null;
 
         UpdatePseudoClasses();
+        ApplyPaneBackdrop();
+        RebuildVisualHosts();
         ApplyPaneVisuals();
-        ActivateCurrentPage();
         ApplySearchFilter();
+        ActivateCurrentPage();
+        UpdateTopBreadcrumb();
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -294,12 +597,125 @@ public class VelaNavigationView : ListBox
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
-        if (_navTrack is not null)
-            _navTrack.LayoutUpdated -= OnNavTrackLayoutUpdated;
-        if (_toggleButton is not null)
-            _toggleButton.Click -= OnTogglePaneClick;
-        if (_pageDeck is not null)
-            _pageDeck.PageSwitched -= OnDeckPageSwitched;
+        DetachTemplateHandlers();
+    }
+
+    private void DetachTemplateHandlers()
+    {
+        if (_navTrack is not null) _navTrack.LayoutUpdated -= OnNavTrackLayoutUpdated;
+        if (_paneToggleButton is not null) _paneToggleButton.Click -= OnTogglePaneClick;
+        if (_topBarToggleButton is not null) _topBarToggleButton.Click -= OnTogglePaneClick;
+        if (_pageDeck is not null) _pageDeck.PageSwitched -= OnDeckPageSwitched;
+    }
+
+    private void OnCollectionsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RebuildVisualHosts();
+    }
+
+    internal void RebuildNavIndex()
+    {
+        _navigableItems.Clear();
+        string? currentSection = null;
+
+        foreach (var entry in Items)
+        {
+            if (entry is VelaNavSectionHeader sec)
+            {
+                currentSection = sec.Header;
+            }
+            else if (entry is VelaNavItem nav)
+            {
+                WireNavItem(nav, parent: null, section: currentSection, isFooter: false);
+            }
+        }
+
+        foreach (var footerNav in FooterItems)
+        {
+            WireNavItem(footerNav, parent: null, section: null, isFooter: true);
+        }
+
+        // Ensure valid selection
+        if (SelectedItem is null || !_navigableItems.Contains(SelectedItem))
+        {
+            if (_navigableItems.Count > 0)
+            {
+                var idx = Math.Clamp(SelectedIndex, 0, _navigableItems.Count - 1);
+                SetSelectionInternal(_navigableItems[idx], idx);
+            }
+        }
+        else
+        {
+            var idx = _navigableItems.IndexOf(SelectedItem);
+            if (idx >= 0 && idx != SelectedIndex)
+                SetSelectionInternal(SelectedItem, idx);
+        }
+    }
+
+    private void WireNavItem(VelaNavItem nav, VelaNavItem? parent, string? section, bool isFooter)
+    {
+        nav.Owner = this;
+        nav.ParentItem = parent;
+        nav.SectionTitle = section;
+        nav.IsFooterItem = isFooter;
+
+        if (nav.IsNavigable)
+            _navigableItems.Add(nav);
+
+        foreach (var child in nav.Children)
+            WireNavItem(child, parent: nav, section: section, isFooter: isFooter);
+    }
+
+    private void RebuildVisualHosts()
+    {
+        RebuildNavIndex();
+
+        if (_itemsHost is null)
+            return;
+
+        _itemsHost.Children.Clear();
+        var isTop = DisplayMode == VelaNavigationDisplayMode.Top;
+        _itemsHost.Orientation = isTop ? Orientation.Horizontal : Orientation.Vertical;
+        _itemsHost.Spacing = isTop ? 2 : 2;
+
+        if (isTop)
+        {
+            foreach (var nav in _navigableItems)
+            {
+                if (nav.Parent is Panel oldP)
+                    oldP.Children.Remove(nav);
+                _itemsHost.Children.Add(nav);
+            }
+        }
+        else
+        {
+            foreach (var entry in Items)
+            {
+                if (entry.Parent is Panel oldP)
+                    oldP.Children.Remove(entry);
+                _itemsHost.Children.Add(entry);
+                if (entry is VelaNavItem nav)
+                    nav.SyncChildrenHost();
+            }
+        }
+
+        if (_footerItemsHost is not null)
+        {
+            _footerItemsHost.Children.Clear();
+            if (!isTop)
+            {
+                foreach (var fItem in FooterItems)
+                {
+                    if (fItem.Parent is Panel oldP)
+                        oldP.Children.Remove(fItem);
+                    _footerItemsHost.Children.Add(fItem);
+                }
+            }
+            _footerItemsHost.IsVisible = !isTop && FooterItems.Count > 0;
+        }
+
+        SyncAllNavItems();
+        UpdateSelectionFlags();
     }
 
     private void OnDeckPageSwitched(object? sender, VelaPageSwitchMetrics metrics)
@@ -312,10 +728,11 @@ public class VelaNavigationView : ListBox
     {
         UpdatePseudoClasses();
         _hasPositionedIndicator = false;
-        _positionedIndex = -1;
+        _positionedItem = null;
 
         if (_initialized)
         {
+            RebuildVisualHosts();
             ApplyPaneVisuals();
             SyncAllNavItems();
             Dispatcher.UIThread.Post(() =>
@@ -324,6 +741,20 @@ public class VelaNavigationView : ListBox
                 UpdateIndicator(animate: false);
             }, DispatcherPriority.Loaded);
         }
+    }
+
+    private void OnPaneVariantChanged()
+    {
+        UpdatePseudoClasses();
+        ApplyPaneBackdrop();
+    }
+
+    private void ApplyPaneBackdrop()
+    {
+        if (_paneBorder is null) return;
+        _paneBorder.BackdropEffect = PaneVariant == VelaNavigationPaneVariant.Frosted
+            ? new BlurEffect { Radius = 18 }
+            : null;
     }
 
     private void OnPaneOpenChanged()
@@ -369,13 +800,102 @@ public class VelaNavigationView : ListBox
         _runner.Wake();
     }
 
-    private void OnSelectionChangedInternal()
+    private void OnSelectedIndexChanged()
     {
+        if (_syncingSelection) return;
+        if (SelectedIndex >= 0 && SelectedIndex < _navigableItems.Count)
+            SetSelectionInternal(_navigableItems[SelectedIndex], SelectedIndex);
+    }
+
+    private void OnSelectedItemChanged()
+    {
+        if (_syncingSelection) return;
+        var item = SelectedItem;
+        if (item is not null)
+        {
+            var idx = _navigableItems.IndexOf(item);
+            SetSelectionInternal(item, idx >= 0 ? idx : SelectedIndex);
+        }
+    }
+
+    private void SetSelectionInternal(VelaNavItem item, int index)
+    {
+        _syncingSelection = true;
+        try
+        {
+            if (!ReferenceEquals(SelectedItem, item))
+                SetCurrentValue(SelectedItemProperty, item);
+            if (index >= 0 && SelectedIndex != index)
+                SetCurrentValue(SelectedIndexProperty, index);
+        }
+        finally
+        {
+            _syncingSelection = false;
+        }
+
+        // Auto-expand parent folder if a nested child is selected programmatically (e.g. via Command Palette)
+        if (item.ParentItem is not null && !item.ParentItem.IsExpanded)
+            item.ParentItem.IsExpanded = true;
+
+        UpdateSelectionFlags();
         ActivateCurrentPage();
+        UpdateTopBreadcrumb();
 
         if (!UpdateIndicator(animate: true))
         {
             Dispatcher.UIThread.Post(() => UpdateIndicator(animate: _hasPositionedIndicator), DispatcherPriority.Loaded);
+        }
+    }
+
+    private void UpdateSelectionFlags()
+    {
+        var active = SelectedItem;
+        foreach (var nav in _navigableItems)
+            nav.IsSelected = ReferenceEquals(nav, active);
+    }
+
+    private void UpdateTopBreadcrumb()
+    {
+        if (_topBreadcrumb is null)
+            return;
+
+        _topBreadcrumb.Items.Clear();
+
+        if (!string.IsNullOrWhiteSpace(BrandTitle))
+        {
+            var rootCrumb = new VelaBreadcrumbItem { Label = BrandTitle };
+            rootCrumb.Click += (_, _) =>
+            {
+                if (_navigableItems.Count > 0)
+                    SelectedIndex = 0;
+            };
+            _topBreadcrumb.Items.Add(rootCrumb);
+        }
+
+        var active = SelectedItem;
+        if (active is null)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(active.SectionTitle))
+        {
+            _topBreadcrumb.Items.Add(new VelaBreadcrumbItem { Label = active.SectionTitle });
+        }
+
+        if (active.ParentItem is not null && !string.IsNullOrWhiteSpace(active.ParentItem.Header))
+        {
+            var parentRef = active.ParentItem;
+            var parentCrumb = new VelaBreadcrumbItem { Label = parentRef.Header };
+            parentCrumb.Click += (_, _) =>
+            {
+                if (parentRef.IsNavigable) SelectedItem = parentRef;
+                else parentRef.IsExpanded = true;
+            };
+            _topBreadcrumb.Items.Add(parentCrumb);
+        }
+
+        if (!string.IsNullOrWhiteSpace(active.Header))
+        {
+            _topBreadcrumb.Items.Add(new VelaBreadcrumbItem { Label = active.Header });
         }
     }
 
@@ -384,16 +904,14 @@ public class VelaNavigationView : ListBox
         if (_pageDeck is null)
             return;
 
-        // 1. Explicit Content binding (MVVM direct View/ViewModel)
         var explicitContent = Content;
         if (explicitContent is not null)
         {
-            var key = SelectedItem ?? explicitContent;
+            var key = (object?)SelectedItem ?? explicitContent;
             _pageDeck.Activate(key, () => explicitContent);
             return;
         }
 
-        // 2. Selected VelaNavItem with lazy PageFactory or inline PageContent
         if (SelectedItem is VelaNavItem navItem)
         {
             _pageDeck.Activate(navItem, () =>
@@ -407,14 +925,6 @@ public class VelaNavigationView : ListBox
             return;
         }
 
-        // 3. Bound MVVM item with global PageFactory or DataTemplate
-        if (SelectedItem is not null)
-        {
-            var item = SelectedItem;
-            _pageDeck.Activate(item, () => PageFactory is not null ? PageFactory(item) : item);
-            return;
-        }
-
         _pageDeck.Activate(null, static () => null);
     }
 
@@ -422,26 +932,52 @@ public class VelaNavigationView : ListBox
     {
         var query = SearchText?.Trim();
         var hasQuery = !string.IsNullOrEmpty(query);
+        var isTop = DisplayMode == VelaNavigationDisplayMode.Top;
 
-        for (var i = 0; i < ItemCount; i++)
+        VelaNavSectionHeader? pendingHeader = null;
+        var visibleUnderHeader = false;
+
+        foreach (var entry in Items)
         {
-            if (ContainerFromIndex(i) is VelaNavItem item)
+            if (entry is VelaNavSectionHeader sec)
             {
-                if (!hasQuery)
+                if (pendingHeader is not null)
+                    pendingHeader.IsVisible = !isTop && (!hasQuery || visibleUnderHeader);
+                pendingHeader = sec;
+                visibleUnderHeader = false;
+                continue;
+            }
+
+            if (entry is VelaNavItem item)
+            {
+                var matchesSelf = !hasQuery || MatchesQuery(item, query!);
+                var anyChildMatch = false;
+
+                foreach (var child in item.Children)
                 {
-                    item.IsVisible = true;
+                    var cm = !hasQuery || MatchesQuery(child, query!) || matchesSelf;
+                    child.IsVisible = cm;
+                    if (cm) anyChildMatch = true;
                 }
-                else
-                {
-                    var matchHeader = item.Header?.Contains(query!, StringComparison.OrdinalIgnoreCase) == true;
-                    var matchCat = item.Category?.Contains(query!, StringComparison.OrdinalIgnoreCase) == true;
-                    item.IsVisible = matchHeader || matchCat;
-                }
+
+                var visible = matchesSelf || anyChildMatch;
+                item.IsVisible = visible;
+                if (hasQuery && anyChildMatch && !item.IsExpanded)
+                    item.IsExpanded = true;
+
+                if (visible) visibleUnderHeader = true;
             }
         }
 
+        if (pendingHeader is not null)
+            pendingHeader.IsVisible = !isTop && (!hasQuery || visibleUnderHeader);
+
         Dispatcher.UIThread.Post(() => UpdateIndicator(animate: true), DispatcherPriority.Loaded);
     }
+
+    private static bool MatchesQuery(VelaNavItem item, string query) =>
+        item.Header?.Contains(query, StringComparison.OrdinalIgnoreCase) == true ||
+        item.Category?.Contains(query, StringComparison.OrdinalIgnoreCase) == true;
 
     private void OnNavTrackLayoutUpdated(object? sender, EventArgs e)
     {
@@ -451,7 +987,8 @@ public class VelaNavigationView : ListBox
             return;
         }
 
-        if (SelectedIndex == _positionedIndex && !_indX.IsAnimating && !_indY.IsAnimating && !_indW.IsAnimating && !_indH.IsAnimating)
+        if (ReferenceEquals(SelectedItem, _positionedItem) &&
+            !_indX.IsAnimating && !_indY.IsAnimating && !_indW.IsAnimating && !_indH.IsAnimating)
         {
             UpdateIndicator(animate: false);
         }
@@ -462,31 +999,43 @@ public class VelaNavigationView : ListBox
         if (_navTrack is null || _activeIndicator is null)
             return false;
 
-        if (SelectedIndex < 0 || SelectedIndex >= ItemCount)
+        var active = SelectedItem;
+        if (active is null || (active.IsFooterItem && DisplayMode == VelaNavigationDisplayMode.Left))
         {
             _activeIndicator.Opacity = 0;
+            _positionedItem = active;
             return true;
         }
 
-        var container = ContainerFromIndex(SelectedIndex);
-        if (container is null || !container.IsVisible || container.Bounds.Width <= 0 || container.Bounds.Height <= 0)
+        // If selected item is a hidden child under a collapsed parent or compact rail, highlight its parent row cleanly!
+        var visualItem = active;
+        if (DisplayMode == VelaNavigationDisplayMode.Left && active.ParentItem is not null &&
+            (!IsPaneOpen || !active.ParentItem.IsExpanded))
+        {
+            visualItem = active.ParentItem;
+        }
+
+        var targetControl = visualItem.GetIndicatorTarget();
+        if (targetControl is null || !visualItem.IsVisible || targetControl.Bounds.Width <= 0 || targetControl.Bounds.Height <= 0)
         {
             _activeIndicator.Opacity = 0;
             return false;
         }
 
-        var origin = container.TranslatePoint(new Point(0, 0), _navTrack);
+        var origin = targetControl.TranslatePoint(new Point(0, 0), _navTrack);
         if (!origin.HasValue)
             return false;
 
         var isTop = DisplayMode == VelaNavigationDisplayMode.Top;
         var targetX = origin.Value.X;
         var targetY = origin.Value.Y;
-        var targetW = isTop ? container.Bounds.Width : Math.Max(36.0, _paneWidthSpring.Value - 16.0);
-        var targetH = container.Bounds.Height;
+        var targetW = isTop
+            ? targetControl.Bounds.Width
+            : Math.Max(36.0, Math.Min(targetControl.Bounds.Width, _paneWidthSpring.Value - 16.0 - targetX));
+        var targetH = targetControl.Bounds.Height;
 
         _activeIndicator.Opacity = 1.0;
-        _positionedIndex = SelectedIndex;
+        _positionedItem = active;
 
         var shouldAnimate = _hasPositionedIndicator && animate && !VelaMotionOptions.ReducedMotion;
         _hasPositionedIndicator = true;
@@ -520,7 +1069,10 @@ public class VelaNavigationView : ListBox
             ApplyPaneVisuals();
             SyncAllNavItems();
             if (DisplayMode == VelaNavigationDisplayMode.Left && _hasPositionedIndicator)
-                _indW.Jump(Math.Max(36.0, _paneWidthSpring.Value - 16.0));
+            {
+                var targetW = Math.Max(36.0, _paneWidthSpring.Value - 16.0 - _indX.Value);
+                _indW.Jump(targetW);
+            }
         }
         else if (_paneWidthSpring.IsAnimating || _openProgressSpring.IsAnimating || _searchFoldSpring.IsAnimating)
         {
@@ -555,6 +1107,13 @@ public class VelaNavigationView : ListBox
             _headerHost.IsHitTestVisible = isTop || progress > 0.4;
         }
 
+        if (_compactHeaderHost is not null)
+        {
+            var compactOp = !isTop && CompactHeader is not null ? 1.0 - progress : 0.0;
+            _compactHeaderHost.Opacity = compactOp;
+            _compactHeaderHost.IsHitTestVisible = compactOp > 0.4;
+        }
+
         if (_searchFold is not null)
         {
             var searchProgress = Math.Clamp(_searchFoldSpring.Value, 0.0, 1.0);
@@ -567,6 +1126,13 @@ public class VelaNavigationView : ListBox
         {
             _footerHost.Opacity = isTop ? 1.0 : progress;
             _footerHost.IsHitTestVisible = isTop || progress > 0.4;
+        }
+
+        if (_compactFooterHost is not null)
+        {
+            var compactFooterOp = !isTop && CompactFooter is not null ? 1.0 - progress : 0.0;
+            _compactFooterHost.Opacity = compactFooterOp;
+            _compactFooterHost.IsHitTestVisible = compactFooterOp > 0.4;
         }
     }
 
@@ -585,13 +1151,18 @@ public class VelaNavigationView : ListBox
     {
         var isTop = DisplayMode == VelaNavigationDisplayMode.Top;
         var isCompact = !isTop && !IsPaneOpen;
-        var opacity = Math.Clamp(_openProgressSpring.Value, 0.0, 1.0);
+        var progress = Math.Clamp(_openProgressSpring.Value, 0.0, 1.0);
 
-        for (var i = 0; i < ItemCount; i++)
+        foreach (var entry in Items)
         {
-            if (ContainerFromIndex(i) is VelaNavItem navItem)
-                navItem.SetLayoutMode(isCompact, isTop, opacity);
+            if (entry is VelaNavSectionHeader sec)
+                sec.SetLayoutMode(isCompact, isTop, progress);
+            else if (entry is VelaNavItem nav)
+                nav.SetLayoutMode(isCompact, isTop, progress);
         }
+
+        foreach (var footerItem in FooterItems)
+            footerItem.SetLayoutMode(isCompact, isTop, progress);
     }
 
     private void UpdatePseudoClasses()
@@ -601,5 +1172,8 @@ public class VelaNavigationView : ListBox
         PseudoClasses.Set(":top", isTop);
         PseudoClasses.Set(":open", !isTop && IsPaneOpen);
         PseudoClasses.Set(":compact", !isTop && !IsPaneOpen);
+        PseudoClasses.Set(":floating", !isTop && PaneVariant == VelaNavigationPaneVariant.Floating);
+        PseudoClasses.Set(":frosted", !isTop && PaneVariant == VelaNavigationPaneVariant.Frosted);
+        PseudoClasses.Set(":topbar", !isTop && ShowTopBar);
     }
 }

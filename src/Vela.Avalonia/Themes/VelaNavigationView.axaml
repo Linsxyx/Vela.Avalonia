@@ -2,80 +2,166 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="using:Vela.Avalonia.Controls">
 
-  <!-- Restrained, monochrome VelaNavItem: crisp typography, zero visual clutter, fixed 44px icon slot -->
-  <ControlTheme x:Key="{x:Type controls:VelaNavItem}" TargetType="controls:VelaNavItem">
-    <Setter Property="Height" Value="36" />
-    <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
-    <Setter Property="FontSize" Value="13.5" />
-    <Setter Property="FontWeight" Value="Medium" />
-    <Setter Property="Cursor" Value="Hand" />
-    <Setter Property="Background" Value="Transparent" />
+  <!-- Quiet section heading ("Workspace", "Pinned") -> folds into centered hairline in compact rail -->
+  <ControlTheme x:Key="{x:Type controls:VelaNavSectionHeader}" TargetType="controls:VelaNavSectionHeader">
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Margin" Value="0,10,0,2" />
+    <Setter Property="IsHitTestVisible" Value="False" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="PART_HoverBorder"
-                Background="Transparent"
-                CornerRadius="10"
-                ClipToBounds="True">
-          <DockPanel LastChildFill="True">
-            <!-- Fixed 44px leading slot (centered at x=22 -> 8 + 22 = 30 = 60/2 dead center of compact rail) -->
-            <Panel x:Name="PART_IconSlot"
-                   DockPanel.Dock="Left"
-                   Width="44"
-                   Height="36">
-              <PathIcon x:Name="PART_Icon"
-                        Width="16"
-                        Height="16"
-                        Data="{TemplateBinding Icon}"
-                        Foreground="{TemplateBinding Foreground}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
-            </Panel>
+        <Grid>
+          <TextBlock Text="{TemplateBinding Header}"
+                     FontSize="11.5"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource VelaTextMutedBrush}"
+                     VerticalAlignment="Center"
+                     Margin="12,0,8,0"
+                     Opacity="{TemplateBinding LabelOpacity}" />
+          <Border Width="22"
+                  Height="1"
+                  HorizontalAlignment="Left"
+                  Margin="11,0,0,0"
+                  VerticalAlignment="Center"
+                  Background="{DynamicResource VelaBorderBrush}"
+                  Opacity="{TemplateBinding DividerOpacity}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
 
-            <!-- Quiet monochrome badge (only shown when explicitly set) -->
-            <Border x:Name="PART_Badge"
-                    DockPanel.Dock="Right"
-                    Margin="4,0,10,0"
-                    Padding="6,1"
-                    VerticalAlignment="Center"
-                    CornerRadius="{DynamicResource VelaRadiusPill}"
-                    Background="{DynamicResource VelaSurfaceMutedBrush}"
-                    Opacity="{TemplateBinding LabelOpacity}"
-                    IsVisible="{TemplateBinding Badge, Converter={x:Static ObjectConverters.IsNotNull}}">
-              <ContentPresenter Content="{TemplateBinding Badge}"
-                                TextElement.FontSize="11"
-                                TextElement.FontWeight="Medium"
-                                TextElement.Foreground="{DynamicResource VelaTextMutedBrush}" />
-            </Border>
+  <!-- Arc App Rail VelaNavItem: crisp monochrome row + quiet counter + collapsible tree children with 1px guide line -->
+  <ControlTheme x:Key="{x:Type controls:VelaNavItem}" TargetType="controls:VelaNavItem">
+    <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="0">
+          <Border x:Name="PART_RowBorder"
+                  Height="34"
+                  Background="Transparent"
+                  CornerRadius="9"
+                  Cursor="Hand"
+                  ClipToBounds="True">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12" />
+              </Transitions>
+            </Border.Transitions>
 
-            <TextBlock x:Name="PART_Header"
-                       Text="{TemplateBinding Header}"
-                       VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis"
-                       Margin="0,0,8,0"
-                       Opacity="{TemplateBinding LabelOpacity}" />
-          </DockPanel>
-        </Border>
+            <DockPanel LastChildFill="True">
+              <!-- Fixed 44px leading icon slot (centered at x=22 -> 8 + 22 = 30 = 60/2 dead center of compact rail) -->
+              <Panel x:Name="PART_IconSlot"
+                     DockPanel.Dock="Left"
+                     Width="44"
+                     Height="34">
+                <PathIcon x:Name="PART_Icon"
+                          Width="15.5"
+                          Height="15.5"
+                          Data="{TemplateBinding Icon}"
+                          Foreground="{TemplateBinding Foreground}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+              </Panel>
+
+              <!-- Collapsible Tree Chevron -->
+              <Panel x:Name="PART_ChevronSlot"
+                     DockPanel.Dock="Right"
+                     Width="28"
+                     Height="34"
+                     Opacity="{TemplateBinding LabelOpacity}"
+                     IsVisible="{TemplateBinding HasChildren}">
+                <PathIcon x:Name="PART_Chevron"
+                          Width="12.5"
+                          Height="12.5"
+                          Data="{DynamicResource VelaIconChevronDown}"
+                          Foreground="{DynamicResource VelaTextMutedBrush}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+              </Panel>
+
+              <!-- Quiet Right-Aligned Counter / Badge (e.g. "4", "⌘K") -->
+              <ContentPresenter x:Name="PART_Badge"
+                                DockPanel.Dock="Right"
+                                Margin="6,0,11,0"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Badge}"
+                                TextElement.FontSize="12"
+                                TextElement.FontWeight="Normal"
+                                TextElement.Foreground="{DynamicResource VelaTextMutedBrush}"
+                                Opacity="{TemplateBinding LabelOpacity}"
+                                IsVisible="{TemplateBinding Badge, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+              <TextBlock x:Name="PART_Header"
+                         Text="{TemplateBinding Header}"
+                         VerticalAlignment="Center"
+                         TextTrimming="CharacterEllipsis"
+                         Margin="0,0,8,0"
+                         Opacity="{TemplateBinding LabelOpacity}" />
+            </DockPanel>
+          </Border>
+
+          <!-- Collapsible Nested Children with 1px Vertical Tree Guide Line -->
+          <controls:VelaCollapsePanel x:Name="PART_ChildrenCollapse"
+                                      IsExpanded="{TemplateBinding EffectiveExpanded}"
+                                      IsVisible="{TemplateBinding HasChildren}">
+            <Grid Margin="0,2,0,4">
+              <!-- Vertical hairline aligned directly under parent icon center (x=21.5) -->
+              <Border Width="1"
+                      HorizontalAlignment="Left"
+                      Margin="21.5,2,0,4"
+                      Background="{DynamicResource VelaBorderBrush}" />
+
+              <StackPanel x:Name="PART_ChildrenHost"
+                          Spacing="2"
+                          Margin="30,0,0,0" />
+            </Grid>
+          </controls:VelaCollapsePanel>
+        </StackPanel>
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^:pointerover:not(:selected) /template/ Border#PART_HoverBorder">
-      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    <!-- Nested Child Item Styling: clean 12px indent when text-only, balanced 34px icon slot when icon is present -->
+    <Style Selector="^:child:not(:has-icon) /template/ Panel#PART_IconSlot">
+      <Setter Property="Width" Value="12" />
     </Style>
-    <Style Selector="^:pointerover">
-      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Style Selector="^:child:has-icon /template/ Panel#PART_IconSlot">
+      <Setter Property="Width" Value="34" />
+    </Style>
+    <Style Selector="^:child:has-icon /template/ PathIcon#PART_Icon">
+      <Setter Property="Width" Value="14" />
+      <Setter Property="Height" Value="14" />
+    </Style>
+    <Style Selector="^:child /template/ Border#PART_RowBorder">
+      <Setter Property="Height" Value="32" />
     </Style>
 
-    <!-- Restrained active state: sharp primary foreground, no loud neon tint -->
-    <Style Selector="^:selected">
-      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <!-- Subtle hover on non-selected rows -->
+    <Style Selector="^:not(:selected) /template/ Border#PART_RowBorder:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
     </Style>
-    <Style Selector="^:selected /template/ Border#PART_Badge ContentPresenter">
+    <Style Selector="^ /template/ Border#PART_RowBorder:pointerover">
       <Setter Property="TextElement.Foreground" Value="{DynamicResource VelaForegroundBrush}" />
     </Style>
 
+    <!-- Crisp Monochrome Selected State -->
+    <Style Selector="^:selected">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="^:selected /template/ ContentPresenter#PART_Badge">
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+
+    <!-- Sticky Footer Item Selected Surface (outside scrollable indicator track) -->
+    <Style Selector="^:footer-item:selected /template/ Border#PART_RowBorder">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+
     <!-- Top DisplayMode -->
-    <Style Selector="^:top">
+    <Style Selector="^:top /template/ Border#PART_RowBorder">
       <Setter Property="Height" Value="34" />
     </Style>
     <Style Selector="^:top /template/ Panel#PART_IconSlot">
@@ -87,19 +173,14 @@
     </Style>
   </ControlTheme>
 
-  <!-- Restrained, performance-first VelaNavigationView backed by VelaPageDeck -->
+  <!-- Arc App Rail VelaNavigationView backed by VelaPageDeck -->
   <ControlTheme x:Key="{x:Type controls:VelaNavigationView}" TargetType="controls:VelaNavigationView">
     <Setter Property="Background" Value="{DynamicResource VelaBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
-    <Setter Property="ItemsPanel">
-      <ItemsPanelTemplate>
-        <StackPanel Orientation="Vertical" Spacing="2" />
-      </ItemsPanelTemplate>
-    </Setter>
     <Setter Property="Template">
       <ControlTemplate>
         <DockPanel Background="{TemplateBinding Background}">
-          <!-- Navigation Pane -->
+          <!-- Navigation Pane (Sidebar / Top Bar) -->
           <Border x:Name="PART_Pane"
                   DockPanel.Dock="Left"
                   Background="{DynamicResource VelaSidebarBackgroundBrush}"
@@ -107,37 +188,49 @@
                   BorderThickness="0,0,1,0"
                   ClipToBounds="True">
             <DockPanel LastChildFill="True">
-              <!-- Minimal Header + Toggle -->
+              <!-- Brand Header Row (dual expanded + compact emblem layers for zero-jump rail collapse) -->
               <Grid x:Name="PART_PaneHeaderRow"
                     DockPanel.Dock="Top"
-                    Height="52"
+                    Height="56"
                     Margin="8,4,8,2"
                     ColumnDefinitions="*,Auto">
                 <Panel x:Name="PART_HeaderHost"
                        VerticalAlignment="Center"
-                       Margin="8,0,4,0"
+                       Margin="6,0,4,0"
                        ClipToBounds="True">
                   <ContentPresenter Content="{TemplateBinding Header}" />
                 </Panel>
 
+                <!-- Compact Icon Rail Brand Emblem (visible when collapsed) -->
+                <Panel x:Name="PART_CompactHeaderHost"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Opacity="0"
+                       IsHitTestVisible="False">
+                  <ContentPresenter Content="{TemplateBinding CompactHeader}" />
+                </Panel>
+
+                <!-- Pane Toggle Button (auto-hides when ShowTopBar is true so toggle lives cleanly in TopBar) -->
                 <Button x:Name="PART_PaneToggle"
                         Grid.Column="1"
                         Theme="{DynamicResource VelaIconButtonTheme}"
-                        Width="32"
-                        Height="32"
-                        Margin="6,0"
+                        Width="30"
+                        Height="30"
+                        Margin="4,0"
                         CornerRadius="8"
                         IsVisible="{TemplateBinding IsPaneToggleVisible}"
                         ToolTip.Tip="Toggle sidebar">
                   <PathIcon x:Name="PART_ToggleIcon"
-                            Width="15"
-                            Height="15"
+                            Width="14"
+                            Height="14"
                             Data="{DynamicResource VelaIconChevronLeft}"
                             Foreground="{DynamicResource VelaTextMutedBrush}" />
                 </Button>
               </Grid>
 
-              <!-- Optional Search Box (hidden by default) -->
+              <!-- Optional Search Box -->
               <Panel x:Name="PART_SearchFold"
                      DockPanel.Dock="Top"
                      Margin="8,0,8,6"
@@ -158,80 +251,146 @@
                               VerticalAlignment="Center" />
                     <TextBox Theme="{DynamicResource VelaBareTextBoxTheme}"
                              Text="{TemplateBinding SearchText, Mode=TwoWay}"
-                             PlaceholderText="Filter..."
+                             PlaceholderText="Filter navigation..."
                              FontSize="12.5" />
                   </DockPanel>
                 </Border>
               </Panel>
 
-              <!-- Footer -->
-              <Panel x:Name="PART_FooterHost"
-                     DockPanel.Dock="Bottom"
-                     Margin="8,6,8,10"
-                     ClipToBounds="True">
-                <ContentPresenter Content="{TemplateBinding Footer}" />
-              </Panel>
+              <!-- Separated Profile / Account Footer (bottom-most) -->
+              <Border x:Name="PART_FooterSection"
+                      DockPanel.Dock="Bottom"
+                      BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                      BorderThickness="0,1,0,0"
+                      Padding="8,10">
+                <Grid>
+                  <Panel x:Name="PART_FooterHost" ClipToBounds="True">
+                    <ContentPresenter Content="{TemplateBinding Footer}" />
+                  </Panel>
+                  <Panel x:Name="PART_CompactFooterHost"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Opacity="0"
+                         IsHitTestVisible="False">
+                    <ContentPresenter Content="{TemplateBinding CompactFooter}" />
+                  </Panel>
+                </Grid>
+              </Border>
 
-              <!-- Nav Items + Quiet Neutral Gliding Selection Surface -->
+              <!-- Sticky Bottom Utility Items (e.g. Settings, Shortcuts — right above the footer hairline) -->
+              <StackPanel x:Name="PART_FooterItemsHost"
+                          DockPanel.Dock="Bottom"
+                          Margin="8,4,8,8"
+                          Spacing="2" />
+
+              <!-- Main Scrollable Navigation Tree + Quiet Gliding Neutral Pill -->
               <ScrollViewer x:Name="PART_ItemsScroller"
                             HorizontalScrollBarVisibility="Disabled"
                             VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="PART_NavTrack" Margin="8,4">
                   <Canvas IsHitTestVisible="False">
                     <Border x:Name="PART_ActiveIndicator"
-                            CornerRadius="10"
-                            Background="{DynamicResource VelaSurfaceBrush}"
-                            BorderBrush="{DynamicResource VelaBorderBrush}"
-                            BorderThickness="1"
-                            BoxShadow="{DynamicResource VelaShadowResting}"
+                            CornerRadius="9"
+                            Background="{DynamicResource VelaSurfaceMutedBrush}"
                             IsHitTestVisible="False" />
                   </Canvas>
 
-                  <ItemsPresenter x:Name="PART_ItemsPresenter"
-                                  ItemsPanel="{TemplateBinding ItemsPanel}" />
+                  <StackPanel x:Name="PART_ItemsHost"
+                              Orientation="Vertical"
+                              Spacing="2" />
                 </Grid>
               </ScrollViewer>
             </DockPanel>
           </Border>
 
-          <!-- High-Performance Cached Page Deck -->
-          <Border Background="{TemplateBinding Background}" ClipToBounds="True">
-            <controls:VelaPageDeck x:Name="PART_PageDeck"
-                                   PageCacheMode="{TemplateBinding PageCacheMode}"
-                                   MaxCachedPages="{TemplateBinding MaxCachedPages}"
-                                   TransitionMode="{TemplateBinding PageTransitionMode}"
-                                   PageTemplate="{TemplateBinding PageTemplate}" />
-          </Border>
+          <!-- Content Area: Optional Arc TopBar + O(1) Cached VelaPageDeck -->
+          <DockPanel Background="{TemplateBinding Background}">
+            <Border x:Name="PART_TopBar"
+                    DockPanel.Dock="Top"
+                    Height="50"
+                    Background="{DynamicResource VelaSurfaceBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="14,0,18,0"
+                    IsVisible="False">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Button x:Name="PART_TopBarToggle"
+                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Width="30"
+                        Height="30"
+                        CornerRadius="8"
+                        IsVisible="{TemplateBinding IsPaneToggleVisible}"
+                        ToolTip.Tip="Toggle sidebar">
+                  <PathIcon Width="15"
+                            Height="15"
+                            Data="{DynamicResource VelaIconSidebar}"
+                            Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                </Button>
+
+                <controls:VelaBreadcrumb x:Name="PART_TopBreadcrumb"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center" />
+
+                <ContentPresenter Grid.Column="2"
+                                  Content="{TemplateBinding TopBarContent}"
+                                  VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+
+            <Border Background="{TemplateBinding Background}" ClipToBounds="True">
+              <controls:VelaPageDeck x:Name="PART_PageDeck"
+                                     PageCacheMode="{TemplateBinding PageCacheMode}"
+                                     MaxCachedPages="{TemplateBinding MaxCachedPages}"
+                                     TransitionMode="{TemplateBinding PageTransitionMode}"
+                                     PageTemplate="{TemplateBinding PageTemplate}" />
+            </Border>
+          </DockPanel>
         </DockPanel>
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^ /template/ Button#PART_PaneToggle:pointerover">
-      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    <!-- Show TopBar & hide duplicate inline pane toggle when :topbar is active -->
+    <Style Selector="^:topbar /template/ Border#PART_TopBar">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:topbar /template/ Button#PART_PaneToggle">
+      <Setter Property="IsVisible" Value="False" />
     </Style>
 
-    <Style Selector="^:left /template/ ItemsPresenter#PART_ItemsPresenter">
-      <Setter Property="Width" Value="212" />
+    <!-- Floating Sidebar Variant (inset rounded card) -->
+    <Style Selector="^:floating /template/ Border#PART_Pane">
+      <Setter Property="Margin" Value="10,10,0,10" />
+      <Setter Property="CornerRadius" Value="16" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource VelaShadowResting}" />
+    </Style>
+
+    <!-- Frosted Sidebar Variant (translucent backdrop blur) -->
+    <Style Selector="^:frosted /template/ Border#PART_Pane">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="Opacity" Value="0.92" />
+    </Style>
+
+    <Style Selector="^:left /template/ StackPanel#PART_ItemsHost">
+      <Setter Property="Width" Value="228" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="^:left /template/ StackPanel#PART_FooterItemsHost">
+      <Setter Property="Width" Value="228" />
       <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 
     <Style Selector="^:compact /template/ Grid#PART_PaneHeaderRow">
       <Setter Property="Margin" Value="0,4,0,2" />
     </Style>
-    <Style Selector="^:compact /template/ Button#PART_PaneToggle">
+    <Style Selector="^:compact:not(:topbar) /template/ Button#PART_PaneToggle">
       <Setter Property="Grid.Column" Value="0" />
       <Setter Property="Grid.ColumnSpan" Value="2" />
       <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
 
     <!-- Top Mode -->
-    <Style Selector="^:top">
-      <Setter Property="ItemsPanel">
-        <ItemsPanelTemplate>
-          <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" />
-        </ItemsPanelTemplate>
-      </Setter>
-    </Style>
     <Style Selector="^:top /template/ Border#PART_Pane">
       <Setter Property="DockPanel.Dock" Value="Top" />
       <Setter Property="Height" Value="52" />
@@ -245,9 +404,10 @@
     <Style Selector="^:top /template/ Button#PART_PaneToggle">
       <Setter Property="IsVisible" Value="False" />
     </Style>
-    <Style Selector="^:top /template/ Panel#PART_FooterHost">
+    <Style Selector="^:top /template/ Border#PART_FooterSection">
       <Setter Property="DockPanel.Dock" Value="Right" />
-      <Setter Property="Margin" Value="10,0,14,0" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="10,0,14,0" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style Selector="^:top /template/ ScrollViewer#PART_ItemsScroller">

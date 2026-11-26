@@ -1208,4 +1208,38 @@ public partial class MainView : UserControl
         ResizableSharesText.Text =
             $"Live split shares — Explorer: {shares[0]:0.0}% · Editor: {shares[1]:0.0}% · Inspector: {shares[2]:0.0}% (double-click any divider to reset)";
     }
+
+    // ─── App Rail Sidebar Handlers ───────────────────────────────────────
+
+    private void OnPaneVariantChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (RootNav is null || sender is not VelaSegmentedControl seg) return;
+        var idx = seg.SelectedIndex;
+        RootNav.PaneVariant = idx switch
+        {
+            1 => VelaNavigationPaneVariant.Floating,
+            2 => VelaNavigationPaneVariant.Frosted,
+            _ => VelaNavigationPaneVariant.Standard,
+        };
+
+        if (PaneVariantSegmented is not null && !ReferenceEquals(seg, PaneVariantSegmented) && PaneVariantSegmented.SelectedIndex != idx)
+            PaneVariantSegmented.SelectedIndex = idx;
+        if (SettingsPaneVariantSegmented is not null && !ReferenceEquals(seg, SettingsPaneVariantSegmented) && SettingsPaneVariantSegmented.SelectedIndex != idx)
+            SettingsPaneVariantSegmented.SelectedIndex = idx;
+    }
+
+    private void OnTopBarVisibleChanged(object? sender, RoutedEventArgs e)
+    {
+        if (RootNav is null || TopBarVisibleSwitch is null) return;
+        RootNav.ShowTopBar = TopBarVisibleSwitch.IsChecked == true;
+    }
+
+    private void OnSettingsSearchSwitchChanged(object? sender, RoutedEventArgs e)
+    {
+        if (RootNav is null || SettingsSearchSwitch is null) return;
+        var vis = SettingsSearchSwitch.IsChecked == true;
+        RootNav.IsSearchVisible = vis;
+        if (SearchVisibleSwitch is not null && SearchVisibleSwitch.IsChecked != vis)
+            SearchVisibleSwitch.IsChecked = vis;
+    }
 }
