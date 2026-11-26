@@ -43,6 +43,11 @@
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSplitButton.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBreadcrumb.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPagination.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBusyOverlay.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaHoldToConfirm.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaRulerSlider.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaColorPicker.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaResizablePanels.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

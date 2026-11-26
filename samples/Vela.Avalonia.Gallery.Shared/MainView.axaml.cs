@@ -418,6 +418,15 @@ public partial class MainView : UserControl
         });
         CommandPalette.Commands.Add(new VelaCommandItem
         {
+            Title = "Go to Motion & Shaders Studio",
+            Description = "ShaderBackground, HoldToConfirm, ColorPicker, RulerSlider, ResizablePanels, BusyOverlay",
+            Group = "Navigation",
+            Icon = Icon("VelaIconSparkles"),
+            Shortcut = "G M",
+            Execute = () => RootNav.SelectedIndex = 12,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
             Title = "Toggle Dark Mode",
             Description = "Switch Light and Dark OKLCH themes",
             Group = "Appearance",
@@ -1104,5 +1113,99 @@ public partial class MainView : UserControl
         var start = (page - 1) * 10 + 1;
         var end = page * 10;
         PaginationSummaryText.Text = $"Showing items {start}–{end} of {total * 10} (Page {page} of {total})";
+    }
+
+    // ─── Motion & Shaders Studio (Batch 2) Handlers ──────────────────────
+
+    private void OnShaderPresetChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (HeroShaderBg is null || ShaderPresetSegmented is null) return;
+        HeroShaderBg.Preset = ShaderPresetSegmented.SelectedIndex switch
+        {
+            1 => VelaShaderBackgroundPreset.Aurora,
+            2 => VelaShaderBackgroundPreset.Silk,
+            _ => VelaShaderBackgroundPreset.Mesh,
+        };
+    }
+
+    private void OnShaderAnimateChanged(object? sender, RoutedEventArgs e)
+    {
+        if (HeroShaderBg is null || ShaderAnimateSwitch is null) return;
+        HeroShaderBg.IsAnimated = ShaderAnimateSwitch.IsChecked == true;
+    }
+
+    private void OnShaderTintPicked(object? sender, Color color)
+    {
+        if (HeroShaderBg is null) return;
+        HeroShaderBg.PrimaryColor = color;
+    }
+
+    private void OnShaderResetTintClick(object? sender, RoutedEventArgs e)
+    {
+        HeroShaderBg.PrimaryColor = null;
+        HeroShaderBg.SecondaryColor = null;
+        HeroShaderBg.TertiaryColor = null;
+        ToastHost.Show("Synced to Theme", "Shader palette now tracks VelaTheme Accent live.", VelaToastTone.Info);
+    }
+
+    private void OnHoldStateChanged(object? sender, bool holding)
+    {
+        if (HoldStatusText is null) return;
+        HoldStatusText.Text = holding
+            ? "Keep holding to confirm..."
+            : "Tip: release halfway to watch spring rewind.";
+    }
+
+    private void OnHoldDangerConfirmed(object? sender, EventArgs e)
+        => ToastHost.Show("Cache purged", "Local snapshot store cleared safely.", VelaToastTone.Danger);
+
+    private void OnHoldAccentConfirmed(object? sender, EventArgs e)
+        => ToastHost.Show("Published v1.0", "Release pipeline started.", VelaToastTone.Success);
+
+    private void OnHoldNeutralConfirmed(object? sender, EventArgs e)
+        => ToastHost.Show("Archive sealed", "Bundle locked with SHA-256 signature.", VelaToastTone.Info);
+
+    private void OnHoldResetAllClick(object? sender, RoutedEventArgs e)
+    {
+        HoldDangerBtn.Reset();
+        HoldAccentBtn.Reset();
+        HoldNeutralBtn.Reset();
+        HoldStatusText.Text = "All hold-to-confirm buttons rewound.";
+    }
+
+    private void OnBusySwitchChanged(object? sender, RoutedEventArgs e)
+    {
+        if (DemoBusyOverlay is null || BusyDemoSwitch is null) return;
+        DemoBusyOverlay.IsBusy = BusyDemoSwitch.IsChecked == true;
+    }
+
+    private async void OnSimulateBusyTaskClick(object? sender, RoutedEventArgs e)
+    {
+        if (DemoBusyOverlay is null) return;
+        DemoBusyOverlay.IsBusy = true;
+        if (BusyDemoSwitch is not null) BusyDemoSwitch.IsChecked = true;
+        await Task.Delay(2200);
+        DemoBusyOverlay.IsBusy = false;
+        if (BusyDemoSwitch is not null) BusyDemoSwitch.IsChecked = false;
+        ToastHost.Show("Task completed", "Workspace shaders indexed in 2.2s.", VelaToastTone.Success);
+    }
+
+    private void OnInlineColorChanged(object? sender, Color color)
+    {
+        if (ColorPreviewBanner is null || ColorPreviewReadout is null) return;
+        ColorPreviewBanner.Background = new SolidColorBrush(color);
+        ColorPreviewReadout.Text = InlineColorPicker.HexText;
+    }
+
+    private void OnResetSplitClick(object? sender, RoutedEventArgs e)
+    {
+        DemoSplitPanels.ResetLayout();
+    }
+
+    private void OnSplitLayoutChanged(object? sender, IReadOnlyList<double> shares)
+    {
+        if (ResizableSharesText is null || shares.Count < 3) return;
+        ResizableSharesText.Text =
+            $"Live split shares — Explorer: {shares[0]:0.0}% · Editor: {shares[1]:0.0}% · Inspector: {shares[2]:0.0}% (double-click any divider to reset)";
     }
 }

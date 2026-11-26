@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaBusyOverlay}" TargetType="controls:VelaBusyOverlay">
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Content="{TemplateBinding Content}" />
+
+            <Grid x:Name="PART_Overlay"
+                  IsVisible="False"
+                  Opacity="0">
+              <!-- Native Avalonia 12.2 frosted backdrop blur -->
+              <Border x:Name="PART_Backdrop"
+                      Background="{DynamicResource VelaSurfaceBrush}"
+                      Opacity="0.68" />
+
+              <!-- Restrained floating status pill -->
+              <Border x:Name="PART_Pill"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                      BorderBrush="{DynamicResource VelaBorderBrush}"
+                      BorderThickness="1"
+                      CornerRadius="14"
+                      Padding="18,12"
+                      BoxShadow="{DynamicResource VelaShadowRaised}">
+                <StackPanel Orientation="Horizontal" Spacing="11" VerticalAlignment="Center">
+                  <controls:VelaSpinnerRing x:Name="PART_Spinner"
+                                            Width="20"
+                                            Height="20"
+                                            StrokeThickness="2.4"
+                                            IsActive="False" />
+                  <TextBlock Text="{TemplateBinding Message}"
+                             FontSize="13.5"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource VelaForegroundBrush}"
+                             VerticalAlignment="Center"
+                             IsVisible="{TemplateBinding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+              </Border>
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaRulerSlider}" TargetType="controls:VelaRulerSlider">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="10">
+          <!-- Header: Label + Precision Readout -->
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{TemplateBinding Label}"
+                       FontSize="13"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                       VerticalAlignment="Bottom"
+                       IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Bottom">
+              <TextBlock Text="{TemplateBinding FormattedValue}"
+                         FontSize="22"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource VelaForegroundBrush}" />
+              <TextBlock Text="{TemplateBinding Unit}"
+                         FontSize="13"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         VerticalAlignment="Bottom"
+                         Margin="0,0,0,3"
+                         IsVisible="{TemplateBinding Unit, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Sliding Tape Viewport -->
+          <Border x:Name="PART_Viewport"
+                  Height="62"
+                  CornerRadius="14"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  ClipToBounds="True"
+                  Cursor="SizeWestEast">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+            <controls:VelaRulerTape x:Name="PART_Tape" />
+          </Border>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Viewport">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_Viewport">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,137 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaHoldToConfirm}" TargetType="controls:VelaHoldToConfirm">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Shell"
+                MinHeight="{TemplateBinding MinHeight}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Background="{DynamicResource VelaSurfaceBrush}"
+                BorderBrush="{DynamicResource VelaBorderBrush}"
+                BorderThickness="1"
+                ClipToBounds="True">
+          <Grid x:Name="PART_ContentGrid">
+            <!-- Idle / Surface Face (drives natural layout width with VelaMorphSlotPanel) -->
+            <Border x:Name="PART_BaseFace" Padding="15,0">
+              <StackPanel Orientation="Horizontal"
+                          Spacing="8"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
+                <PathIcon x:Name="PART_BaseIcon"
+                          Width="15"
+                          Height="15"
+                          VerticalAlignment="Center" />
+                <controls:VelaMorphSlotPanel VerticalAlignment="Center">
+                  <TextBlock x:Name="PART_BaseLabel"
+                             Text="{TemplateBinding DisplayLabel}"
+                             FontSize="13.5"
+                             FontWeight="Medium"
+                             VerticalAlignment="Center" />
+                </controls:VelaMorphSlotPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Advancing Clipped Inverted Fill Face (zero layout impact via Canvas + ClipToBounds) -->
+            <Canvas IsHitTestVisible="False">
+              <Border x:Name="PART_FillClip"
+                      Width="0"
+                      ClipToBounds="True"
+                      IsHitTestVisible="False">
+                <Border x:Name="PART_FillLayer"
+                        Padding="15,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        IsHitTestVisible="False">
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="8"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
+                    <PathIcon x:Name="PART_FillIcon"
+                              Width="15"
+                              Height="15"
+                              VerticalAlignment="Center" />
+                    <TextBlock x:Name="PART_FillLabel"
+                               Text="{TemplateBinding DisplayLabel}"
+                               FontSize="13.5"
+                               FontWeight="Medium"
+                               VerticalAlignment="Center" />
+                  </StackPanel>
+                </Border>
+              </Border>
+            </Canvas>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Danger Tone -->
+    <Style Selector="^:danger /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaDangerMutedBrush}" />
+      <Setter Property="Background" Value="{DynamicResource VelaDangerSubtleBrush}" />
+    </Style>
+    <Style Selector="^:danger /template/ PathIcon#PART_BaseIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:danger /template/ TextBlock#PART_BaseLabel">
+      <Setter Property="Foreground" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:danger /template/ Border#PART_FillLayer">
+      <Setter Property="Background" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:danger /template/ PathIcon#PART_FillIcon">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="^:danger /template/ TextBlock#PART_FillLabel">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- Accent Tone -->
+    <Style Selector="^:accent /template/ PathIcon#PART_BaseIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+    <Style Selector="^:accent /template/ TextBlock#PART_BaseLabel">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:accent /template/ Border#PART_FillLayer">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+    <Style Selector="^:accent /template/ PathIcon#PART_FillIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentForegroundBrush}" />
+    </Style>
+    <Style Selector="^:accent /template/ TextBlock#PART_FillLabel">
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentForegroundBrush}" />
+    </Style>
+
+    <!-- Neutral Tone -->
+    <Style Selector="^:neutral /template/ PathIcon#PART_BaseIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    </Style>
+    <Style Selector="^:neutral /template/ TextBlock#PART_BaseLabel">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:neutral /template/ Border#PART_FillLayer">
+      <Setter Property="Background" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:neutral /template/ PathIcon#PART_FillIcon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaBackgroundBrush}" />
+    </Style>
+    <Style Selector="^:neutral /template/ TextBlock#PART_FillLabel">
+      <Setter Property="Foreground" Value="{DynamicResource VelaBackgroundBrush}" />
+    </Style>
+
+    <Style Selector="^:confirmed">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

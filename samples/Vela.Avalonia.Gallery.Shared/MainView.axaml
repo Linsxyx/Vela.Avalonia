@@ -1597,6 +1597,343 @@
           </ScrollViewer>
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
+
+      <!-- Page 13: Motion & Shaders Studio (Batch 2) -->
+      <vela:VelaNavItem Header="Motion &amp; Shaders"
+                        Category="ShaderBackground HoldToConfirm ColorPicker RulerSlider ResizablePanels BusyOverlay"
+                        Icon="{DynamicResource VelaIconSparkles}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="24" MaxWidth="920">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Motion &amp; Shaders Studio" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Clean-room MIT SkSL GPU ambient shaders paired with Liquid Glass optical refraction, hold-to-confirm edge-clipped buttons, tape-measure inertia sliders, studio HSV/OKLCH color picker, elastic split panes, and frosted busy overlays." />
+              </StackPanel>
+
+              <!-- 1. VelaShaderBackground + VelaLiquidGlass Hero Stage -->
+              <Border Classes="card" Padding="20">
+                <StackPanel Spacing="16">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaShaderBackground × VelaLiquidGlass" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="MIT clean-room SkSL ambient flow synced to VelaTheme accent &amp; Light/Dark mode, refracted live through our optical Liquid Glass lens." />
+                    </StackPanel>
+                    <vela:VelaSegmentedControl x:Name="ShaderPresetSegmented"
+                                               Grid.Column="1"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnShaderPresetChanged">
+                      <x:String>Mesh</x:String>
+                      <x:String>Aurora</x:String>
+                      <x:String>Silk</x:String>
+                    </vela:VelaSegmentedControl>
+                  </Grid>
+
+                  <Border Height="236"
+                          CornerRadius="16"
+                          BorderBrush="{DynamicResource VelaBorderBrush}"
+                          BorderThickness="1"
+                          ClipToBounds="True">
+                    <Grid>
+                      <vela:VelaShaderBackground x:Name="HeroShaderBg"
+                                                 Preset="Mesh"
+                                                 Speed="1.0"
+                                                 Intensity="0.85" />
+
+                      <vela:VelaLiquidGlass HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            CornerRadius="22"
+                                            Padding="24,18"
+                                            BlurRadius="12"
+                                            BevelWidth="18"
+                                            Refraction="0.8"
+                                            Dispersion="0.6">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                          <TextBlock Text="SkSL Fluid × Optical Glass"
+                                     FontSize="17"
+                                     FontWeight="SemiBold"
+                                     HorizontalAlignment="Center" />
+                          <TextBlock Text="Switch Accent or Dark Mode — colors interpolate smoothly on GPU"
+                                     FontSize="12.5"
+                                     Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                                     HorizontalAlignment="Center" />
+                        </StackPanel>
+                      </vela:VelaLiquidGlass>
+                    </Grid>
+                  </Border>
+
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="16" LineSpacing="10">
+                    <vela:VelaSwitch x:Name="ShaderAnimateSwitch"
+                                     Content="Animate GPU flow"
+                                     IsChecked="True"
+                                     IsCheckedChanged="OnShaderAnimateChanged" />
+                    <vela:VelaColorPicker x:Name="ShaderTintPicker"
+                                          Label="Custom tint"
+                                          SelectedColor="#6850B9"
+                                          ShowAlpha="False"
+                                          ColorChanged="OnShaderTintPicked" />
+                    <vela:VelaButton Variant="Ghost"
+                                     Size="Small"
+                                     Content="Sync to Theme Accent"
+                                     Click="OnShaderResetTintClick" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+
+              <!-- 2. VelaHoldToConfirm + 3. VelaBusyOverlay -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="16">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaHoldToConfirm" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Press and hold (or hold Space/Enter). Release early to feel the spring rewind; hold to completion to morph width &amp; icon." />
+                    </StackPanel>
+
+                    <StackPanel Spacing="10">
+                      <vela:VelaHoldToConfirm x:Name="HoldDangerBtn"
+                                              Tone="Danger"
+                                              Label="Hold to purge cache"
+                                              ConfirmedLabel="Cache purged"
+                                              DurationMs="1000"
+                                              HoldChanged="OnHoldStateChanged"
+                                              Confirmed="OnHoldDangerConfirmed" />
+
+                      <vela:VelaHoldToConfirm x:Name="HoldAccentBtn"
+                                              Tone="Accent"
+                                              Icon="{DynamicResource VelaIconRocket}"
+                                              Label="Hold to publish v1.0"
+                                              ConfirmedLabel="Published"
+                                              DurationMs="1100"
+                                              HoldChanged="OnHoldStateChanged"
+                                              Confirmed="OnHoldAccentConfirmed" />
+
+                      <vela:VelaHoldToConfirm x:Name="HoldNeutralBtn"
+                                              Tone="Neutral"
+                                              Icon="{DynamicResource VelaIconShield}"
+                                              Label="Hold to seal archive"
+                                              ConfirmedLabel="Sealed"
+                                              DurationMs="900"
+                                              HoldChanged="OnHoldStateChanged"
+                                              Confirmed="OnHoldNeutralConfirmed" />
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                      <TextBlock x:Name="HoldStatusText"
+                                 Text="Tip: release halfway to watch spring rewind."
+                                 FontSize="12"
+                                 Foreground="{DynamicResource VelaTextMutedBrush}"
+                                 VerticalAlignment="Center"
+                                 TextWrapping="Wrap" />
+                      <vela:VelaButton Grid.Column="1"
+                                       Variant="Secondary"
+                                       Size="Small"
+                                       Content="Reset All"
+                                       Click="OnHoldResetAllClick" />
+                    </Grid>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Spacing="2">
+                        <TextBlock Classes="cardTitle" Text="VelaBusyOverlay" />
+                        <TextBlock Classes="cardDesc"
+                                   Text="Localized Avalonia 12.2 BackdropEffect blur + spring-faded spinner ring." />
+                      </StackPanel>
+                      <vela:VelaSwitch x:Name="BusyDemoSwitch"
+                                       Grid.Column="1"
+                                       IsChecked="False"
+                                       IsCheckedChanged="OnBusySwitchChanged" />
+                    </Grid>
+
+                    <vela:VelaBusyOverlay x:Name="DemoBusyOverlay"
+                                          Message="Indexing workspace shaders..."
+                                          BlurRadius="10"
+                                          CornerRadius="12">
+                      <Border Background="{DynamicResource VelaSurfaceMutedBrush}"
+                              BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                              BorderThickness="1"
+                              CornerRadius="12"
+                              Padding="16">
+                        <StackPanel Spacing="10">
+                          <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Build Pipeline #402" FontSize="14" FontWeight="SemiBold" />
+                            <vela:VelaBadge Tone="Success" IsPill="True" Content="Active" />
+                          </Grid>
+                          <TextBlock Text="When busy is enabled, this card blurs smoothly with native GPU backdrop blur and blocks accidental clicks underneath."
+                                     FontSize="12.5"
+                                     Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                                     TextWrapping="Wrap" />
+                          <vela:VelaButton Variant="Secondary"
+                                           Size="Small"
+                                           Content="Simulate 2.2s Task"
+                                           Click="OnSimulateBusyTaskClick" />
+                        </StackPanel>
+                      </Border>
+                    </vela:VelaBusyOverlay>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- 4. VelaRulerSlider -->
+              <Border Classes="card">
+                <StackPanel Spacing="18">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="cardTitle" Text="VelaRulerSlider" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Precision tape-measure input: drag 1:1, flick to coast with inertia, pull past bounds for rubber-band resistance, tap any tick, or scroll mouse wheel." />
+                  </StackPanel>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+                    <vela:VelaRulerSlider x:Name="ExposureRuler"
+                                          Label="Color Temperature"
+                                          Unit="K"
+                                          Minimum="2500"
+                                          Maximum="8500"
+                                          Step="100"
+                                          MajorEvery="10"
+                                          TickSpacing="9"
+                                          Value="5600"
+                                          FormatString="0" />
+
+                    <vela:VelaRulerSlider x:Name="ZoomRuler"
+                                          Grid.Column="1"
+                                          Label="Canvas Zoom"
+                                          Unit="%"
+                                          Minimum="25"
+                                          Maximum="200"
+                                          Step="5"
+                                          MajorEvery="5"
+                                          TickSpacing="10"
+                                          Value="100"
+                                          FormatString="0" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- 5. VelaColorPicker -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="cardTitle" Text="VelaColorPicker" />
+                    <TextBlock Classes="cardDesc"
+                               Text="2D HSV spectrum, Hue &amp; Alpha bars with spring thumbs, Hex / RGB / HSL / OKLCH cycler, live WCAG 2.1 contrast badge, and saved swatches." />
+                  </StackPanel>
+
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="24" LineSpacing="16">
+                    <vela:VelaColorPicker x:Name="InlineColorPicker"
+                                          IsInline="True"
+                                          Label="Brand Surface"
+                                          SelectedColor="#2F6BFF"
+                                          ColorChanged="OnInlineColorChanged" />
+
+                    <StackPanel Spacing="14" Width="280" VerticalAlignment="Top">
+                      <Border x:Name="ColorPreviewBanner"
+                              Height="96"
+                              CornerRadius="14"
+                              Background="#2F6BFF"
+                              Padding="16">
+                        <StackPanel VerticalAlignment="Bottom" Spacing="2">
+                          <TextBlock Text="Live Color Output"
+                                     FontSize="14"
+                                     FontWeight="SemiBold"
+                                     Foreground="White" />
+                          <TextBlock x:Name="ColorPreviewReadout"
+                                     Text="#2F6BFF"
+                                     FontFamily="JetBrains Mono, Menlo, Consolas, monospace"
+                                     FontSize="12"
+                                     Foreground="#DDFFFFFF" />
+                        </StackPanel>
+                      </Border>
+
+                      <TextBlock Text="Also available as a compact swatch trigger with a floating VelaPopupSurface:"
+                                 FontSize="12.5"
+                                 Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                                 TextWrapping="Wrap" />
+
+                      <vela:VelaColorPicker Label="Secondary Accent"
+                                            SelectedColor="#10A870" />
+                    </StackPanel>
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+
+              <!-- 6. VelaResizablePanels -->
+              <Border Classes="card">
+                <StackPanel Spacing="14">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaResizablePanels" />
+                      <TextBlock x:Name="ResizableSharesText"
+                                 Classes="cardDesc"
+                                 Text="Drag dividers 1:1 · drag Explorer/Inspector past min width to collapse · click restore pill or double-click any divider to reset." />
+                    </StackPanel>
+                    <vela:VelaButton Grid.Column="1"
+                                     Variant="Secondary"
+                                     Size="Small"
+                                     Content="Reset Split"
+                                     Click="OnResetSplitClick" />
+                  </Grid>
+
+                  <vela:VelaResizablePanels x:Name="DemoSplitPanels"
+                                            Height="210"
+                                            LayoutChanged="OnSplitLayoutChanged">
+                    <vela:VelaResizablePane Header="Explorer"
+                                            DefaultShare="1.0"
+                                            MinSize="110"
+                                            IsCollapsible="True">
+                      <Border Background="{DynamicResource VelaSidebarBackgroundBrush}" Padding="14">
+                        <StackPanel Spacing="8">
+                          <TextBlock Text="EXPLORER" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                          <TextBlock Text="VelaShaderBackground.cs" FontSize="12.5" />
+                          <TextBlock Text="VelaHoldToConfirm.cs" FontSize="12.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                          <TextBlock Text="VelaRulerSlider.cs" FontSize="12.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                          <TextBlock Text="VelaColorPicker.cs" FontSize="12.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        </StackPanel>
+                      </Border>
+                    </vela:VelaResizablePane>
+
+                    <vela:VelaResizablePane Header="Editor"
+                                            DefaultShare="2.2"
+                                            MinSize="160">
+                      <Border Background="{DynamicResource VelaSurfaceBrush}" Padding="16">
+                        <StackPanel Spacing="8">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Editor Canvas" FontSize="13.5" FontWeight="SemiBold" />
+                            <vela:VelaBadge Tone="Neutral" IsPill="True" Content="Flex Primary" />
+                          </StackPanel>
+                          <TextBlock Text="Drag either hairline divider to feel 1:1 tracking and elastic rubber-band resistance at min sizes. Pull the left or right pane well past its minimum width to collapse it into a restore pill."
+                                     FontSize="12.5"
+                                     LineHeight="19"
+                                     Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                                     TextWrapping="Wrap" />
+                        </StackPanel>
+                      </Border>
+                    </vela:VelaResizablePane>
+
+                    <vela:VelaResizablePane Header="Inspector"
+                                            DefaultShare="1.1"
+                                            MinSize="110"
+                                            IsCollapsible="True">
+                      <Border Background="{DynamicResource VelaSurfaceMutedBrush}" Padding="14">
+                        <StackPanel Spacing="8">
+                          <TextBlock Text="INSPECTOR" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                          <TextBlock Text="FPS: 60 Hz (idle 0%)" FontSize="12" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                          <TextBlock Text="Springs: Analytical 2nd-order" FontSize="12" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                          <TextBlock Text="Double-click divider to reset" FontSize="11.5" Foreground="{DynamicResource VelaTextMutedBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+                      </Border>
+                    </vela:VelaResizablePane>
+                  </vela:VelaResizablePanels>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
         </vela:VelaNavigationView>
           </DockPanel>
         </vela:VelaDialogHost>
