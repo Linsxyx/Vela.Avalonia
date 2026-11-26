@@ -109,12 +109,15 @@ This repository includes a WebAssembly head (`samples/Vela.Avalonia.Gallery.Brow
 
 ---
 
-## Automated NuGet Publishing (GitHub Actions)
+## Automated NuGet Publishing (Trusted Publishing / OIDC)
 
-`.github/workflows/release.yml` builds, tests, packs (`Vela.Avalonia` + `Vela.Avalonia.Charts` with `.snupkg` symbols), publishes to NuGet.org, and creates a GitHub Release automatically:
+`.github/workflows/release.yml` uses **NuGet Trusted Publishing (`NuGet/login@v1`)** via GitHub OIDC — no long-lived API keys to store or rotate. It builds, runs all unit tests, packs `Vela.Avalonia` + `Vela.Avalonia.Charts` (with `.snupkg` symbols), publishes to NuGet.org, and creates a GitHub Release automatically:
 
-1. Generate an API key on [nuget.org](https://www.nuget.org/account/apikeys).
-2. In your GitHub repo, open **Settings → Secrets and variables → Actions → New repository secret** and add **`NUGET_API_KEY`**.
+1. On [nuget.org](https://www.nuget.org/), open **Account settings → Trusted Publishers → Add a new publisher (GitHub)**:
+   - **Owner / Repository**: your GitHub owner and repository name
+   - **Workflow File**: `release.yml` (filename only, without `.github/workflows/`)
+   - **Environment**: leave blank
+2. In your GitHub repo, open **Settings → Secrets and variables → Actions → Variables** and add **`NUGET_USER`** set to your NuGet.org profile username (not your email).
 3. Push a semantic version tag:
 
 ```bash
