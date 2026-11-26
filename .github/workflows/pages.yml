@@ -2,7 +2,7 @@ name: Deploy Gallery to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
@@ -28,7 +28,9 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Install wasm-tools workload
-        run: dotnet workload install wasm-tools
+        run: |
+          dotnet --version
+          dotnet workload install wasm-tools
 
       - name: Publish Browser Gallery (WebAssembly)
         run: dotnet publish samples/Vela.Avalonia.Gallery.Browser/Vela.Avalonia.Gallery.Browser.csproj -c Release

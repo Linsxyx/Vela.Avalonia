@@ -81,6 +81,13 @@ html, body {
 .splash-sub {
   font-size: 12.5px;
   color: var(--muted);
+  max-width: 360px;
+  text-align: center;
+  word-break: break-word;
+}
+
+.splash-sub.is-error {
+  color: #dc2626;
 }
 
 .splash-bar {
