@@ -1,0 +1,180 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <!-- VelaDropdownButton with gliding spring hover highlight -->
+  <ControlTheme x:Key="{x:Type controls:VelaDropdownButton}" TargetType="controls:VelaDropdownButton">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <Button x:Name="PART_Trigger"
+                  MinHeight="{DynamicResource VelaControlHeightSm}"
+                  Padding="12,0"
+                  CornerRadius="12"
+                  Background="{DynamicResource VelaSurfaceBrush}"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  Foreground="{DynamicResource VelaForegroundBrush}"
+                  FontSize="{DynamicResource VelaTextSm}"
+                  FontWeight="Medium"
+                  Cursor="Hand">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <PathIcon Width="15"
+                        Height="15"
+                        Data="{TemplateBinding LeadingIcon}"
+                        Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                        VerticalAlignment="Center"
+                        IsVisible="{TemplateBinding LeadingIcon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+              <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+              <PathIcon x:Name="PART_Chevron"
+                        Width="14"
+                        Height="14"
+                        Data="{DynamicResource VelaIconChevronDown}"
+                        Foreground="{DynamicResource VelaTextMutedBrush}"
+                        VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+
+          <Popup x:Name="PART_Popup"
+                 WindowManagerAddShadowHint="False"
+                 IsOpen="{TemplateBinding IsOpen, Mode=TwoWay}"
+                 PlacementTarget="PART_Trigger"
+                 Placement="BottomEdgeAlignedLeft"
+                 VerticalOffset="6"
+                 IsLightDismissEnabled="True">
+            <controls:VelaPopupSurface Margin="6,2,6,16"
+                                       MinWidth="{TemplateBinding MenuMinWidth}"
+                                       Padding="5"
+                                       CornerRadius="14"
+                                       BorderThickness="1"
+                                       Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                                       BorderBrush="{DynamicResource VelaBorderBrush}"
+                                       BoxShadow="{DynamicResource VelaShadowFloating}">
+              <Grid x:Name="PART_MenuTrack">
+                <!-- Gliding hover highlight pill (transitions to soft danger tint on destructive items) -->
+                <Canvas IsHitTestVisible="False">
+                  <Border x:Name="PART_Highlight"
+                          CornerRadius="10"
+                          Background="{DynamicResource VelaSurfaceMutedBrush}"
+                          IsHitTestVisible="False" />
+                </Canvas>
+
+                <StackPanel x:Name="PART_ItemsHost" Spacing="1" />
+              </Grid>
+            </controls:VelaPopupSurface>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^ /template/ Button#PART_Trigger:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+    <Style Selector="^:open /template/ Button#PART_Trigger">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Native Avalonia ContextMenu & MenuItem themed identically to VelaDropdownButton -->
+  <ControlTheme x:Key="{x:Type ContextMenu}" TargetType="ContextMenu">
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="5" />
+    <Setter Property="MinWidth" Value="188" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <controls:VelaPopupSurface Margin="4,2,4,12"
+                                   Background="{TemplateBinding Background}"
+                                   BorderBrush="{TemplateBinding BorderBrush}"
+                                   BorderThickness="{TemplateBinding BorderThickness}"
+                                   CornerRadius="{TemplateBinding CornerRadius}"
+                                   Padding="{TemplateBinding Padding}"
+                                   MinWidth="{TemplateBinding MinWidth}"
+                                   BoxShadow="{DynamicResource VelaShadowFloating}">
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+            <ItemsPresenter x:Name="PART_ItemsPresenter"
+                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                            KeyboardNavigation.TabNavigation="Continue" />
+          </ScrollViewer>
+        </controls:VelaPopupSurface>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type MenuItem}" TargetType="MenuItem">
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FontSize" Value="13.5" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_LayoutRoot"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}"
+                MinHeight="{TemplateBinding MinHeight}">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
+            <ContentPresenter x:Name="PART_IconPresenter"
+                              Content="{TemplateBinding Icon}"
+                              Width="16"
+                              Height="16"
+                              VerticalAlignment="Center"
+                              IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <ContentPresenter x:Name="PART_HeaderPresenter"
+                              Grid.Column="1"
+                              Content="{TemplateBinding Header}"
+                              ContentTemplate="{TemplateBinding HeaderTemplate}"
+                              RecognizesAccessKey="True"
+                              VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2"
+                       Text="{TemplateBinding InputGesture}"
+                       FontSize="11.5"
+                       Foreground="{DynamicResource VelaTextMutedBrush}"
+                       Margin="14,0,0,0"
+                       VerticalAlignment="Center"
+                       IsVisible="{TemplateBinding InputGesture, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^.danger">
+      <Setter Property="Foreground" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^.danger:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource VelaDangerSubtleBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Separator}" TargetType="Separator">
+    <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Margin" Value="4,4" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                Height="{TemplateBinding Height}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

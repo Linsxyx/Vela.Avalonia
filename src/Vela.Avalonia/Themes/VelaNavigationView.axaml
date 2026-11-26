@@ -122,16 +122,11 @@
 
                 <Button x:Name="PART_PaneToggle"
                         Grid.Column="1"
+                        Theme="{DynamicResource VelaIconButtonTheme}"
                         Width="32"
                         Height="32"
                         Margin="6,0"
-                        Padding="0"
                         CornerRadius="8"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Cursor="Hand"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
                         IsVisible="{TemplateBinding IsPaneToggleVisible}"
                         ToolTip.Tip="Toggle sidebar">
                   <PathIcon x:Name="PART_ToggleIcon"
@@ -161,14 +156,10 @@
                               Data="{DynamicResource VelaIconSearch}"
                               Foreground="{DynamicResource VelaTextMutedBrush}"
                               VerticalAlignment="Center" />
-                    <TextBox Text="{TemplateBinding SearchText, Mode=TwoWay}"
+                    <TextBox Theme="{DynamicResource VelaBareTextBoxTheme}"
+                             Text="{TemplateBinding SearchText, Mode=TwoWay}"
                              PlaceholderText="Filter..."
-                             BorderThickness="0"
-                             Background="Transparent"
-                             Padding="0"
-                             MinHeight="0"
-                             FontSize="12.5"
-                             VerticalContentAlignment="Center" />
+                             FontSize="12.5" />
                   </DockPanel>
                 </Border>
               </Panel>

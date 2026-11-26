@@ -1,0 +1,106 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaBadge}" TargetType="controls:VelaBadge">
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="Padding" Value="9,0" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Border"
+                MinHeight="{TemplateBinding MinHeight}"
+                Padding="{TemplateBinding Padding}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+          <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Ellipse x:Name="PART_Dot"
+                     Width="6"
+                     Height="6"
+                     Fill="{TemplateBinding Foreground}"
+                     VerticalAlignment="Center"
+                     IsVisible="{TemplateBinding ShowDot}" />
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              VerticalAlignment="Center" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Sizes -->
+    <Style Selector="^:sm">
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="Padding" Value="7,0" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style Selector="^:lg">
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="Padding" Value="11,0" />
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="^:pill">
+      <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusPill}" />
+    </Style>
+
+    <!-- Semantic Tones (OKLab soft tints) -->
+    <Style Selector="^:neutral">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    </Style>
+    <Style Selector="^:neutral:outline">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+
+    <Style Selector="^:accent">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentSubtleBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaAccentStrongBrush}" />
+    </Style>
+    <Style Selector="^:accent:outline">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+
+    <Style Selector="^:success">
+      <Setter Property="Background" Value="{DynamicResource VelaSuccessSubtleBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaSuccessBrush}" />
+    </Style>
+    <Style Selector="^:success:outline">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaSuccessBrush}" />
+    </Style>
+
+    <Style Selector="^:warning">
+      <Setter Property="Background" Value="{DynamicResource VelaWarningSubtleBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaWarningBrush}" />
+    </Style>
+    <Style Selector="^:warning:outline">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaWarningBrush}" />
+    </Style>
+
+    <Style Selector="^:danger">
+      <Setter Property="Background" Value="{DynamicResource VelaDangerSubtleBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:danger:outline">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+
+    <Style Selector="^:info">
+      <Setter Property="Background" Value="{DynamicResource VelaInfoSubtleBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaInfoBrush}" />
+    </Style>
+    <Style Selector="^:info:outline">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaInfoBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

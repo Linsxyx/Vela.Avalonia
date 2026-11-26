@@ -146,6 +146,11 @@ lightColors.VelaSuccess = lightColors.VelaToneGreen;
 lightColors.VelaWarning = lightColors.VelaToneAmber;
 lightColors.VelaDanger = lightColors.VelaToneRose;
 lightColors.VelaInfo = lightColors.VelaToneSky;
+lightColors.VelaSuccessSubtle = mixOklab(lightColors.VelaSuccess, 0.11, lightColors.VelaSurface, 0.89);
+lightColors.VelaWarningSubtle = mixOklab(lightColors.VelaWarning, 0.12, lightColors.VelaSurface, 0.88);
+lightColors.VelaDangerSubtle = mixOklab(lightColors.VelaDanger, 0.11, lightColors.VelaSurface, 0.89);
+lightColors.VelaInfoSubtle = mixOklab(lightColors.VelaInfo, 0.11, lightColors.VelaSurface, 0.89);
+lightColors.VelaOverlayScrim = oklch(0.10, 0, 0, 0.44);
 lightColors.VelaDangerMuted = mixOklab(lightColors.VelaDanger, 0.55, lightColors.VelaSurfaceMuted, 0.45);
 lightColors.VelaChartOther = mixOklab(lightColors.VelaForeground, 0.26, lightColors.VelaSurface, 0.74);
 
@@ -178,6 +183,11 @@ darkColors.VelaSuccess = darkColors.VelaToneGreen;
 darkColors.VelaWarning = darkColors.VelaToneAmber;
 darkColors.VelaDanger = darkColors.VelaToneRose;
 darkColors.VelaInfo = darkColors.VelaToneSky;
+darkColors.VelaSuccessSubtle = mixOklab(darkColors.VelaSuccess, 0.14, darkColors.VelaSurface, 0.86);
+darkColors.VelaWarningSubtle = mixOklab(darkColors.VelaWarning, 0.14, darkColors.VelaSurface, 0.86);
+darkColors.VelaDangerSubtle = mixOklab(darkColors.VelaDanger, 0.14, darkColors.VelaSurface, 0.86);
+darkColors.VelaInfoSubtle = mixOklab(darkColors.VelaInfo, 0.14, darkColors.VelaSurface, 0.86);
+darkColors.VelaOverlayScrim = oklch(0.06, 0, 0, 0.62);
 darkColors.VelaDangerMuted = mixOklab(darkColors.VelaDanger, 0.55, darkColors.VelaSurfaceMuted, 0.45);
 darkColors.VelaChartOther = mixOklab(darkColors.VelaForeground, 0.26, darkColors.VelaSurface, 0.74);
 

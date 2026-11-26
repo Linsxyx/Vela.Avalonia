@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaCheckBox}" TargetType="controls:VelaCheckBox">
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Background="Transparent">
+          <!-- 18x18 crisp checkbox frame -->
+          <Grid Width="18" Height="18" VerticalAlignment="Top" Margin="0,2,0,0">
+            <Border x:Name="PART_Box"
+                    CornerRadius="5.5"
+                    Background="{DynamicResource VelaSurfaceBrush}"
+                    BorderBrush="{DynamicResource VelaBorderStrongBrush}"
+                    BorderThickness="1.25">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.14" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+
+            <!-- Spring-scaled active fill -->
+            <Border x:Name="PART_Fill"
+                    CornerRadius="5.5"
+                    Background="{DynamicResource VelaControlOnBrush}"
+                    Opacity="0" />
+
+            <!-- 3-point morphing checkmark <-> indeterminate dash -->
+            <controls:VelaCheckMark x:Name="PART_Mark"
+                                    Width="18"
+                                    Height="18"
+                                    Stroke="{DynamicResource VelaControlGlyphBrush}"
+                                    Opacity="0" />
+          </Grid>
+
+          <!-- Label + Optional Description -->
+          <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              RecognizesAccessKey="True"
+                              IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{TemplateBinding Description}"
+                       FontSize="{DynamicResource VelaTextXs}"
+                       Foreground="{DynamicResource VelaTextMutedBrush}"
+                       TextWrapping="Wrap"
+                       IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </StackPanel>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Box">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

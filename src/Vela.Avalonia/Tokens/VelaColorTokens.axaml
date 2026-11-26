@@ -57,6 +57,16 @@
       <SolidColorBrush x:Key="VelaDangerBrush" Color="{StaticResource VelaDangerColor}" />
       <Color x:Key="VelaInfoColor">#FF136D9E</Color>
       <SolidColorBrush x:Key="VelaInfoBrush" Color="{StaticResource VelaInfoColor}" />
+      <Color x:Key="VelaSuccessSubtleColor">#FFE6F0EA</Color>
+      <SolidColorBrush x:Key="VelaSuccessSubtleBrush" Color="{StaticResource VelaSuccessSubtleColor}" />
+      <Color x:Key="VelaWarningSubtleColor">#FFF4ECE3</Color>
+      <SolidColorBrush x:Key="VelaWarningSubtleBrush" Color="{StaticResource VelaWarningSubtleColor}" />
+      <Color x:Key="VelaDangerSubtleColor">#FFFBE9EB</Color>
+      <SolidColorBrush x:Key="VelaDangerSubtleBrush" Color="{StaticResource VelaDangerSubtleColor}" />
+      <Color x:Key="VelaInfoSubtleColor">#FFE6EEF5</Color>
+      <SolidColorBrush x:Key="VelaInfoSubtleBrush" Color="{StaticResource VelaInfoSubtleColor}" />
+      <Color x:Key="VelaOverlayScrimColor">#70030303</Color>
+      <SolidColorBrush x:Key="VelaOverlayScrimBrush" Color="{StaticResource VelaOverlayScrimColor}" />
       <Color x:Key="VelaDangerMutedColor">#FFDD8C99</Color>
       <SolidColorBrush x:Key="VelaDangerMutedBrush" Color="{StaticResource VelaDangerMutedColor}" />
       <Color x:Key="VelaChartOtherColor">#FFB7B7B7</Color>
@@ -121,6 +131,16 @@
       <SolidColorBrush x:Key="VelaDangerBrush" Color="{StaticResource VelaDangerColor}" />
       <Color x:Key="VelaInfoColor">#FF7CC4F0</Color>
       <SolidColorBrush x:Key="VelaInfoBrush" Color="{StaticResource VelaInfoColor}" />
+      <Color x:Key="VelaSuccessSubtleColor">#FF24302A</Color>
+      <SolidColorBrush x:Key="VelaSuccessSubtleBrush" Color="{StaticResource VelaSuccessSubtleColor}" />
+      <Color x:Key="VelaWarningSubtleColor">#FF332D25</Color>
+      <SolidColorBrush x:Key="VelaWarningSubtleBrush" Color="{StaticResource VelaWarningSubtleColor}" />
+      <Color x:Key="VelaDangerSubtleColor">#FF342628</Color>
+      <SolidColorBrush x:Key="VelaDangerSubtleBrush" Color="{StaticResource VelaDangerSubtleColor}" />
+      <Color x:Key="VelaInfoSubtleColor">#FF272E33</Color>
+      <SolidColorBrush x:Key="VelaInfoSubtleBrush" Color="{StaticResource VelaInfoSubtleColor}" />
+      <Color x:Key="VelaOverlayScrimColor">#9E010101</Color>
+      <SolidColorBrush x:Key="VelaOverlayScrimBrush" Color="{StaticResource VelaOverlayScrimColor}" />
       <Color x:Key="VelaDangerMutedColor">#FF8F505C</Color>
       <SolidColorBrush x:Key="VelaDangerMutedBrush" Color="{StaticResource VelaDangerMutedColor}" />
       <Color x:Key="VelaChartOtherColor">#FF4A4A4A</Color>

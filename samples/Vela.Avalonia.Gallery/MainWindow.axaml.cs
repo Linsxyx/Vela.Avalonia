@@ -151,6 +151,18 @@ public partial class MainWindow : Window
         // Lazy page factory: HeavyStressPage (500 controls) is NOT allocated at app startup!
         StressNavItem.PageFactory = static () => new HeavyStressPage();
 
+        FrameworkComboBox.ItemsSource = new[]
+        {
+            "Avalonia 12.2",
+            "SkiaSharp",
+            ".NET 10 LTS",
+            "ReactiveUI",
+            "CommunityToolkit.Mvvm",
+            "Vela.Avalonia",
+            "Arc Design Tokens",
+        };
+        FrameworkComboBox.SelectedItem = "Avalonia 12.2";
+
         VolumeSlider.Marks = [0, 25, 50, 75, 100];
         DetentSlider.Marks = [0, 50, 100, 150, 200];
 
@@ -310,6 +322,133 @@ public partial class MainWindow : Window
         if (ShowcaseDonut is null) return;
         ApplyDataset(Math.Clamp(ChartDatasetSegmented.SelectedIndex, 0, Datasets.Length - 1));
     }
+
+    private async void OnShowConfirmDialogClick(object? sender, RoutedEventArgs e)
+    {
+        var ok = await DialogHost.ShowConfirmAsync(new VelaConfirmDialogOptions
+        {
+            Title = "Publish release v0.1.0?",
+            Description = "This will tag the commit and push NuGet packages for Vela.Avalonia.",
+            ConfirmText = "Publish",
+            CancelText = "Cancel",
+        });
+
+        ToastHost.Show(
+            ok ? "Release published" : "Publish cancelled",
+            ok ? "NuGet package queued for indexing." : "No changes were made.",
+            ok ? VelaToastTone.Success : VelaToastTone.Neutral);
+    }
+
+    private async void OnShowDestructiveDialogClick(object? sender, RoutedEventArgs e)
+    {
+        var ok = await DialogHost.ShowConfirmAsync(new VelaConfirmDialogOptions
+        {
+            Title = "Delete workspace cache?",
+            Description = "All cached page snapshots and local preferences will be cleared immediately.",
+            ConfirmText = "Delete cache",
+            CancelText = "Keep",
+            IsDestructive = true,
+        });
+
+        if (ok)
+        {
+            RootNav.ClearInactivePageCache();
+            ToastHost.Show("Cache cleared", "Inactive cached pages were evicted.", VelaToastTone.Danger);
+        }
+    }
+
+    private async void OnShowCustomDialogClick(object? sender, RoutedEventArgs e)
+    {
+        var nameInput = new VelaInput
+        {
+            Label = "Project name",
+            PlaceholderText = "e.g. Vela Desktop Studio",
+            IsClearable = true,
+        };
+
+        var cancelBtn = new VelaButton { Variant = VelaButtonVariant.Secondary, Size = VelaControlSize.Small, Content = "Cancel" };
+        var createBtn = new VelaButton { Variant = VelaButtonVariant.Primary, Size = VelaControlSize.Small, Content = "Create" };
+
+        cancelBtn.Click += (_, _) => DialogHost.Close(null);
+        createBtn.Click += (_, _) =>
+        {
+            if (string.IsNullOrWhiteSpace(nameInput.Text))
+            {
+                nameInput.ErrorMessage = "Please enter a project name.";
+                return;
+            }
+            DialogHost.Close(nameInput.Text.Trim());
+        };
+
+        var content = new StackPanel
+        {
+            Spacing = 18,
+            Children =
+            {
+                nameInput,
+                new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Spacing = 10,
+                    Children = { cancelBtn, createBtn },
+                },
+            },
+        };
+
+        var createdName = await DialogHost.ShowAsync<string>(content, new VelaDialogOptions
+        {
+            Title = "Create new project",
+            Description = "Configure your workspace name to get started.",
+        });
+
+        if (!string.IsNullOrEmpty(createdName))
+        {
+            ToastHost.Show("Project created", $"Workspace \"{createdName}\" is ready.", VelaToastTone.Success);
+        }
+    }
+
+    private void OnToastSuccessClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("Changes saved", "Your theme configuration has been synced.", VelaToastTone.Success);
+
+    private void OnToastUndoClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show(
+            "Archived 3 items",
+            "Hover to pause auto-dismiss or click Undo.",
+            VelaToastTone.Info,
+            actionLabel: "Undo",
+            onAction: () => ToastHost.Show("Restored", "The 3 items are back in your inbox.", VelaToastTone.Success));
+
+    private void OnToastWarningClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("High memory usage", "Consider switching PageCacheMode to LRU (Max 3).", VelaToastTone.Warning);
+
+    private void OnToastDangerClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("Connection lost", "Retrying WebSocket handshake in 5 seconds...", VelaToastTone.Danger);
+
+    private void OnMenuRenameClick(object? sender, EventArgs e)
+        => ToastHost.Show("Rename", "Triggered from VelaDropdownButton.", VelaToastTone.Info);
+
+    private void OnMenuDuplicateClick(object? sender, EventArgs e)
+        => ToastHost.Show("Duplicated", "Created a copy of the document.", VelaToastTone.Success);
+
+    private void OnMenuShareClick(object? sender, EventArgs e)
+        => ToastHost.Show("Link copied", "Share URL copied to clipboard.", VelaToastTone.Info);
+
+    private void OnMenuDeleteClick(object? sender, EventArgs e)
+        => ToastHost.Show("Moved to Trash", "Document deleted.", VelaToastTone.Danger, actionLabel: "Undo",
+            onAction: () => ToastHost.Show("Restored", "Document restored.", VelaToastTone.Success));
+
+    private void OnClosePopoverClick(object? sender, RoutedEventArgs e)
+        => QuickSettingsPopover.IsOpen = false;
+
+    private void OnContextEditClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("ContextMenu: Edit", "Invoked native themed ContextMenu item.", VelaToastTone.Info);
+
+    private void OnContextCopyClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("ContextMenu: Copy", "Path copied to clipboard.", VelaToastTone.Success);
+
+    private void OnContextDeleteClick(object? sender, RoutedEventArgs e)
+        => ToastHost.Show("ContextMenu: Delete", "Danger menu item triggered.", VelaToastTone.Danger);
 
     private void ApplyDataset(int index)
     {

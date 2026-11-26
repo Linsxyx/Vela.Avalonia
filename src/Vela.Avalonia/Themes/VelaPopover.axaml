@@ -1,0 +1,41 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaPopover}" TargetType="controls:VelaPopover">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <ContentPresenter x:Name="PART_TriggerHost"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+
+          <Popup x:Name="PART_Popup"
+                 WindowManagerAddShadowHint="False"
+                 IsOpen="{TemplateBinding IsOpen, Mode=TwoWay}"
+                 PlacementTarget="PART_TriggerHost"
+                 Placement="{TemplateBinding Placement}"
+                 VerticalOffset="{TemplateBinding VerticalOffset}"
+                 HorizontalOffset="{TemplateBinding HorizontalOffset}"
+                 IsLightDismissEnabled="True">
+            <controls:VelaPopupSurface x:Name="PART_Surface"
+                                       Margin="8,4,8,16"
+                                       MinWidth="220"
+                                       MaxWidth="360"
+                                       Padding="16"
+                                       CornerRadius="16"
+                                       BorderThickness="1"
+                                       Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                                       BorderBrush="{DynamicResource VelaBorderBrush}"
+                                       BoxShadow="{DynamicResource VelaShadowFloating}">
+              <ContentPresenter Content="{TemplateBinding PopoverContent}" />
+            </controls:VelaPopupSurface>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

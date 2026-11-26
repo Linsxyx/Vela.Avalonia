@@ -7,8 +7,16 @@
         <ResourceInclude Source="avares://Vela.Avalonia/Icons/VelaIcons.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Tokens/VelaDesignTokens.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Tokens/VelaColorTokens.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPrimitives.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaButton.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSwitch.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaCheckBox.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaInput.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBadge.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSelect.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaComboBox.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMenu.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPopover.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSegmentedControl.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaElasticSlider.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaNavigationView.axaml" />

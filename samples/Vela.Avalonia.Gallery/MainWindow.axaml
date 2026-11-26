@@ -41,7 +41,9 @@
     </Style>
   </Window.Styles>
 
-  <DockPanel>
+  <Grid>
+    <vela:VelaDialogHost x:Name="DialogHost">
+      <DockPanel>
     <!-- Live Page-Switch Performance Telemetry Bar -->
     <Border DockPanel.Dock="Bottom"
             Height="32"
@@ -193,7 +195,280 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
-      <!-- Page 2: Heavy Stress Benchmark (Lazy constructed via PageFactory in code-behind!) -->
+      <!-- Page 2: Forms & Overlays (New Batch 2 Controls!) -->
+      <vela:VelaNavItem Header="Forms &amp; Overlays"
+                        Category="Input CheckBox Badge Dialog Toast"
+                        Icon="{DynamicResource VelaIconLayers}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Forms, Badges &amp; Overlays" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Core foundational primitives: border-only focus inputs, 3-point morphing checkboxes, OKLab-tinted badges, AnimatePresence modal dialogs, and hover-pausing toast stacks." />
+              </StackPanel>
+
+              <!-- VelaInput Card -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <TextBlock Classes="cardTitle" Text="VelaInput" />
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                    <vela:VelaInput Label="Email address"
+                                    PlaceholderText="you@company.com"
+                                    LeadingIcon="{DynamicResource VelaIconMail}"
+                                    Description="We never share your email with third parties."
+                                    IsClearable="True" />
+
+                    <vela:VelaInput Grid.Column="1"
+                                    Label="Workspace slug"
+                                    Text="vela-invalid!!"
+                                    ErrorMessage="Only lowercase letters, numbers, and hyphens are allowed."
+                                    IsClearable="True" />
+
+                    <vela:VelaInput Grid.Row="1"
+                                    Label="Password"
+                                    PlaceholderText="Enter password..."
+                                    PasswordChar="•"
+                                    Size="Medium" />
+
+                    <vela:VelaInput Grid.Row="1"
+                                    Grid.Column="1"
+                                    Label="Disabled field"
+                                    Text="Read-only preset"
+                                    IsEnabled="False" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- VelaCheckBox + VelaBadge Row -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaCheckBox" />
+                    <TextBlock Classes="cardDesc"
+                               Text="3-point path morphing between checkmark and indeterminate dash on physical springs." />
+
+                    <StackPanel Spacing="10">
+                      <vela:VelaCheckBox Content="Enable hardware composition"
+                                         Description="Runs opacity fades on Avalonia's render thread."
+                                         IsChecked="True" />
+                      <vela:VelaCheckBox Content="Tri-state selection (click to morph)"
+                                         IsThreeState="True"
+                                         IsChecked="{x:Null}" />
+                      <vela:VelaCheckBox Content="Send weekly release notes"
+                                         IsChecked="False" />
+                      <vela:VelaCheckBox Content="Disabled checked"
+                                         IsChecked="True"
+                                         IsEnabled="False" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaBadge" />
+                    <TextBlock Classes="cardDesc"
+                               Text="OKLab-tinted semantic surfaces, optional status dots, pill and outline variants." />
+
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+                      <vela:VelaBadge Tone="Neutral" Content="Neutral" />
+                      <vela:VelaBadge Tone="Accent" Content="Accent" />
+                      <vela:VelaBadge Tone="Success" ShowDot="True" IsPill="True" Content="Operational" />
+                      <vela:VelaBadge Tone="Warning" ShowDot="True" IsPill="True" Content="Degraded" />
+                      <vela:VelaBadge Tone="Danger" ShowDot="True" IsPill="True" Content="Outage" />
+                      <vela:VelaBadge Tone="Info" IsOutline="True" Content="v0.1.0-alpha" />
+                      <vela:VelaBadge Tone="Neutral" Size="Small" IsOutline="True" Content="Small" />
+                      <vela:VelaBadge Tone="Accent" Size="Large" IsPill="True" Content="Large Pill" />
+                    </WrapPanel>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- VelaDialogHost & VelaToastHost Triggers -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaDialogHost" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Decoupled async modal host with spring AnimatePresence entrance/exit, Esc &amp; backdrop dismiss." />
+
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10">
+                      <vela:VelaButton Variant="Primary"
+                                       Size="Small"
+                                       Content="Confirm Dialog"
+                                       Click="OnShowConfirmDialogClick" />
+                      <vela:VelaButton Variant="Danger"
+                                       Size="Small"
+                                       Content="Destructive Dialog"
+                                       Click="OnShowDestructiveDialogClick" />
+                      <vela:VelaButton Variant="Secondary"
+                                       Size="Small"
+                                       Content="Custom Form Dialog"
+                                       Click="OnShowCustomDialogClick" />
+                    </WrapPanel>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaToastHost" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Stacking notifications with spring enter/exit, hover-to-pause timer, and inline actions." />
+
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+                      <vela:VelaButton Variant="Secondary" Size="Small" Content="Success" Click="OnToastSuccessClick" />
+                      <vela:VelaButton Variant="Secondary" Size="Small" Content="Info + Undo" Click="OnToastUndoClick" />
+                      <vela:VelaButton Variant="Secondary" Size="Small" Content="Warning" Click="OnToastWarningClick" />
+                      <vela:VelaButton Variant="Danger" Size="Small" Content="Error" Click="OnToastDangerClick" />
+                    </WrapPanel>
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 3: Select & Menus (Batch 3 Controls!) -->
+      <vela:VelaNavItem Header="Select &amp; Menus"
+                        Category="Select ComboBox Dropdown Popover ContextMenu"
+                        Icon="{DynamicResource VelaIconList}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Select, ComboBox, Menus &amp; Popover" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Static anchor triggers, spring-rotating chevrons, shared VelaPopupSurface entrance physics, gliding menu highlights, and themed native ContextMenu." />
+              </StackPanel>
+
+              <!-- VelaSelect + VelaComboBox -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <TextBlock Classes="cardTitle" Text="Selection Fields" />
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                    <vela:VelaSelect x:Name="RegionSelect"
+                                     Label="Deployment Region"
+                                     PlaceholderText="Choose a region..."
+                                     Description="Controls closest edge POP for desktop sync."
+                                     SelectedIndex="0">
+                      <x:String>Asia Pacific · Tokyo (ap-northeast-1)</x:String>
+                      <x:String>Asia Pacific · Singapore (ap-southeast-1)</x:String>
+                      <x:String>US West · Oregon (us-west-2)</x:String>
+                      <x:String>Europe · Frankfurt (eu-central-1)</x:String>
+                    </vela:VelaSelect>
+
+                    <vela:VelaComboBox x:Name="FrameworkComboBox"
+                                       Grid.Column="1"
+                                       Label="Searchable ComboBox"
+                                       PlaceholderText="Type to filter frameworks..."
+                                       Description="Supports Up/Down/Enter/Esc and live search filtering." />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- VelaDropdownButton + VelaPopover -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaDropdownButton" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Hover across items to see the gliding highlight pill; hover Delete to see it softly tint to danger." />
+
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                      <vela:VelaDropdownButton Content="Document Actions"
+                                               LeadingIcon="{DynamicResource VelaIconList}">
+                        <vela:VelaMenuItem Header="Rename"
+                                           Icon="{DynamicResource VelaIconEdit}"
+                                           Shortcut="⌘R"
+                                           Click="OnMenuRenameClick" />
+                        <vela:VelaMenuItem Header="Duplicate"
+                                           Icon="{DynamicResource VelaIconCopy}"
+                                           Shortcut="⌘D"
+                                           Click="OnMenuDuplicateClick" />
+                        <vela:VelaMenuItem Header="Share link"
+                                           Icon="{DynamicResource VelaIconShare}"
+                                           Shortcut="⇧⌘C"
+                                           Click="OnMenuShareClick" />
+                        <vela:VelaMenuItem IsSeparator="True" />
+                        <vela:VelaMenuItem Header="Delete document"
+                                           Icon="{DynamicResource VelaIconTrash}"
+                                           Shortcut="⌫"
+                                           IsDestructive="True"
+                                           Click="OnMenuDeleteClick" />
+                      </vela:VelaDropdownButton>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaPopover" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Anchored floating panel with directional spring entrance and light-dismiss." />
+
+                    <vela:VelaPopover x:Name="QuickSettingsPopover"
+                                      Placement="BottomEdgeAlignedLeft">
+                      <vela:VelaButton Variant="Secondary" Size="Small" Content="Open Quick Popover" />
+                      <vela:VelaPopover.PopoverContent>
+                        <StackPanel Spacing="12" Width="250">
+                          <TextBlock Text="Quick Display Preferences" FontSize="14" FontWeight="SemiBold" />
+                          <vela:VelaCheckBox Content="Show performance bar" IsChecked="True" />
+                          <vela:VelaCheckBox Content="Snap sliders to detents" IsChecked="True" />
+                          <vela:VelaButton Variant="Primary"
+                                           Size="Small"
+                                           HorizontalAlignment="Right"
+                                           Content="Done"
+                                           Click="OnClosePopoverClick" />
+                        </StackPanel>
+                      </vela:VelaPopover.PopoverContent>
+                    </vela:VelaPopover>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- Native Right-Click ContextMenu Zone -->
+              <Border Classes="card"
+                      Background="{DynamicResource VelaSurfaceMutedBrush}"
+                      Cursor="Hand">
+                <Border.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Edit item" InputGesture="Ctrl+E" Click="OnContextEditClick">
+                      <MenuItem.Icon>
+                        <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconEdit}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Copy path" InputGesture="Ctrl+C" Click="OnContextCopyClick">
+                      <MenuItem.Icon>
+                        <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconCopy}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Classes="danger" Header="Delete permanently" InputGesture="Delete" Click="OnContextDeleteClick">
+                      <MenuItem.Icon>
+                        <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconTrash}" Foreground="{DynamicResource VelaDangerBrush}" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </Border.ContextMenu>
+
+                <StackPanel Spacing="4" HorizontalAlignment="Center" Margin="0,12">
+                  <TextBlock Text="Right-click anywhere in this box"
+                             FontSize="14"
+                             FontWeight="SemiBold"
+                             HorizontalAlignment="Center" />
+                  <TextBlock Text="Tests Vela's native Avalonia ContextMenu &amp; MenuItem ControlTheme with spring surface entrance."
+                             FontSize="12.5"
+                             Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                             HorizontalAlignment="Center" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 4: Heavy Stress Benchmark (Lazy constructed via PageFactory in code-behind!) -->
       <vela:VelaNavItem x:Name="StressNavItem"
                         Header="Heavy Stress"
                         Category="Benchmark Performance 500 Nodes"
@@ -344,5 +619,10 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
     </vela:VelaNavigationView>
-  </DockPanel>
+      </DockPanel>
+    </vela:VelaDialogHost>
+
+    <!-- Non-intrusive stacking toast overlay -->
+    <vela:VelaToastHost x:Name="ToastHost" />
+  </Grid>
 </Window>

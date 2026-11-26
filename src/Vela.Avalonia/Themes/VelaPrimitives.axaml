@@ -1,0 +1,98 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Completely bare borderless TextBox for embedding inside composite Vela controls (ComboBox, Sidebar Search, etc.).
+       Prevents FluentTheme / SimpleTheme blue focus boxes from ever leaking inside Vela fields. -->
+  <ControlTheme x:Key="VelaBareTextBoxTheme" TargetType="TextBox">
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource VelaAccentSubtleBrush}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ScrollViewer x:Name="PART_ScrollViewer"
+                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                      IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                      AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
+                      Background="Transparent"
+                      VerticalAlignment="Center">
+          <Panel Background="Transparent">
+            <TextBlock x:Name="PART_Watermark"
+                       Text="{TemplateBinding PlaceholderText}"
+                       Foreground="{DynamicResource VelaTextMutedBrush}"
+                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                       TextAlignment="{TemplateBinding TextAlignment}"
+                       TextWrapping="{TemplateBinding TextWrapping}"
+                       IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                       IsHitTestVisible="False" />
+
+            <TextPresenter x:Name="PART_TextPresenter"
+                           Text="{TemplateBinding Text, Mode=TwoWay}"
+                           CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                           CaretIndex="{TemplateBinding CaretIndex}"
+                           SelectionStart="{TemplateBinding SelectionStart}"
+                           SelectionEnd="{TemplateBinding SelectionEnd}"
+                           TextAlignment="{TemplateBinding TextAlignment}"
+                           TextWrapping="{TemplateBinding TextWrapping}"
+                           LineHeight="{TemplateBinding LineHeight}"
+                           LetterSpacing="{TemplateBinding LetterSpacing}"
+                           PasswordChar="{TemplateBinding PasswordChar}"
+                           RevealPassword="{TemplateBinding RevealPassword}"
+                           SelectionBrush="{TemplateBinding SelectionBrush}"
+                           SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                           CaretBrush="{TemplateBinding CaretBrush}"
+                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+          </Panel>
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Clean, Fluent-isolated icon button for inline clear/toggle/close actions inside Vela controls -->
+  <ControlTheme x:Key="VelaIconButtonTheme" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Bg"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.14" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_Bg">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Bg">
+      <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

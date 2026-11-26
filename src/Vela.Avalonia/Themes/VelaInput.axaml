@@ -1,0 +1,178 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaInput}" TargetType="controls:VelaInput">
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="CaretBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource VelaAccentSubtleBrush}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <!-- Optional Label -->
+          <TextBlock Text="{TemplateBinding Label}"
+                     FontSize="{DynamicResource VelaTextSm}"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource VelaForegroundBrush}"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+          <!-- Field Box (Arc border-only focus feedback, zero noisy halo) -->
+          <Border x:Name="PART_Border"
+                  MinHeight="{TemplateBinding MinHeight}"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+                <BrushTransition Property="Background" Duration="0:0:0.16" />
+              </Transitions>
+            </Border.Transitions>
+
+            <DockPanel LastChildFill="True">
+              <!-- Leading Icon -->
+              <PathIcon DockPanel.Dock="Left"
+                        Width="15"
+                        Height="15"
+                        Margin="0,0,8,0"
+                        Data="{TemplateBinding LeadingIcon}"
+                        Foreground="{DynamicResource VelaTextMutedBrush}"
+                        VerticalAlignment="Center"
+                        IsVisible="{TemplateBinding LeadingIcon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+              <!-- Trailing InnerRightContent -->
+              <ContentPresenter DockPanel.Dock="Right"
+                                Content="{TemplateBinding InnerRightContent}"
+                                VerticalAlignment="Center"
+                                IsVisible="{TemplateBinding InnerRightContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+              <!-- Clear Button (when IsClearable & non-empty) -->
+              <Button x:Name="PART_ClearButton"
+                      DockPanel.Dock="Right"
+                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Width="22"
+                      Height="22"
+                      Margin="6,0,-2,0"
+                      CornerRadius="999"
+                      Focusable="False"
+                      IsVisible="False">
+                <PathIcon Width="12"
+                          Height="12"
+                          Data="{DynamicResource VelaIconClose}"
+                          Foreground="{DynamicResource VelaTextMutedBrush}" />
+              </Button>
+
+              <!-- Native TextBox ScrollViewer + TextPresenter + Placeholder -->
+              <ScrollViewer x:Name="PART_ScrollViewer"
+                            HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                            VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                            IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                            AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
+                            VerticalAlignment="Center">
+                <Panel>
+                  <TextBlock x:Name="PART_Watermark"
+                             Text="{TemplateBinding PlaceholderText}"
+                             Foreground="{DynamicResource VelaTextMutedBrush}"
+                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                             TextAlignment="{TemplateBinding TextAlignment}"
+                             TextWrapping="{TemplateBinding TextWrapping}"
+                             IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                             IsHitTestVisible="False" />
+
+                  <TextPresenter x:Name="PART_TextPresenter"
+                                 Text="{TemplateBinding Text, Mode=TwoWay}"
+                                 CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                                 CaretIndex="{TemplateBinding CaretIndex}"
+                                 SelectionStart="{TemplateBinding SelectionStart}"
+                                 SelectionEnd="{TemplateBinding SelectionEnd}"
+                                 TextAlignment="{TemplateBinding TextAlignment}"
+                                 TextWrapping="{TemplateBinding TextWrapping}"
+                                 LineHeight="{TemplateBinding LineHeight}"
+                                 LetterSpacing="{TemplateBinding LetterSpacing}"
+                                 PasswordChar="{TemplateBinding PasswordChar}"
+                                 RevealPassword="{TemplateBinding RevealPassword}"
+                                 SelectionBrush="{TemplateBinding SelectionBrush}"
+                                 SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                 CaretBrush="{TemplateBinding CaretBrush}"
+                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                </Panel>
+              </ScrollViewer>
+            </DockPanel>
+          </Border>
+
+          <!-- Error message (takes precedence over description) -->
+          <TextBlock Text="{TemplateBinding ErrorMessage}"
+                     FontSize="{DynamicResource VelaTextXs}"
+                     Foreground="{DynamicResource VelaDangerBrush}"
+                     TextWrapping="Wrap"
+                     IsVisible="{TemplateBinding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+          <!-- Supporting description -->
+          <TextBlock x:Name="PART_Description"
+                     Text="{TemplateBinding Description}"
+                     FontSize="{DynamicResource VelaTextXs}"
+                     Foreground="{DynamicResource VelaTextMutedBrush}"
+                     TextWrapping="Wrap"
+                     IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Sizes -->
+    <Style Selector="^:sm">
+      <Setter Property="MinHeight" Value="34" />
+      <Setter Property="Padding" Value="10,0" />
+      <Setter Property="CornerRadius" Value="10" />
+    </Style>
+    <Style Selector="^:md">
+      <Setter Property="MinHeight" Value="40" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="CornerRadius" Value="12" />
+    </Style>
+    <Style Selector="^:lg">
+      <Setter Property="MinHeight" Value="46" />
+      <Setter Property="Padding" Value="14,0" />
+      <Setter Property="CornerRadius" Value="14" />
+    </Style>
+
+    <!-- Hover / Focus / Error / Disabled -->
+    <Style Selector="^:pointerover:not(:error) /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:focus:not(:error) /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:error /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:error /template/ TextBlock#PART_Description">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+
+    <!-- Show clear button when :has-text -->
+    <Style Selector="^:has-text /template/ Button#PART_ClearButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^ /template/ Button#PART_ClearButton:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
