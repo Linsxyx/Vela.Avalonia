@@ -176,7 +176,135 @@ public partial class MainWindow : Window
         };
 
         BuildAccentSwatches();
+        PopulateCommandPalette();
         ApplyDataset(0);
+    }
+
+    private void PopulateCommandPalette()
+    {
+        Geometry? Icon(string key) => this.TryFindResource(key, ActualThemeVariant, out var r) ? r as Geometry : null;
+
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Go to Navigation & Performance",
+            Description = "Benchmark VelaPageDeck caching",
+            Group = "Navigation",
+            Icon = Icon("VelaIconCompass"),
+            Shortcut = "G N",
+            Execute = () => RootNav.SelectedIndex = 0,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Go to Flagship Lab",
+            Description = "CommandPalette, FloatingBar, ConfirmMorph, ScrubInput",
+            Group = "Navigation",
+            Icon = Icon("VelaIconHome"),
+            Shortcut = "G F",
+            Execute = () => RootNav.SelectedIndex = 1,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Go to Liquid Glass Lab",
+            Description = "GPU SDF optical refraction playground",
+            Group = "Navigation",
+            Icon = Icon("VelaIconSparkles"),
+            Shortcut = "G L",
+            Execute = () => RootNav.SelectedIndex = 2,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Go to Select & Menus",
+            Description = "Select, ComboBox, Dropdown, Popover, ContextMenu",
+            Group = "Navigation",
+            Icon = Icon("VelaIconList"),
+            Execute = () => RootNav.SelectedIndex = 4,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Go to Data & Charts",
+            Description = "VelaDonutChart interactive ring",
+            Group = "Navigation",
+            Icon = Icon("VelaIconChart"),
+            Execute = () => RootNav.SelectedIndex = 9,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Toggle Dark Mode",
+            Description = "Switch Light and Dark OKLCH themes",
+            Group = "Appearance",
+            Icon = Icon("VelaIconPalette"),
+            Shortcut = "⌘D",
+            Execute = () => DarkModeSwitch.IsChecked = !(DarkModeSwitch.IsChecked == true),
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Toggle Sidebar Collapse",
+            Description = "Expand or compact navigation icon rail",
+            Group = "Appearance",
+            Icon = Icon("VelaIconSidebar"),
+            Shortcut = "⌘\\",
+            Execute = () => RootNav.IsPaneOpen = !RootNav.IsPaneOpen,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Toggle Command Palette Liquid Glass",
+            Description = "Switch solid surface vs optical glass palette",
+            Group = "Appearance",
+            Icon = Icon("VelaIconSparkles"),
+            Execute = () =>
+            {
+                CommandPalette.UseLiquidGlass = !CommandPalette.UseLiquidGlass;
+                if (PaletteGlassSwitch is not null)
+                    PaletteGlassSwitch.IsChecked = CommandPalette.UseLiquidGlass;
+                ToastHost.Show("Palette material updated",
+                    CommandPalette.UseLiquidGlass ? "Switched to Liquid Glass mode." : "Switched to Solid mode.",
+                    VelaToastTone.Info);
+            },
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
+            Title = "Clear Inactive Page Cache",
+            Description = "Evict hidden cached pages from VelaPageDeck",
+            Group = "Actions",
+            Icon = Icon("VelaIconTrash"),
+            Execute = () =>
+            {
+                RootNav.ClearInactivePageCache();
+                ToastHost.Show("Cache cleared", "Inactive cached pages evicted.", VelaToastTone.Success);
+            },
+        });
+    }
+
+    private void OnOpenCommandPaletteClick(object? sender, RoutedEventArgs e)
+        => CommandPalette.Open();
+
+    private void OnPaletteGlassModeChanged(object? sender, RoutedEventArgs e)
+    {
+        if (CommandPalette is null || PaletteGlassSwitch is null) return;
+        CommandPalette.UseLiquidGlass = PaletteGlassSwitch.IsChecked == true;
+    }
+
+    private void OnFloatingEditClick(object? sender, EventArgs e)
+        => ToastHost.Show("FloatingBar: Edit", "Action fired from liquid glass bar.", VelaToastTone.Info);
+
+    private void OnFloatingCopyClick(object? sender, EventArgs e)
+        => ToastHost.Show("FloatingBar: Copy", "Copied selection to clipboard.", VelaToastTone.Success);
+
+    private void OnFloatingDeleteClick(object? sender, EventArgs e)
+        => ToastHost.Show("FloatingBar: Delete", "Item moved to trash.", VelaToastTone.Danger);
+
+    private void OnBranchDeleted(object? sender, EventArgs e)
+        => ToastHost.Show("Branch deleted", "You can still click Undo inside the morphing pill.", VelaToastTone.Warning);
+
+    private void OnBranchRestored(object? sender, EventArgs e)
+        => ToastHost.Show("Branch restored", "main-v2 is back.", VelaToastTone.Success);
+
+    private void OnTabsVariantChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DemoTabs is null || TabsVariantSegmented is null) return;
+        DemoTabs.Variant = TabsVariantSegmented.SelectedIndex == 1
+            ? VelaTabsVariant.Underline
+            : VelaTabsVariant.Pill;
     }
 
     private void OnPageSwitched(object? sender, VelaPageSwitchMetrics m)

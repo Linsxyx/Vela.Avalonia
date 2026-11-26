@@ -1,0 +1,106 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaTabItem}" TargetType="controls:VelaTabItem">
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="13,0" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+          <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <PathIcon Width="14"
+                      Height="14"
+                      Data="{TemplateBinding Icon}"
+                      Foreground="{TemplateBinding Foreground}"
+                      IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{TemplateBinding Header}" VerticalAlignment="Center" />
+            <Border Padding="5,1"
+                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    IsVisible="{TemplateBinding Badge, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <ContentPresenter Content="{TemplateBinding Badge}"
+                                TextElement.FontSize="11"
+                                TextElement.Foreground="{DynamicResource VelaTextMutedBrush}" />
+            </Border>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:selected">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaTabs}" TargetType="controls:VelaTabs">
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Horizontal" Spacing="2" />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="14">
+          <!-- Tab Strip Header -->
+          <Border x:Name="PART_HeaderShell"
+                  HorizontalAlignment="Left"
+                  CornerRadius="12"
+                  Padding="3"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1">
+            <Grid x:Name="PART_Track">
+              <Canvas IsHitTestVisible="False">
+                <Border x:Name="PART_Indicator"
+                        CornerRadius="9"
+                        Background="{DynamicResource VelaSurfaceBrush}"
+                        BorderBrush="{DynamicResource VelaBorderBrush}"
+                        BorderThickness="1"
+                        BoxShadow="{DynamicResource VelaShadowResting}"
+                        IsHitTestVisible="False" />
+              </Canvas>
+
+              <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+            </Grid>
+          </Border>
+
+          <!-- O(1) Cached Tab Content via VelaPageDeck -->
+          <controls:VelaPageDeck x:Name="PART_PageDeck"
+                                 PageCacheMode="{TemplateBinding PageCacheMode}"
+                                 TransitionMode="{TemplateBinding PageTransitionMode}"
+                                 PageTemplate="{TemplateBinding PageTemplate}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Underline variant -->
+    <Style Selector="^:underline /template/ Border#PART_HeaderShell">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderSubtleBrush}" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="^:underline /template/ Border#PART_Indicator">
+      <Setter Property="CornerRadius" Value="99" />
+      <Setter Property="Background" Value="{DynamicResource VelaForegroundBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="BoxShadow" Value="0 0 0 0 Transparent" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

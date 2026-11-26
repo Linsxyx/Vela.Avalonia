@@ -1,0 +1,162 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaConfirmMorph}" TargetType="controls:VelaConfirmMorph">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Height="{DynamicResource VelaControlHeightSm}"
+                CornerRadius="{DynamicResource VelaRadiusPill}"
+                Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                BorderBrush="{DynamicResource VelaBorderBrush}"
+                BorderThickness="1"
+                BoxShadow="{DynamicResource VelaShadowResting}"
+                ClipToBounds="True">
+          <!-- Smoothly springs pill width as faces swap -->
+          <controls:VelaMorphSlotPanel>
+            <Panel Height="{DynamicResource VelaControlHeightSm}">
+              <!-- Face 1: Idle -->
+              <Button x:Name="PART_IdleButton"
+                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Height="34"
+                      Padding="14,0,16,0"
+                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      IsVisible="False">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <PathIcon Width="15"
+                            Height="15"
+                            Data="{TemplateBinding Icon}"
+                            Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                            IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                  <TextBlock Text="{TemplateBinding IdleText}"
+                             FontSize="13.5"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource VelaForegroundBrush}"
+                             VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+
+              <!-- Face 2: Confirming -->
+              <StackPanel x:Name="PART_ConfirmFace"
+                          Orientation="Horizontal"
+                          Spacing="4"
+                          Margin="12,0,4,0"
+                          VerticalAlignment="Center"
+                          IsVisible="False">
+                <TextBlock Text="{TemplateBinding PromptText}"
+                           FontSize="13"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource VelaForegroundBrush}"
+                           Margin="0,0,6,0"
+                           VerticalAlignment="Center" />
+
+                <Button x:Name="PART_CancelButton"
+                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Height="28"
+                        Padding="11,0"
+                        CornerRadius="{DynamicResource VelaRadiusPill}">
+                  <TextBlock Text="{TemplateBinding CancelText}"
+                             FontSize="12.5"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                </Button>
+
+                <Button x:Name="PART_ConfirmButton"
+                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Height="28"
+                        Padding="12,0"
+                        CornerRadius="{DynamicResource VelaRadiusPill}"
+                        Background="{DynamicResource VelaDangerBrush}">
+                  <TextBlock Text="{TemplateBinding ConfirmText}"
+                             FontSize="12.5"
+                             FontWeight="Medium"
+                             Foreground="White" />
+                </Button>
+              </StackPanel>
+
+              <!-- Face 3: Busy -->
+              <StackPanel x:Name="PART_BusyFace"
+                          Orientation="Horizontal"
+                          Spacing="8"
+                          Margin="14,0,16,0"
+                          VerticalAlignment="Center"
+                          IsVisible="False">
+                <Arc x:Name="PART_Spinner"
+                     Width="14"
+                     Height="14"
+                     StartAngle="0"
+                     SweepAngle="265"
+                     Stroke="{DynamicResource VelaTextSecondaryBrush}"
+                     StrokeThickness="1.75"
+                     StrokeLineCap="Round"
+                     RenderTransformOrigin="50%,50%">
+                  <Arc.RenderTransform>
+                    <RotateTransform />
+                  </Arc.RenderTransform>
+                </Arc>
+                <TextBlock Text="{TemplateBinding BusyText}"
+                           FontSize="13"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                           VerticalAlignment="Center" />
+              </StackPanel>
+
+              <!-- Face 4: Done + Undo -->
+              <StackPanel x:Name="PART_DoneFace"
+                          Orientation="Horizontal"
+                          Spacing="6"
+                          Margin="12,0,4,0"
+                          VerticalAlignment="Center"
+                          IsVisible="False">
+                <PathIcon Width="15"
+                          Height="15"
+                          Data="{DynamicResource VelaIconCheckCircle}"
+                          Foreground="{DynamicResource VelaSuccessBrush}" />
+                <TextBlock Text="{TemplateBinding DoneText}"
+                           FontSize="13"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource VelaForegroundBrush}"
+                           VerticalAlignment="Center" />
+                <Button x:Name="PART_UndoButton"
+                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Height="28"
+                        Padding="10,0"
+                        CornerRadius="{DynamicResource VelaRadiusPill}"
+                        IsVisible="{TemplateBinding UndoText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <TextBlock Text="{TemplateBinding UndoText}"
+                             FontSize="12.5"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource VelaAccentStrongBrush}" />
+                </Button>
+              </StackPanel>
+            </Panel>
+          </controls:VelaMorphSlotPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:idle /template/ Button#PART_IdleButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:confirming /template/ StackPanel#PART_ConfirmFace">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:busy /template/ StackPanel#PART_BusyFace">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:busy /template/ Arc#PART_Spinner">
+      <Style.Animations>
+        <Animation Duration="0:0:0.7" IterationCount="INFINITE">
+          <KeyFrame Cue="0%"><Setter Property="RotateTransform.Angle" Value="0" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="RotateTransform.Angle" Value="360" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="^:done /template/ StackPanel#PART_DoneFace">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

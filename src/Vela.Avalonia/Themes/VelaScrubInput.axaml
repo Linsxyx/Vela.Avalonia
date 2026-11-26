@@ -1,0 +1,87 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaScrubInput}" TargetType="controls:VelaScrubInput">
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock Text="{TemplateBinding Label}"
+                     FontSize="12.5"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+          <Grid Height="36" ClipToBounds="False">
+            <!-- Separate background shell layer so boundary strain never stretches text -->
+            <Border x:Name="PART_Shell"
+                    CornerRadius="10"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="1"
+                    ClipToBounds="True">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.14" />
+                </Transitions>
+              </Border.Transitions>
+
+              <!-- Quiet progress wash from left -->
+              <Border x:Name="PART_Fill"
+                      Background="{DynamicResource VelaBorderSubtleBrush}"
+                      Opacity="0.85"
+                      IsHitTestVisible="False" />
+            </Border>
+
+            <!-- Handle + Value + Unit -->
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <Border x:Name="PART_Handle"
+                      MinWidth="30"
+                      Padding="10,0,6,0"
+                      Background="Transparent"
+                      Cursor="SizeWestEast"
+                      ToolTip.Tip="Drag left or right to scrub (Shift: 10x, Alt: 0.1x)">
+                <TextBlock x:Name="PART_HandleLabel"
+                           Text="{TemplateBinding HandleText}"
+                           FontSize="12.5"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource VelaTextMutedBrush}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
+              </Border>
+
+              <TextBox x:Name="PART_Input"
+                       Grid.Column="1"
+                       Theme="{DynamicResource VelaBareTextBoxTheme}"
+                       FontSize="13.5"
+                       Padding="2,0,4,0" />
+
+              <TextBlock Grid.Column="2"
+                         Text="{TemplateBinding Unit}"
+                         FontSize="12"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         VerticalAlignment="Center"
+                         Margin="0,0,10,0"
+                         IsVisible="{TemplateBinding Unit, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </Grid>
+          </Grid>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+    <Style Selector="^:focused /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:scrubbing /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:scrubbing /template/ TextBlock#PART_HandleLabel">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -42,9 +42,10 @@
   </Window.Styles>
 
   <Grid>
-    <vela:VelaDrawerHost x:Name="DrawerHost">
-      <vela:VelaDialogHost x:Name="DialogHost">
-        <DockPanel>
+    <vela:VelaCommandPalette x:Name="CommandPalette" EnableGlobalShortcut="True">
+      <vela:VelaDrawerHost x:Name="DrawerHost">
+        <vela:VelaDialogHost x:Name="DialogHost">
+          <DockPanel>
     <!-- Live Page-Switch Performance Telemetry Bar -->
     <Border DockPanel.Dock="Bottom"
             Height="32"
@@ -196,7 +197,174 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
-      <!-- Page 2: Liquid Glass Lab (Native Avalonia 12.2 BackdropEffect + Clean-Room MIT SkSL Refraction!) -->
+      <!-- Page 2: Flagship Interactions (Phase 5!) -->
+      <vela:VelaNavItem Header="Flagship Lab"
+                        Category="CommandPalette FloatingBar Tabs ConfirmMorph ScrubInput"
+                        Icon="{DynamicResource VelaIconHome}"
+                        Badge="⌘K">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Flagship Desktop Interactions" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Signature Arc motion + Liquid Glass controls: ⌘K Command Palette, Liquid Glass FloatingBar, O(1) Cached Tabs, ConfirmMorph pill, and Figma-style ScrubInput." />
+              </StackPanel>
+
+              <!-- VelaCommandPalette Card -->
+              <Border Classes="card">
+                <StackPanel Spacing="14">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="3">
+                      <TextBlock Classes="cardTitle" Text="VelaCommandPalette (⌘K / Ctrl+K)" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Press ⌘K (or Ctrl+K) anywhere in this app to search &amp; jump between pages, toggle Dark mode, or run actions." />
+                    </StackPanel>
+                    <vela:VelaSwitch x:Name="PaletteGlassSwitch"
+                                     Grid.Column="1"
+                                     Content="Liquid Glass mode"
+                                     IsCheckedChanged="OnPaletteGlassModeChanged" />
+                  </Grid>
+
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <vela:VelaButton Variant="Primary" Size="Small" Content="Open Command Palette (⌘K)" Click="OnOpenCommandPaletteClick" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <!-- VelaFloatingBar (Liquid Glass Toolbar over gradient backdrop) -->
+              <Border Classes="card">
+                <StackPanel Spacing="14">
+                  <TextBlock Classes="cardTitle" Text="VelaFloatingBar (Liquid Glass + Gliding Highlight)" />
+                  <TextBlock Classes="cardDesc"
+                             Text="Hover across buttons to watch ONE shared highlight pill glide across the floating glass tray." />
+
+                  <Border CornerRadius="16" Height="112" ClipToBounds="True">
+                    <Grid>
+                      <Border>
+                        <Border.Background>
+                          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                            <GradientStop Color="#7747FF" Offset="0" />
+                            <GradientStop Color="#EC4899" Offset="0.52" />
+                            <GradientStop Color="#F59E0B" Offset="1" />
+                          </LinearGradientBrush>
+                        </Border.Background>
+                      </Border>
+
+                      <vela:VelaFloatingBar HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            UseLiquidGlass="True">
+                        <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconEdit}" Label="Edit" Click="OnFloatingEditClick" />
+                        <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconCopy}" Label="Copy" Click="OnFloatingCopyClick" />
+                        <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconShare}" Label="Share" IsToggle="True" />
+                        <vela:VelaFloatingBarItem IsSeparator="True" />
+                        <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconTrash}" ToolTipText="Delete item" Click="OnFloatingDeleteClick" />
+                      </vela:VelaFloatingBar>
+                    </Grid>
+                  </Border>
+                </StackPanel>
+              </Border>
+
+              <!-- VelaConfirmMorph + VelaScrubInput Row -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaConfirmMorph" />
+                    <TextBlock Classes="cardDesc"
+                               Text="In-place destructive confirmation pill: click Delete → springs open to Confirm/Cancel → Busy spinner → Done with Undo." />
+
+                    <StackPanel Spacing="12">
+                      <vela:VelaConfirmMorph IdleText="Delete branch"
+                                             Icon="{DynamicResource VelaIconTrash}"
+                                             PromptText="Delete main-v2?"
+                                             ConfirmText="Delete"
+                                             CancelText="Cancel"
+                                             BusyText="Deleting..."
+                                             DoneText="Branch deleted"
+                                             UndoText="Undo"
+                                             Confirmed="OnBranchDeleted"
+                                             Undone="OnBranchRestored" />
+
+                      <vela:VelaConfirmMorph IdleText="Purge cache"
+                                             PromptText="Clear all cached pages?"
+                                             ConfirmText="Purge"
+                                             BusyText="Purging..."
+                                             DoneText="Cache purged"
+                                             UndoText="Restore" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaScrubInput (Figma-style)" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Drag the handle (X / W / Opacity) horizontally, strain past limits, or type arithmetic like 120+40." />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="12">
+                      <vela:VelaScrubInput Label="Width" HandleText="W" Value="320" Minimum="0" Maximum="1200" Step="1" Unit="px" />
+                      <vela:VelaScrubInput Grid.Column="1" Label="Corner Radius" HandleText="R" Value="18" Minimum="0" Maximum="64" Step="1" Unit="px" />
+                      <vela:VelaScrubInput Grid.Row="1" Label="Opacity" HandleText="%" Value="85" Minimum="0" Maximum="100" Step="1" Unit="%" />
+                      <vela:VelaScrubInput Grid.Row="1" Grid.Column="1" Label="Rotation" HandleText="∠" Value="0" Minimum="-180" Maximum="180" Step="1" Unit="°" />
+                    </Grid>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- VelaTabs (Pill & Underline variants powered by VelaPageDeck) -->
+              <Border Classes="card">
+                <StackPanel Spacing="18">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaTabs (Powered by VelaPageDeck)" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Gliding indicator with O(1) KeepAlive tab caching. Toggle between Pill and Underline variants." />
+                    </StackPanel>
+                    <vela:VelaSegmentedControl x:Name="TabsVariantSegmented"
+                                               Grid.Column="1"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnTabsVariantChanged">
+                      <x:String>Pill</x:String>
+                      <x:String>Underline</x:String>
+                    </vela:VelaSegmentedControl>
+                  </Grid>
+
+                  <vela:VelaTabs x:Name="DemoTabs" Variant="Pill" SelectedIndex="0">
+                    <vela:VelaTabItem Header="Overview" Icon="{DynamicResource VelaIconHome}">
+                      <vela:VelaTabItem.PageContent>
+                        <Border Background="{DynamicResource VelaSurfaceMutedBrush}" CornerRadius="12" Padding="16">
+                          <TextBlock Text="Overview panel — cached in VelaPageDeck. Switch tabs and notice instant 0ms return with state preserved."
+                                     TextWrapping="Wrap" FontSize="13.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        </Border>
+                      </vela:VelaTabItem.PageContent>
+                    </vela:VelaTabItem>
+                    <vela:VelaTabItem Header="Activity" Icon="{DynamicResource VelaIconBell}" Badge="12">
+                      <vela:VelaTabItem.PageContent>
+                        <Border Background="{DynamicResource VelaSurfaceMutedBrush}" CornerRadius="12" Padding="16">
+                          <StackPanel Spacing="8">
+                            <TextBlock Text="Recent Activity (Stateful Tab)" FontWeight="SemiBold" FontSize="13.5" />
+                            <vela:VelaCheckBox Content="Toggle me, switch tabs, and come back — state stays alive!" IsChecked="False" />
+                          </StackPanel>
+                        </Border>
+                      </vela:VelaTabItem.PageContent>
+                    </vela:VelaTabItem>
+                    <vela:VelaTabItem Header="Settings" Icon="{DynamicResource VelaIconSliders}">
+                      <vela:VelaTabItem.PageContent>
+                        <Border Background="{DynamicResource VelaSurfaceMutedBrush}" CornerRadius="12" Padding="16">
+                          <TextBlock Text="Settings panel — zero visual-tree teardown when switching between VelaTabItems."
+                                     TextWrapping="Wrap" FontSize="13.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        </Border>
+                      </vela:VelaTabItem.PageContent>
+                    </vela:VelaTabItem>
+                  </vela:VelaTabs>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 3: Liquid Glass Lab (Native Avalonia 12.2 BackdropEffect + Clean-Room MIT SkSL Refraction!) -->
       <vela:VelaNavItem Header="Liquid Glass"
                         Category="Shader Glass Blur Refraction Skia"
                         Icon="{DynamicResource VelaIconSparkles}"
@@ -919,9 +1087,10 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
         </vela:VelaNavigationView>
-        </DockPanel>
-      </vela:VelaDialogHost>
-    </vela:VelaDrawerHost>
+          </DockPanel>
+        </vela:VelaDialogHost>
+      </vela:VelaDrawerHost>
+    </vela:VelaCommandPalette>
 
     <!-- Non-intrusive stacking toast overlay -->
     <vela:VelaToastHost x:Name="ToastHost" />

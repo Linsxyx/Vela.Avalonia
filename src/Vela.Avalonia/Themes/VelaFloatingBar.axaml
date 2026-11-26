@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaFloatingBar}" TargetType="controls:VelaFloatingBar">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <!-- Liquid Glass mode -->
+          <controls:VelaLiquidGlass CornerRadius="16"
+                                    Padding="4"
+                                    BlurRadius="{TemplateBinding GlassBlurRadius}"
+                                    BevelWidth="14"
+                                    Refraction="0.7"
+                                    Dispersion="0.4"
+                                    Specular="0.85"
+                                    IsVisible="{TemplateBinding UseLiquidGlass}"
+                                    IsHitTestVisible="False" />
+
+          <!-- Solid raised surface mode -->
+          <Border CornerRadius="16"
+                  Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  BoxShadow="{DynamicResource VelaShadowRaised}"
+                  IsVisible="{TemplateBinding UseLiquidGlass, Converter={x:Static BoolConverters.Not}}"
+                  IsHitTestVisible="False" />
+
+          <!-- Shared gliding highlight + button strip -->
+          <Grid x:Name="PART_Track" Margin="4">
+            <Canvas IsHitTestVisible="False">
+              <Border x:Name="PART_Highlight"
+                      CornerRadius="11"
+                      Background="{DynamicResource VelaSurfaceMutedBrush}"
+                      IsHitTestVisible="False" />
+            </Canvas>
+
+            <StackPanel x:Name="PART_ItemsHost"
+                        Orientation="Horizontal"
+                        Spacing="2" />
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>
