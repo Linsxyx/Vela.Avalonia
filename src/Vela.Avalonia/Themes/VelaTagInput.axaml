@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaTagInput}" TargetType="controls:VelaTagInput">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock Text="{TemplateBinding Label}"
+                     FontSize="{DynamicResource VelaTextSm}"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource VelaForegroundBrush}"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+          <Border x:Name="PART_Shell"
+                  MinHeight="42"
+                  Padding="6"
+                  CornerRadius="12"
+                  Background="{DynamicResource VelaSurfaceBrush}"
+                  BorderBrush="{DynamicResource VelaBorderStrongBrush}"
+                  BorderThickness="1"
+                  Cursor="Ibeam">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+
+            <WrapPanel x:Name="PART_WrapHost"
+                       Orientation="Horizontal"
+                       ItemSpacing="6"
+                       LineSpacing="6" />
+          </Border>
+
+          <TextBlock Text="{TemplateBinding Description}"
+                     FontSize="{DynamicResource VelaTextXs}"
+                     Foreground="{DynamicResource VelaTextMutedBrush}"
+                     TextWrapping="Wrap"
+                     IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:focused /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

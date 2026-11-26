@@ -177,7 +177,90 @@ public partial class MainWindow : Window
 
         BuildAccentSwatches();
         PopulateCommandPalette();
+        InitPhase6Samples();
         ApplyDataset(0);
+    }
+
+    private bool _metricsToggle;
+
+    private void InitPhase6Samples()
+    {
+        DemoTagInput.Tags.Add("Avalonia 12.2");
+        DemoTagInput.Tags.Add("Liquid Glass");
+        DemoTagInput.Tags.Add("OKLCH");
+
+        var today = DateTime.Today;
+        InlineCalendar.SelectedDate = today;
+        DemoDatePicker.SelectedDate = today.AddDays(5);
+    }
+
+    private void OnSimulateMetricsClick(object? sender, RoutedEventArgs e)
+    {
+        _metricsToggle = !_metricsToggle;
+        MetricRevenue.Value = _metricsToggle ? 74620 : 48250;
+        MetricUsers.Value = _metricsToggle ? 19480 : 12940;
+        MetricLatency.Value = _metricsToggle ? 0.08 : 0.12;
+    }
+
+    private void OnRadioLayoutChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (PlanRadioCards is null || RadioLayoutSegmented is null) return;
+        PlanRadioCards.Layout = RadioLayoutSegmented.SelectedIndex == 1
+            ? VelaRadioCardsLayout.List
+            : VelaRadioCardsLayout.Grid;
+    }
+
+    private VelaSurfaceMaterial GetSelectedOverlayMaterial() => OverlayMaterialSegmented.SelectedIndex switch
+    {
+        1 => VelaSurfaceMaterial.Frosted,
+        2 => VelaSurfaceMaterial.LiquidGlass,
+        _ => VelaSurfaceMaterial.Solid,
+    };
+
+    private async void OnTestMaterialDialogClick(object? sender, RoutedEventArgs e)
+    {
+        var material = GetSelectedOverlayMaterial();
+        var ok = await DialogHost.ShowConfirmAsync(new VelaConfirmDialogOptions
+        {
+            Title = $"Dialog · {material} Material",
+            Description = "Every Vela overlay defaults to Solid and can opt into Frosted (BackdropEffect) or full optical LiquidGlass with one property.",
+            ConfirmText = "Looks great",
+            CancelText = "Close",
+            Material = material,
+        });
+
+        if (ok)
+            ToastHost.Show($"Material: {material}", "Confirmed from unified overlay material dialog.", VelaToastTone.Success);
+    }
+
+    private async void OnTestMaterialDrawerClick(object? sender, RoutedEventArgs e)
+    {
+        var material = GetSelectedOverlayMaterial();
+        var closeBtn = new VelaButton { Variant = VelaButtonVariant.Primary, Size = VelaControlSize.Small, Content = "Close Drawer" };
+        closeBtn.Click += (_, _) => DrawerHost.Close();
+
+        await DrawerHost.ShowAsync(new StackPanel
+        {
+            Spacing = 14,
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = $"This side drawer is rendered using VelaSurfaceMaterial.{material}. Notice how underlying content blurs and refracts cleanly along the rounded glass bezel.",
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 13.5,
+                },
+                new VelaBadge { Tone = VelaBadgeTone.Accent, IsPill = true, Content = material.ToString() },
+                closeBtn,
+            },
+        }, new VelaDrawerOptions
+        {
+            Title = $"Drawer · {material}",
+            Description = "Unified overlay surface material demo.",
+            Side = VelaDrawerSide.Right,
+            Width = 380,
+            Material = material,
+        });
     }
 
     private void PopulateCommandPalette()
@@ -213,11 +296,19 @@ public partial class MainWindow : Window
         });
         CommandPalette.Commands.Add(new VelaCommandItem
         {
+            Title = "Go to Pickers & Cards",
+            Description = "RadioCards, TagInput, Calendar, DatePicker, MetricCard",
+            Group = "Navigation",
+            Icon = Icon("VelaIconCalendar"),
+            Execute = () => RootNav.SelectedIndex = 3,
+        });
+        CommandPalette.Commands.Add(new VelaCommandItem
+        {
             Title = "Go to Select & Menus",
             Description = "Select, ComboBox, Dropdown, Popover, ContextMenu",
             Group = "Navigation",
             Icon = Icon("VelaIconList"),
-            Execute = () => RootNav.SelectedIndex = 4,
+            Execute = () => RootNav.SelectedIndex = 5,
         });
         CommandPalette.Commands.Add(new VelaCommandItem
         {
@@ -225,7 +316,7 @@ public partial class MainWindow : Window
             Description = "VelaDonutChart interactive ring",
             Group = "Navigation",
             Icon = Icon("VelaIconChart"),
-            Execute = () => RootNav.SelectedIndex = 9,
+            Execute = () => RootNav.SelectedIndex = 10,
         });
         CommandPalette.Commands.Add(new VelaCommandItem
         {

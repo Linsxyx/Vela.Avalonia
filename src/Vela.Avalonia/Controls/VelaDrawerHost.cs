@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Vela.Avalonia.Motion;
+using Vela.Avalonia.Tokens;
 
 namespace Vela.Avalonia.Controls;
 
@@ -24,6 +25,7 @@ public sealed class VelaDrawerOptions
     public VelaDrawerSide Side { get; init; } = VelaDrawerSide.Right;
     public double Width { get; init; } = 390.0;
     public bool CloseOnBackdropClick { get; init; } = true;
+    public VelaSurfaceMaterial Material { get; init; } = VelaSurfaceMaterial.Solid;
 }
 
 /// <summary>
@@ -152,7 +154,39 @@ public class VelaDrawerHost : ContentControl
 
         _sheet.Width = opts.Width;
         _sheet.HorizontalAlignment = opts.Side == VelaDrawerSide.Left ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-        _sheet.Child = BuildDrawerChrome(body, opts);
+        var chrome = BuildDrawerChrome(body, opts);
+
+        if (opts.Material == VelaSurfaceMaterial.LiquidGlass)
+        {
+            _sheet.BackdropEffect = null;
+            _sheet.Background = Brushes.Transparent;
+            _sheet.BorderThickness = new Thickness(0);
+            _sheet.Child = new VelaLiquidGlass
+            {
+                CornerRadius = new CornerRadius(20),
+                Padding = new Thickness(0),
+                BlurRadius = 14,
+                BevelWidth = 18,
+                Refraction = 0.6,
+                Dispersion = 0.35,
+                Specular = 0.85,
+                Content = chrome,
+            };
+        }
+        else if (opts.Material == VelaSurfaceMaterial.Frosted)
+        {
+            _sheet.BackdropEffect = new BlurEffect { Radius = 14 };
+            _sheet.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaLiquidGlassTintBrush"));
+            _sheet.BorderThickness = new Thickness(1);
+            _sheet.Child = chrome;
+        }
+        else
+        {
+            _sheet.BackdropEffect = null;
+            _sheet.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaSurfaceRaisedBrush"));
+            _sheet.BorderThickness = new Thickness(1);
+            _sheet.Child = chrome;
+        }
 
         var offscreenX = opts.Side == VelaDrawerSide.Left ? -(opts.Width + 24) : (opts.Width + 24);
         _overlayLayer.IsVisible = true;

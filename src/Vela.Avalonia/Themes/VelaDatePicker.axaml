@@ -1,0 +1,171 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaCalendar}" TargetType="controls:VelaCalendar">
+    <Setter Property="Width" Value="292" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="10">
+          <!-- Month Header + Navigation -->
+          <Grid ColumnDefinitions="*,Auto" MinHeight="32">
+            <TextBlock x:Name="PART_MonthTitle"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource VelaForegroundBrush}"
+                       VerticalAlignment="Center"
+                       Margin="4,0,0,0" />
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+              <Button x:Name="PART_PrevButton"
+                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Width="30"
+                      Height="30"
+                      CornerRadius="999">
+                <PathIcon Width="15" Height="15" Data="{DynamicResource VelaIconChevronLeft}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+              </Button>
+              <Button x:Name="PART_TodayButton"
+                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Height="30"
+                      Padding="10,0"
+                      CornerRadius="999">
+                <TextBlock Text="Today" FontSize="12.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+              </Button>
+              <Button x:Name="PART_NextButton"
+                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Width="30"
+                      Height="30"
+                      CornerRadius="999">
+                <PathIcon Width="15" Height="15" Data="{DynamicResource VelaIconChevronRight}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+              </Button>
+            </StackPanel>
+          </Grid>
+
+          <!-- Weekday Labels -->
+          <UniformGrid Columns="7" Rows="1">
+            <TextBlock Text="Su" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+            <TextBlock Text="Mo" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+            <TextBlock Text="Tu" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+            <TextBlock Text="We" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+            <TextBlock Text="Th" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+            <TextBlock Text="Fr" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+            <TextBlock Text="Sa" HorizontalAlignment="Center" FontSize="11.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextMutedBrush}" />
+          </UniformGrid>
+
+          <!-- Fixed 6x7 Days Grid + Single Gliding Circular Selection Disc -->
+          <Grid x:Name="PART_DaysContainer">
+            <Canvas IsHitTestVisible="False">
+              <Border x:Name="PART_SelectionDisc"
+                      CornerRadius="999"
+                      Background="{DynamicResource VelaAccentBrush}"
+                      IsHitTestVisible="False" />
+            </Canvas>
+
+            <UniformGrid x:Name="PART_DaysGrid"
+                         Columns="7"
+                         Rows="6"
+                         RowSpacing="2"
+                         ColumnSpacing="2" />
+          </Grid>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaDatePicker}" TargetType="controls:VelaDatePicker">
+    <Setter Property="MinWidth" Value="210" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock Text="{TemplateBinding Label}"
+                     FontSize="{DynamicResource VelaTextSm}"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource VelaForegroundBrush}"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+          <Grid>
+            <Button x:Name="PART_Trigger"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    MinHeight="40"
+                    Padding="12,0,8,0"
+                    CornerRadius="12"
+                    Background="{DynamicResource VelaSurfaceBrush}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="1"
+                    Cursor="Hand">
+              <Button.Template>
+                <ControlTemplate>
+                  <Border x:Name="PART_BtnBg"
+                          Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          CornerRadius="{TemplateBinding CornerRadius}"
+                          Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Content}" />
+                  </Border>
+                </ControlTemplate>
+              </Button.Template>
+
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
+                <PathIcon Width="15"
+                          Height="15"
+                          Data="{DynamicResource VelaIconCalendar}"
+                          Foreground="{DynamicResource VelaTextMutedBrush}"
+                          VerticalAlignment="Center" />
+                <TextBlock x:Name="PART_DisplayText"
+                           Grid.Column="1"
+                           Text="{TemplateBinding DisplayText}"
+                           FontSize="{DynamicResource VelaTextSm}"
+                           Foreground="{DynamicResource VelaTextMutedBrush}"
+                           VerticalAlignment="Center" />
+                <Button x:Name="PART_ClearButton"
+                        Grid.Column="2"
+                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Width="22"
+                        Height="22"
+                        CornerRadius="999"
+                        Focusable="False"
+                        IsVisible="False">
+                  <PathIcon Width="11" Height="11" Data="{DynamicResource VelaIconClose}" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                </Button>
+              </Grid>
+            </Button>
+
+            <Popup IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                   PlacementTarget="PART_Trigger"
+                   Placement="BottomEdgeAlignedLeft"
+                   VerticalOffset="6"
+                   IsLightDismissEnabled="True"
+                   WindowManagerAddShadowHint="False">
+              <controls:VelaPopupSurface Margin="6,2,6,16"
+                                         Padding="16"
+                                         CornerRadius="18"
+                                         BorderThickness="1"
+                                         Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                                         BorderBrush="{DynamicResource VelaBorderBrush}"
+                                         BoxShadow="{DynamicResource VelaShadowFloating}">
+                <controls:VelaCalendar x:Name="PART_Calendar"
+                                       SelectedDate="{TemplateBinding SelectedDate, Mode=TwoWay}" />
+              </controls:VelaPopupSurface>
+            </Popup>
+          </Grid>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:has-value /template/ TextBlock#PART_DisplayText">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:has-value /template/ Button#PART_ClearButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Button#PART_Trigger">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+    <Style Selector="^:open /template/ Button#PART_Trigger">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

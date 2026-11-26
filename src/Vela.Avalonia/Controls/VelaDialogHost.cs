@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Vela.Avalonia.Motion;
+using Vela.Avalonia.Tokens;
 
 namespace Vela.Avalonia.Controls;
 
@@ -19,6 +20,7 @@ public sealed class VelaDialogOptions
     public double MaxWidth { get; init; } = 440;
     public bool CloseOnBackdropClick { get; init; } = true;
     public bool ShowCloseButton { get; init; } = true;
+    public VelaSurfaceMaterial Material { get; init; } = VelaSurfaceMaterial.Solid;
 }
 
 public sealed class VelaConfirmDialogOptions
@@ -30,6 +32,7 @@ public sealed class VelaConfirmDialogOptions
     public string CancelText { get; init; } = "Cancel";
     public bool IsDestructive { get; init; }
     public bool CloseOnBackdropClick { get; init; } = true;
+    public VelaSurfaceMaterial Material { get; init; } = VelaSurfaceMaterial.Solid;
 }
 
 /// <summary>
@@ -191,6 +194,7 @@ public class VelaDialogHost : ContentControl
                 Description = options.Description,
                 CloseOnBackdropClick = options.CloseOnBackdropClick,
                 ShowCloseButton = true,
+                Material = options.Material,
             },
             result => tcs.TrySetResult(result is bool b && b));
 
@@ -255,7 +259,39 @@ public class VelaDialogHost : ContentControl
         _isOpen = true;
 
         _cardShell.Width = options.MaxWidth;
-        _cardShell.Child = BuildDialogChrome(body, options);
+        var chrome = BuildDialogChrome(body, options);
+
+        if (options.Material == VelaSurfaceMaterial.LiquidGlass)
+        {
+            _cardShell.BackdropEffect = null;
+            _cardShell.Background = Brushes.Transparent;
+            _cardShell.BorderThickness = new Thickness(0);
+            _cardShell.Child = new VelaLiquidGlass
+            {
+                CornerRadius = new CornerRadius(24),
+                Padding = new Thickness(0),
+                BlurRadius = 12,
+                BevelWidth = 18,
+                Refraction = 0.65,
+                Dispersion = 0.35,
+                Specular = 0.85,
+                Content = chrome,
+            };
+        }
+        else if (options.Material == VelaSurfaceMaterial.Frosted)
+        {
+            _cardShell.BackdropEffect = new BlurEffect { Radius = 14 };
+            _cardShell.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaLiquidGlassTintBrush"));
+            _cardShell.BorderThickness = new Thickness(1);
+            _cardShell.Child = chrome;
+        }
+        else
+        {
+            _cardShell.BackdropEffect = null;
+            _cardShell.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaSurfaceRaisedBrush"));
+            _cardShell.BorderThickness = new Thickness(1);
+            _cardShell.Child = chrome;
+        }
 
         _overlayLayer.IsVisible = true;
         _overlayLayer.IsHitTestVisible = true;

@@ -1,0 +1,61 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaMetricCard}" TargetType="controls:VelaMetricCard">
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Padding" Value="20,18" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}"
+                BoxShadow="{DynamicResource VelaShadowResting}">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{TemplateBinding Label}"
+                         FontSize="13"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                         VerticalAlignment="Center" />
+              <PathIcon Grid.Column="1"
+                        Width="16"
+                        Height="16"
+                        Data="{TemplateBinding Icon}"
+                        Foreground="{DynamicResource VelaTextMutedBrush}"
+                        IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+              <controls:VelaAnimatedCounter Value="{TemplateBinding Value}"
+                                            Prefix="{TemplateBinding Prefix}"
+                                            Suffix="{TemplateBinding Suffix}"
+                                            Decimals="{TemplateBinding Decimals}"
+                                            FontSize="26"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource VelaForegroundBrush}"
+                                            VerticalAlignment="Center" />
+              <controls:VelaBadge Tone="{TemplateBinding DeltaTone}"
+                                  Size="Small"
+                                  IsPill="True"
+                                  Content="{TemplateBinding Delta}"
+                                  VerticalAlignment="Center"
+                                  IsVisible="{TemplateBinding Delta, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+
+            <TextBlock Text="{TemplateBinding Caption}"
+                       FontSize="12"
+                       Foreground="{DynamicResource VelaTextMutedBrush}"
+                       IsVisible="{TemplateBinding Caption, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,135 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaRadioCardItem}" TargetType="controls:VelaRadioCardItem">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Padding" Value="16,14" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Card"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.15" />
+              <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+            </Transitions>
+          </Border.Transitions>
+
+          <Grid RowDefinitions="*,Auto" RowSpacing="10">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <StackPanel Spacing="4">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <PathIcon x:Name="PART_Icon"
+                            Width="16"
+                            Height="16"
+                            Data="{TemplateBinding Icon}"
+                            Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                            IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                  <TextBlock Text="{TemplateBinding Header}"
+                             FontSize="14"
+                             FontWeight="SemiBold"
+                             Foreground="{DynamicResource VelaForegroundBrush}" />
+                </StackPanel>
+
+                <TextBlock Text="{TemplateBinding Description}"
+                           FontSize="12.5"
+                           Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                           TextWrapping="Wrap"
+                           IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+              </StackPanel>
+
+              <!-- Crisp 18x18 Radio Dot Indicator -->
+              <Border x:Name="PART_RadioOuter"
+                      Grid.Column="1"
+                      Width="18"
+                      Height="18"
+                      CornerRadius="999"
+                      BorderThickness="1.5"
+                      BorderBrush="{DynamicResource VelaBorderStrongBrush}"
+                      Background="Transparent"
+                      VerticalAlignment="Top"
+                      Margin="0,2,0,0">
+                <Ellipse x:Name="PART_RadioDot"
+                         Width="6"
+                         Height="6"
+                         Fill="{DynamicResource VelaControlGlyphBrush}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Opacity="0" />
+              </Border>
+            </Grid>
+
+            <TextBlock Grid.Row="1"
+                       Text="{TemplateBinding Meta}"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource VelaForegroundBrush}"
+                       IsVisible="{TemplateBinding Meta, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover:not(:selected) /template/ Border#PART_Card">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_Card">
+      <Setter Property="Background" Value="{DynamicResource VelaControlOnSubtleBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_RadioOuter">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaControlOnBrush}" />
+      <Setter Property="Background" Value="{DynamicResource VelaControlOnBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Ellipse#PART_RadioDot">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:selected /template/ PathIcon#PART_Icon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaRadioCards}" TargetType="controls:VelaRadioCards">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <UniformGrid Rows="1" ColumnSpacing="12" />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid x:Name="PART_Track">
+          <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+
+          <!-- Shared gliding accent selection ring floating cleanly on top of card border -->
+          <Canvas IsHitTestVisible="False" ZIndex="5">
+            <Border x:Name="PART_Ring"
+                    CornerRadius="16"
+                    BorderBrush="{DynamicResource VelaControlOnBrush}"
+                    BorderThickness="1.75"
+                    Background="Transparent"
+                    IsHitTestVisible="False" />
+          </Canvas>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:list">
+      <Setter Property="ItemsPanel">
+        <ItemsPanelTemplate>
+          <StackPanel Orientation="Vertical" Spacing="8" />
+        </ItemsPanelTemplate>
+      </Setter>
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

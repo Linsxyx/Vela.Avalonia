@@ -527,7 +527,132 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
-      <!-- Page 3: Forms & Overlays (New Batch 2 Controls!) -->
+      <!-- Page 4: Pickers, Cards & Metrics (Phase 6!) -->
+      <vela:VelaNavItem Header="Pickers &amp; Cards"
+                        Category="RadioCards TagInput Calendar DatePicker MetricCard Material"
+                        Icon="{DynamicResource VelaIconCalendar}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="22" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Pickers, RadioCards, Tags &amp; Metric Cards" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Everyday business building blocks: rolling KPI counters, gliding-ring radio cards, pill tag inputs, gliding-disc calendars, inverted tooltips, and unified Solid/Frosted/LiquidGlass overlays." />
+              </StackPanel>
+
+              <!-- Metric Cards Row -->
+              <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="cardTitle" Text="VelaMetricCard &amp; VelaAnimatedCounter" VerticalAlignment="Center" />
+                  <vela:VelaButton Grid.Column="1" Variant="Secondary" Size="Small" Content="Simulate Quarter Jump" Click="OnSimulateMetricsClick" />
+                </Grid>
+                <UniformGrid Columns="3" ColumnSpacing="14">
+                  <vela:VelaMetricCard x:Name="MetricRevenue"
+                                       Label="Monthly Revenue"
+                                       Value="48250"
+                                       Prefix="$"
+                                       Delta="+18.4%"
+                                       DeltaTone="Success"
+                                       Caption="vs. last 30 days"
+                                       Icon="{DynamicResource VelaIconTrendingUp}" />
+                  <vela:VelaMetricCard x:Name="MetricUsers"
+                                       Label="Active Desktops"
+                                       Value="12940"
+                                       Delta="+6.2%"
+                                       DeltaTone="Info"
+                                       Caption="macOS · Windows · Linux"
+                                       Icon="{DynamicResource VelaIconCompass}" />
+                  <vela:VelaMetricCard x:Name="MetricLatency"
+                                       Label="Avg Switch Latency"
+                                       Value="0.12"
+                                       Suffix=" ms"
+                                       Decimals="2"
+                                       Delta="-94%"
+                                       DeltaTone="Accent"
+                                       Caption="VelaPageDeck KeepAlive"
+                                       Icon="{DynamicResource VelaIconSparkles}" />
+                </UniformGrid>
+              </StackPanel>
+
+              <!-- RadioCards -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaRadioCards" />
+                      <TextBlock Classes="cardDesc" Text="Click between cards to watch the 1.75px accent selection ring glide smoothly across." />
+                    </StackPanel>
+                    <vela:VelaSegmentedControl x:Name="RadioLayoutSegmented"
+                                               Grid.Column="1"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnRadioLayoutChanged">
+                      <x:String>Grid</x:String>
+                      <x:String>List</x:String>
+                    </vela:VelaSegmentedControl>
+                  </Grid>
+
+                  <vela:VelaRadioCards x:Name="PlanRadioCards" Layout="Grid" SelectedIndex="1">
+                    <vela:VelaRadioCardItem Header="Starter"
+                                            Description="For solo builders and open-source tools."
+                                            Meta="$0 / mo"
+                                            Icon="{DynamicResource VelaIconHome}" />
+                    <vela:VelaRadioCardItem Header="Studio Pro"
+                                            Description="Unlimited desktop apps, GPU shaders &amp; charts."
+                                            Meta="$24 / mo"
+                                            Icon="{DynamicResource VelaIconSparkles}" />
+                    <vela:VelaRadioCardItem Header="Enterprise"
+                                            Description="Dedicated support, custom tokens &amp; SLA."
+                                            Meta="$89 / mo"
+                                            Icon="{DynamicResource VelaIconLayers}" />
+                  </vela:VelaRadioCards>
+                </StackPanel>
+              </Border>
+
+              <!-- TagInput + DatePicker + Overlay Material Tester -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="18">
+                    <vela:VelaTagInput x:Name="DemoTagInput"
+                                       Label="VelaTagInput"
+                                       Description="Type a tag and press Enter or Comma. Backspace deletes the last pill." />
+
+                    <vela:VelaDatePicker x:Name="DemoDatePicker"
+                                         Label="VelaDatePicker"
+                                         PlaceholderText="Pick release date..." />
+
+                    <!-- Unified Overlay Material Switcher -->
+                    <StackPanel Spacing="10">
+                      <TextBlock Text="Unified Overlay Material (Dialog &amp; Drawer)"
+                                 FontSize="13"
+                                 FontWeight="Medium"
+                                 Foreground="{DynamicResource VelaForegroundBrush}" />
+                      <vela:VelaSegmentedControl x:Name="OverlayMaterialSegmented" SelectedIndex="2">
+                        <x:String>Solid</x:String>
+                        <x:String>Frosted</x:String>
+                        <x:String>LiquidGlass</x:String>
+                      </vela:VelaSegmentedControl>
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <vela:VelaButton Variant="Primary" Size="Small" Content="Test Material Dialog" Click="OnTestMaterialDialogClick" />
+                        <vela:VelaButton Variant="Secondary" Size="Small" Content="Test Material Drawer" Click="OnTestMaterialDrawerClick" />
+                      </StackPanel>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <!-- Standalone VelaCalendar -->
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="12" HorizontalAlignment="Center">
+                    <TextBlock Classes="cardTitle" Text="VelaCalendar (Gliding Disc)" />
+                    <vela:VelaCalendar x:Name="InlineCalendar" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 5: Forms & Overlays (Batch 2 Controls!) -->
       <vela:VelaNavItem Header="Forms &amp; Overlays"
                         Category="Input CheckBox Badge Dialog Toast"
                         Icon="{DynamicResource VelaIconLayers}">
