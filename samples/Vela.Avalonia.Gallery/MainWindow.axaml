@@ -42,8 +42,9 @@
   </Window.Styles>
 
   <Grid>
-    <vela:VelaDialogHost x:Name="DialogHost">
-      <DockPanel>
+    <vela:VelaDrawerHost x:Name="DrawerHost">
+      <vela:VelaDialogHost x:Name="DialogHost">
+        <DockPanel>
     <!-- Live Page-Switch Performance Telemetry Bar -->
     <Border DockPanel.Dock="Bottom"
             Height="32"
@@ -468,7 +469,143 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
-      <!-- Page 4: Heavy Stress Benchmark (Lazy constructed via PageFactory in code-behind!) -->
+      <!-- Page 4: Feedback & Panels (Batch 4 Controls!) -->
+      <vela:VelaNavItem Header="Feedback &amp; Panels"
+                        Category="Progress Skeleton Alert Accordion Drawer"
+                        Icon="{DynamicResource VelaIconBell}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="Progress, Skeleton, Alert, Accordion &amp; Drawer" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Restrained status feedback and disclosure surfaces with spring progress, calm skeleton loading, hairline accordions, and slide-over drawers." />
+              </StackPanel>
+
+              <!-- VelaProgress -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="cardTitle" Text="VelaProgress" VerticalAlignment="Center" />
+                    <vela:VelaSwitch x:Name="IndeterminateSwitch"
+                                     Grid.Column="1"
+                                     Content="Indeterminate"
+                                     IsCheckedChanged="OnIndeterminateChanged" />
+                  </Grid>
+
+                  <vela:VelaProgress x:Name="DemoProgress"
+                                     Label="Uploading build artifact"
+                                     Value="42" />
+
+                  <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+                    <vela:VelaButton Variant="Secondary" Size="Small" Content="0%" Click="OnProgress0Click" />
+                    <vela:VelaButton Variant="Secondary" Size="Small" Content="35%" Click="OnProgress35Click" />
+                    <vela:VelaButton Variant="Secondary" Size="Small" Content="72%" Click="OnProgress72Click" />
+                    <vela:VelaButton Variant="Primary" Size="Small" Content="100% Complete" Click="OnProgress100Click" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+
+              <!-- VelaSkeleton + VelaDrawerHost Row -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="cardTitle" Text="VelaSkeleton" VerticalAlignment="Center" />
+                      <vela:VelaSwitch x:Name="SkeletonLoadingSwitch"
+                                       Grid.Column="1"
+                                       Content="Loading"
+                                       IsChecked="True"
+                                       IsCheckedChanged="OnSkeletonToggleChanged" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                      <vela:VelaSkeleton x:Name="SkelAvatar" Width="44" Height="44" IsCircle="True" IsLoading="True">
+                        <Border Width="44" Height="44" CornerRadius="999" Background="{DynamicResource VelaAccentSubtleBrush}">
+                          <TextBlock Text="VU" FontWeight="SemiBold" Foreground="{DynamicResource VelaAccentStrongBrush}"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                      </vela:VelaSkeleton>
+
+                      <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                        <vela:VelaSkeleton x:Name="SkelLine1" Height="16" Width="150" HorizontalAlignment="Left" IsLoading="True">
+                          <TextBlock Text="Vela.Avalonia Team" FontSize="14" FontWeight="SemiBold" />
+                        </vela:VelaSkeleton>
+                        <vela:VelaSkeleton x:Name="SkelLine2" Height="13" IsLoading="True">
+                          <TextBlock Text="Avalonia 12.2 · Motion-first desktop primitives" FontSize="12.5"
+                                     Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        </vela:VelaSkeleton>
+                      </StackPanel>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaDrawerHost" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Floating side sheets with smooth spring slide-in/slide-out, Esc &amp; backdrop dismiss." />
+
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10">
+                      <vela:VelaButton Variant="Primary" Size="Small" Content="Open Right Drawer" Click="OnOpenRightDrawerClick" />
+                      <vela:VelaButton Variant="Secondary" Size="Small" Content="Open Left Drawer" Click="OnOpenLeftDrawerClick" />
+                    </WrapPanel>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- VelaAlert -->
+              <Border Classes="card">
+                <StackPanel Spacing="12">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="cardTitle" Text="VelaAlert" VerticalAlignment="Center" />
+                    <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="Restore dismissed" Click="OnRestoreAlertsClick" />
+                  </Grid>
+
+                  <vela:VelaAlert x:Name="AlertInfo"
+                                  Tone="Info"
+                                  Title="Avalonia 12.2 Composition Ready"
+                                  Description="VelaPageDeck uses O(1) KeepAlive caching and optional render-thread fades."
+                                  IsDismissible="True" />
+                  <vela:VelaAlert x:Name="AlertSuccess"
+                                  Tone="Success"
+                                  Title="Design tokens synced"
+                                  Description="All OKLCH surfaces and 8 accent palettes compiled cleanly with 0 warnings."
+                                  IsDismissible="True" />
+                  <vela:VelaAlert x:Name="AlertWarning"
+                                  Tone="Warning"
+                                  Title="High DPI scaling detected"
+                                  Description="Keep PageTransitionMode set to Instant for zero offscreen GPU texture allocations."
+                                  IsDismissible="True" />
+                </StackPanel>
+              </Border>
+
+              <!-- VelaAccordion -->
+              <Border Classes="card">
+                <StackPanel Spacing="14">
+                  <TextBlock Classes="cardTitle" Text="VelaAccordion" />
+                  <vela:VelaAccordion AllowMultiple="False">
+                    <vela:VelaAccordionItem Header="How does Vela isolate itself from FluentTheme?" IsExpanded="True">
+                      <TextBlock TextWrapping="Wrap"
+                                 Text="Composite Vela controls use internal VelaBareTextBoxTheme and VelaIconButtonTheme primitives so FluentTheme focus rings and button styles never leak into Vela fields." />
+                    </vela:VelaAccordionItem>
+                    <vela:VelaAccordionItem Header="Why is VelaPageDeck faster than a standard TabControl?">
+                      <TextBlock TextWrapping="Wrap"
+                                 Text="VelaPageDeck lazily instantiates pages on first visit, keeps them alive via KeepAlive or bounded LRU caching, and skips inactive pages completely during Measure and Arrange." />
+                    </vela:VelaAccordionItem>
+                    <vela:VelaAccordionItem Header="Does Vela support Reduced Motion accessibility?">
+                      <TextBlock TextWrapping="Wrap"
+                                 Text="Yes. Toggling VelaMotionOptions.ReducedMotion immediately snaps all spring channels, pauses skeleton pulses, and disables compositor transitions across every control." />
+                    </vela:VelaAccordionItem>
+                  </vela:VelaAccordion>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 5: Heavy Stress Benchmark (Lazy constructed via PageFactory in code-behind!) -->
       <vela:VelaNavItem x:Name="StressNavItem"
                         Header="Heavy Stress"
                         Category="Benchmark Performance 500 Nodes"
@@ -618,9 +755,10 @@
           </ScrollViewer>
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
-    </vela:VelaNavigationView>
-      </DockPanel>
-    </vela:VelaDialogHost>
+        </vela:VelaNavigationView>
+        </DockPanel>
+      </vela:VelaDialogHost>
+    </vela:VelaDrawerHost>
 
     <!-- Non-intrusive stacking toast overlay -->
     <vela:VelaToastHost x:Name="ToastHost" />

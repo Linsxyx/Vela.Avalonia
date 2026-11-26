@@ -1,0 +1,78 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaAccordion}" TargetType="controls:VelaAccordion">
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+          <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaAccordionItem}" TargetType="controls:VelaAccordionItem">
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+          <StackPanel>
+            <Button x:Name="PART_Trigger"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="0,13"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Cursor="Hand">
+              <Button.Template>
+                <ControlTemplate>
+                  <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Content}" />
+                  </Border>
+                </ControlTemplate>
+              </Button.Template>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <ContentPresenter x:Name="PART_Header"
+                                  Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                  TextElement.FontWeight="Medium"
+                                  TextElement.Foreground="{DynamicResource VelaForegroundBrush}"
+                                  VerticalAlignment="Center" />
+                <PathIcon x:Name="PART_Chevron"
+                          Grid.Column="1"
+                          Width="15"
+                          Height="15"
+                          Data="{DynamicResource VelaIconChevronDown}"
+                          Foreground="{DynamicResource VelaTextMutedBrush}"
+                          VerticalAlignment="Center" />
+              </Grid>
+            </Button>
+
+            <!-- True physical spring height disclosure -->
+            <controls:VelaCollapsePanel IsExpanded="{TemplateBinding IsExpanded}">
+              <Border Padding="0,0,28,16">
+                <ContentPresenter Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  TextElement.FontSize="{DynamicResource VelaTextSm}"
+                                  TextElement.Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+              </Border>
+            </controls:VelaCollapsePanel>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:expanded /template/ PathIcon#PART_Chevron">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

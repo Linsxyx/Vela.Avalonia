@@ -450,6 +450,101 @@ public partial class MainWindow : Window
     private void OnContextDeleteClick(object? sender, RoutedEventArgs e)
         => ToastHost.Show("ContextMenu: Delete", "Danger menu item triggered.", VelaToastTone.Danger);
 
+    private void OnProgress0Click(object? sender, RoutedEventArgs e) => SetDemoProgress(0);
+    private void OnProgress35Click(object? sender, RoutedEventArgs e) => SetDemoProgress(35);
+    private void OnProgress72Click(object? sender, RoutedEventArgs e) => SetDemoProgress(72);
+    private void OnProgress100Click(object? sender, RoutedEventArgs e) => SetDemoProgress(100);
+
+    private void SetDemoProgress(double value)
+    {
+        IndeterminateSwitch.IsChecked = false;
+        DemoProgress.IsIndeterminate = false;
+        DemoProgress.Value = value;
+    }
+
+    private void OnIndeterminateChanged(object? sender, RoutedEventArgs e)
+    {
+        if (DemoProgress is null || IndeterminateSwitch is null) return;
+        DemoProgress.IsIndeterminate = IndeterminateSwitch.IsChecked == true;
+    }
+
+    private void OnSkeletonToggleChanged(object? sender, RoutedEventArgs e)
+    {
+        if (SkelAvatar is null || SkeletonLoadingSwitch is null) return;
+        var loading = SkeletonLoadingSwitch.IsChecked == true;
+        SkelAvatar.IsLoading = loading;
+        SkelLine1.IsLoading = loading;
+        SkelLine2.IsLoading = loading;
+    }
+
+    private void OnRestoreAlertsClick(object? sender, RoutedEventArgs e)
+    {
+        AlertInfo.Restore();
+        AlertSuccess.Restore();
+        AlertWarning.Restore();
+    }
+
+    private async void OnOpenRightDrawerClick(object? sender, RoutedEventArgs e)
+    {
+        var closeBtn = new VelaButton { Variant = VelaButtonVariant.Primary, Size = VelaControlSize.Small, Content = "Apply & Close" };
+        closeBtn.Click += (_, _) =>
+        {
+            DrawerHost.Close();
+            ToastHost.Show("Inspector updated", "Drawer changes applied.", VelaToastTone.Success);
+        };
+
+        var body = new StackPanel
+        {
+            Spacing = 16,
+            Children =
+            {
+                new VelaInput { Label = "Component Title", Text = "VelaDrawerHost", IsClearable = true },
+                new VelaInput { Label = "Namespace", Text = "Vela.Avalonia.Controls" },
+                new VelaCheckBox { Content = "Close on backdrop click", IsChecked = true },
+                new VelaCheckBox { Content = "Trap Escape key", IsChecked = true },
+                closeBtn,
+            },
+        };
+
+        await DrawerHost.ShowAsync(body, new VelaDrawerOptions
+        {
+            Title = "Inspector Drawer",
+            Description = "Side sheet sliding smoothly from the right edge.",
+            Side = VelaDrawerSide.Right,
+            Width = 380,
+        });
+    }
+
+    private async void OnOpenLeftDrawerClick(object? sender, RoutedEventArgs e)
+    {
+        var closeBtn = new VelaButton { Variant = VelaButtonVariant.Secondary, Size = VelaControlSize.Small, Content = "Close" };
+        closeBtn.Click += (_, _) => DrawerHost.Close();
+
+        var body = new StackPanel
+        {
+            Spacing = 14,
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = "Left drawers work great for quick filters, workspace switchers, or secondary navigation trees.",
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 13,
+                },
+                new VelaBadge { Tone = VelaBadgeTone.Info, IsPill = true, Content = "Left Edge · 340px" },
+                closeBtn,
+            },
+        };
+
+        await DrawerHost.ShowAsync(body, new VelaDrawerOptions
+        {
+            Title = "Quick Filters",
+            Description = "Slide-over sheet from the left edge.",
+            Side = VelaDrawerSide.Left,
+            Width = 340,
+        });
+    }
+
     private void ApplyDataset(int index)
     {
         ShowcaseDonut.TotalLabel = DatasetLabels[index];

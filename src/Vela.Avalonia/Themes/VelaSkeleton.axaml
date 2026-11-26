@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaSkeleton}" TargetType="controls:VelaSkeleton">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Background" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="MinHeight" Value="12" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <!-- Live content (shown when IsLoading=False) -->
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Opacity="1" />
+
+          <!-- Calm skeleton placeholder pulse (shown when IsLoading=True) -->
+          <Border x:Name="PART_Bone"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Background="{TemplateBinding Background}"
+                  IsVisible="False" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:circle">
+      <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusPill}" />
+    </Style>
+
+    <Style Selector="^:loading /template/ ContentPresenter#PART_Content">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+    <Style Selector="^:loading /template/ Border#PART_Bone">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:loading:not(:reduced) /template/ Border#PART_Bone">
+      <Style.Animations>
+        <Animation Duration="0:0:1.8" IterationCount="INFINITE" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.85" /></KeyFrame>
+          <KeyFrame Cue="50%"><Setter Property="Opacity" Value="0.42" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.85" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
