@@ -57,15 +57,28 @@ jobs:
           ls -la ./artifacts
 
       # NuGet Trusted Publishing (OIDC) — no long-lived API key secret needed!
+      # Note: GitHub Actions disallows `secrets.*` directly inside `if:` expressions,
+      # so we check via step env -> step output to support either Variables or Secrets.
+      - name: Check NuGet Publisher Configuration
+        id: nuget-cfg
+        env:
+          NUGET_USER_VAL: ${{ vars.NUGET_USER || secrets.NUGET_USER }}
+        run: |
+          if [ -n "$NUGET_USER_VAL" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: NuGet Login (Trusted Publishing OIDC)
         id: nuget-login
-        if: ${{ vars.NUGET_USER != '' || secrets.NUGET_USER != '' }}
+        if: steps.nuget-cfg.outputs.enabled == 'true'
         uses: NuGet/login@v1
         with:
           user: ${{ vars.NUGET_USER || secrets.NUGET_USER }}
 
       - name: Push to NuGet.org
-        if: ${{ steps.nuget-login.outputs.NUGET_API_KEY != '' }}
+        if: steps.nuget-cfg.outputs.enabled == 'true' && steps.nuget-login.outputs.NUGET_API_KEY != ''
         run: |
           dotnet nuget push "./artifacts/*.nupkg" \
             --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
