@@ -369,8 +369,75 @@
               <StackPanel Spacing="4">
                 <TextBlock Classes="pageTitle" Text="Flagship Desktop Interactions" />
                 <TextBlock Classes="pageSubtitle"
-                           Text="Signature Arc motion + Liquid Glass controls: ⌘K Command Palette, Liquid Glass FloatingBar, O(1) Cached Tabs, ConfirmMorph pill, and Figma-style ScrubInput." />
+                           Text="Signature Arc motion + Liquid Glass controls: Floating DockBar with morphing search orb, ⌘K Command Palette, Liquid Glass FloatingBar, O(1) Cached Tabs, ConfirmMorph pill, and Figma-style ScrubInput." />
               </StackPanel>
+
+              <!-- VelaDockBar (iOS 26 / Arc Floating Tab Dock + Detached Morphing Search Orb) -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaDockBar (Floating Tab Pill + Morphing Search Orb)" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Click or drag-scrub across tabs to glide the active pill; click the detached search orb to morph into an inline search field while the tabs compact into a return orb." />
+                    </StackPanel>
+                    <vela:VelaSegmentedControl x:Name="DockMaterialSegmented"
+                                               Grid.Column="1"
+                                               SelectedIndex="0"
+                                               SelectionChanged="OnDockMaterialChanged">
+                      <x:String>Solid</x:String>
+                      <x:String>Frosted</x:String>
+                      <x:String>Liquid Glass</x:String>
+                    </vela:VelaSegmentedControl>
+                  </Grid>
+
+                  <Border CornerRadius="18"
+                          Height="148"
+                          Background="{DynamicResource VelaSurfaceMutedBrush}"
+                          BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                          BorderThickness="1"
+                          ClipToBounds="True">
+                    <Grid>
+                      <vela:VelaShaderBackground x:Name="DockStageShader"
+                                                 Preset="Aurora"
+                                                 Intensity="0.85"
+                                                 IsVisible="False" />
+
+                      <vela:VelaDockBar x:Name="ShowcaseDockBar"
+                                        SelectedIndex="2"
+                                        Material="Solid"
+                                        ShowSearch="True"
+                                        SearchPlaceholder="Search saved items..."
+                                        SelectionChanged="OnDockSelectionChanged"
+                                        SearchSubmitted="OnDockSearchSubmitted">
+                        <vela:VelaDockItem Header="Home" Icon="{DynamicResource VelaIconHome}" />
+                        <vela:VelaDockItem Header="Explore" Icon="{DynamicResource VelaIconCompass}" />
+                        <vela:VelaDockItem Header="Saved" Icon="{DynamicResource VelaIconBookmark}" Badge="3" />
+                        <vela:VelaDockItem Header="Profile" Icon="{DynamicResource VelaIconUser}" />
+                      </vela:VelaDockBar>
+                    </Grid>
+                  </Border>
+
+                  <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                    <TextBlock x:Name="DockStatusText"
+                               Text="Active tab: Saved (drag horizontally across tabs or click the search orb)"
+                               FontSize="12.5"
+                               Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <vela:VelaButton Grid.Column="1"
+                                     Variant="Secondary"
+                                     Size="Small"
+                                     Content="+1 Badge"
+                                     Click="OnDockAddBadgeClick" />
+                    <vela:VelaButton Grid.Column="2"
+                                     Variant="Ghost"
+                                     Size="Small"
+                                     Content="Clear Badge"
+                                     Click="OnDockClearBadgeClick" />
+                  </Grid>
+                </StackPanel>
+              </Border>
 
               <!-- VelaCommandPalette Card -->
               <Border Classes="card">

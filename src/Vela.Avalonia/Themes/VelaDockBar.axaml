@@ -1,0 +1,185 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaDockBar}" TargetType="controls:VelaDockBar">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="10"
+                    VerticalAlignment="Center">
+          <!-- Main Floating Tab Pill -->
+          <Border x:Name="PART_TabsShell"
+                  Height="{TemplateBinding DockHeight}"
+                  CornerRadius="999"
+                  BorderThickness="1"
+                  BoxShadow="{DynamicResource VelaShadowFloating}">
+            <Border CornerRadius="999" ClipToBounds="True">
+              <Grid>
+                <!-- Optional Frosted / LiquidGlass Backdrop Blur -->
+                <Border x:Name="PART_TabsBackdrop"
+                        CornerRadius="999"
+                        IsHitTestVisible="False" />
+
+                <!-- Optional GPU SDF Optical Refraction Lens -->
+                <controls:VelaLiquidGlassLens x:Name="PART_TabsLens"
+                                              CornerRadius="999"
+                                              BevelWidth="14"
+                                              Refraction="0.72"
+                                              Dispersion="0.52"
+                                              Specular="0.88"
+                                              IsVisible="False" />
+
+                <!-- Surface Tint -->
+                <Border x:Name="PART_TabsSurface"
+                        CornerRadius="999"
+                        IsHitTestVisible="False" />
+
+                <!-- Full Tabs Track + Gliding Active Capsule -->
+                <Grid x:Name="PART_TabsTrack" Margin="5">
+                  <Canvas IsHitTestVisible="False">
+                    <Border x:Name="PART_Indicator"
+                            CornerRadius="999"
+                            Background="{DynamicResource VelaSurfaceMutedBrush}"
+                            Opacity="0"
+                            IsHitTestVisible="False" />
+                  </Canvas>
+
+                  <StackPanel x:Name="PART_TabsHost"
+                              Orientation="Horizontal"
+                              Spacing="2"
+                              VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Compact Active-Tab Return Orb (fades in when Search expands!) -->
+                <Border x:Name="PART_CompactReturn"
+                        Background="Transparent"
+                        CornerRadius="999"
+                        Cursor="Hand"
+                        Opacity="0"
+                        IsVisible="False"
+                        ToolTip.Tip="Return to tabs">
+                  <PathIcon x:Name="PART_CompactReturnIcon"
+                            Width="20"
+                            Height="20"
+                            Foreground="{DynamicResource VelaForegroundBrush}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                </Border>
+              </Grid>
+            </Border>
+          </Border>
+
+          <!-- Detached Circular Search Orb -> Smoothly Morphs into Search Pill -->
+          <Border x:Name="PART_SearchShell"
+                  Height="{TemplateBinding DockHeight}"
+                  CornerRadius="999"
+                  BorderThickness="1"
+                  BoxShadow="{DynamicResource VelaShadowFloating}"
+                  IsVisible="{TemplateBinding ShowSearch}">
+            <Border CornerRadius="999" ClipToBounds="True">
+              <Grid>
+                <Border x:Name="PART_SearchBackdrop"
+                        CornerRadius="999"
+                        IsHitTestVisible="False" />
+
+                <controls:VelaLiquidGlassLens x:Name="PART_SearchLens"
+                                              CornerRadius="999"
+                                              BevelWidth="14"
+                                              Refraction="0.72"
+                                              Dispersion="0.52"
+                                              Specular="0.88"
+                                              IsVisible="False" />
+
+                <Border x:Name="PART_SearchSurface"
+                        CornerRadius="999"
+                        IsHitTestVisible="False" />
+
+                <!-- Collapsed Search Orb Trigger -->
+                <Grid x:Name="PART_SearchCollapsedHit"
+                      Background="Transparent"
+                      Cursor="Hand">
+                  <PathIcon Width="20"
+                            Height="20"
+                            Data="{DynamicResource VelaIconSearch}"
+                            Foreground="{DynamicResource VelaForegroundBrush}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Expanded Search Input Field -->
+                <Grid x:Name="PART_SearchExpandedRow"
+                      ColumnDefinitions="Auto,*,Auto"
+                      ColumnSpacing="8"
+                      Margin="16,0,10,0"
+                      Opacity="0"
+                      IsVisible="False">
+                  <PathIcon Width="16"
+                            Height="16"
+                            Data="{DynamicResource VelaIconSearch}"
+                            Foreground="{DynamicResource VelaTextMutedBrush}"
+                            VerticalAlignment="Center" />
+
+                  <TextBox x:Name="PART_SearchBox"
+                           Grid.Column="1"
+                           Theme="{DynamicResource VelaBareTextBoxTheme}"
+                           Text="{TemplateBinding SearchText, Mode=TwoWay}"
+                           PlaceholderText="{TemplateBinding SearchPlaceholder}"
+                           FontSize="13.5"
+                           VerticalAlignment="Center" />
+
+                  <Button x:Name="PART_SearchClose"
+                          Grid.Column="2"
+                          Theme="{DynamicResource VelaIconButtonTheme}"
+                          Width="28"
+                          Height="28"
+                          CornerRadius="999"
+                          ToolTip.Tip="Close search">
+                    <PathIcon Width="12"
+                              Height="12"
+                              Data="{DynamicResource VelaIconClose}"
+                              Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  </Button>
+                </Grid>
+              </Grid>
+            </Border>
+          </Border>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Solid Material (exact clean floating pill from reference) -->
+    <Style Selector="^:solid /template/ Border#PART_TabsShell, ^:solid /template/ Border#PART_SearchShell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+    <Style Selector="^:solid /template/ Border#PART_TabsSurface, ^:solid /template/ Border#PART_SearchSurface">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceRaisedBrush}" />
+      <Setter Property="Opacity" Value="1.0" />
+    </Style>
+
+    <!-- Frosted Material -->
+    <Style Selector="^:frosted /template/ Border#PART_TabsShell, ^:frosted /template/ Border#PART_SearchShell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    </Style>
+    <Style Selector="^:frosted /template/ Border#PART_TabsSurface, ^:frosted /template/ Border#PART_SearchSurface">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="Opacity" Value="0.72" />
+    </Style>
+
+    <!-- LiquidGlass Material (real GPU optical refraction + Fresnel rim) -->
+    <Style Selector="^:glass /template/ Border#PART_TabsShell, ^:glass /template/ Border#PART_SearchShell">
+      <Setter Property="BorderBrush" Value="#48FFFFFF" />
+    </Style>
+    <Style Selector="^:glass /template/ Border#PART_TabsSurface, ^:glass /template/ Border#PART_SearchSurface">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="Opacity" Value="0.28" />
+    </Style>
+    <Style Selector="^:glass /template/ Border#PART_Indicator">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+      <Setter Property="Opacity" Value="0.62" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

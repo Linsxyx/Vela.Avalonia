@@ -1242,4 +1242,54 @@ public partial class MainView : UserControl
         if (SearchVisibleSwitch is not null && SearchVisibleSwitch.IsChecked != vis)
             SearchVisibleSwitch.IsChecked = vis;
     }
+
+    // ─── VelaDockBar Showcase Handlers ───────────────────────────────────
+
+    private int _dockBadgeCount = 3;
+
+    private void OnDockMaterialChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ShowcaseDockBar is null || DockMaterialSegmented is null) return;
+        var mat = DockMaterialSegmented.SelectedIndex switch
+        {
+            1 => VelaSurfaceMaterial.Frosted,
+            2 => VelaSurfaceMaterial.LiquidGlass,
+            _ => VelaSurfaceMaterial.Solid,
+        };
+        ShowcaseDockBar.Material = mat;
+        if (DockStageShader is not null)
+            DockStageShader.IsVisible = mat != VelaSurfaceMaterial.Solid;
+    }
+
+    private void OnDockSelectionChanged(object? sender, int index)
+    {
+        if (DockStatusText is null || ShowcaseDockBar is null) return;
+        var label = index >= 0 && index < ShowcaseDockBar.Items.Count
+            ? ShowcaseDockBar.Items[index].Header
+            : string.Empty;
+        DockStatusText.Text = $"Active tab: {label} (index {index})";
+    }
+
+    private void OnDockSearchSubmitted(object? sender, string query)
+    {
+        if (DockStatusText is null) return;
+        DockStatusText.Text = string.IsNullOrWhiteSpace(query)
+            ? "Search submitted (empty query)"
+            : $"Searched dock for \"{query}\"";
+        ToastHost.Show("Dock Search", DockStatusText.Text, VelaToastTone.Info);
+    }
+
+    private void OnDockAddBadgeClick(object? sender, RoutedEventArgs e)
+    {
+        _dockBadgeCount++;
+        if (ShowcaseDockBar.Items.Count > 2)
+            ShowcaseDockBar.Items[2].Badge = _dockBadgeCount.ToString();
+    }
+
+    private void OnDockClearBadgeClick(object? sender, RoutedEventArgs e)
+    {
+        _dockBadgeCount = 0;
+        if (ShowcaseDockBar.Items.Count > 2)
+            ShowcaseDockBar.Items[2].Badge = null;
+    }
 }
