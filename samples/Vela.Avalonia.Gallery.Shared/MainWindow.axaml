@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:Vela.Avalonia.Gallery"
+        x:Class="Vela.Avalonia.Gallery.MainWindow"
+        Title="Vela.Avalonia — Performance-First Desktop UI"
+        Width="1160"
+        Height="780"
+        MinWidth="860"
+        MinHeight="620"
+        Background="{DynamicResource VelaBackgroundBrush}"
+        Foreground="{DynamicResource VelaForegroundBrush}"
+        FontFamily="Inter, sans-serif">
+  <local:MainView />
+</Window>

@@ -1,17 +1,13 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vela="using:Vela.Avalonia.Controls"
-        x:Class="Vela.Avalonia.Gallery.MainWindow"
-        Title="Vela.Avalonia — Performance-First Desktop UI"
-        Width="1160"
-        Height="780"
-        MinWidth="860"
-        MinHeight="620"
-        Background="{DynamicResource VelaBackgroundBrush}"
-        Foreground="{DynamicResource VelaForegroundBrush}"
-        FontFamily="Inter, sans-serif">
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:charts="using:Vela.Avalonia.Charts"
+             x:Class="Vela.Avalonia.Gallery.MainView"
+             Background="{DynamicResource VelaBackgroundBrush}"
+             Foreground="{DynamicResource VelaForegroundBrush}"
+             FontFamily="Inter, sans-serif">
 
-  <Window.Styles>
+  <UserControl.Styles>
     <Style Selector="Border.card">
       <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
@@ -39,7 +35,7 @@
       <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
       <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
-  </Window.Styles>
+  </UserControl.Styles>
 
   <Grid>
     <vela:VelaCommandPalette x:Name="CommandPalette" EnableGlobalShortcut="True">
@@ -1173,38 +1169,131 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
-      <!-- Page 5: Data & Charts -->
+      <!-- Page 11: Data & Charts (Independent Vela.Avalonia.Charts Sub-Package!) -->
       <vela:VelaNavItem Header="Data &amp; Charts"
-                        Category="Donut Visualization Analytics"
-                        Icon="{DynamicResource VelaIconChart}">
+                        Category="Donut Line Bar Sparkline Gauge Heatmap Visualization"
+                        Icon="{DynamicResource VelaIconChart}"
+                        Badge="6">
         <vela:VelaNavItem.PageContent>
           <ScrollViewer Padding="32,28">
-            <StackPanel Spacing="20" MaxWidth="860">
+            <StackPanel Spacing="22" MaxWidth="900">
               <StackPanel Spacing="4">
-                <TextBlock Classes="pageTitle" Text="VelaDonutChart" />
+                <TextBlock Classes="pageTitle" Text="Vela.Avalonia.Charts" />
                 <TextBlock Classes="pageSubtitle"
-                           Text="Parallel-gapped rounded annular sectors drawn directly via StreamGeometry with live spring morphing." />
+                           Text="Zero-dependency vector chart sub-package sharing Vela's OKLCH series palette and physical spring engine: Line, Bar, Donut, Gauge, Sparkline, and Activity Heatmap." />
               </StackPanel>
 
+              <!-- 1. VelaLineChart -->
               <Border Classes="card">
-                <StackPanel Spacing="20">
+                <StackPanel Spacing="16">
                   <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Classes="cardTitle" Text="Traffic &amp; Revenue" VerticalAlignment="Center" />
-                    <vela:VelaSegmentedControl x:Name="ChartDatasetSegmented"
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="VelaLineChart" />
+                      <TextBlock Classes="cardDesc" Text="Scrub horizontally for gliding crosshair &amp; readout; click legend dots to toggle series; switch ranges to morph curves." />
+                    </StackPanel>
+                    <vela:VelaSegmentedControl x:Name="LineRangeSegmented"
                                                Grid.Column="1"
                                                SelectedIndex="0"
-                                               SelectionChanged="OnChartDatasetChanged">
-                      <x:String>Q1 Traffic</x:String>
-                      <x:String>Q2 Traffic</x:String>
-                      <x:String>Revenue Mix</x:String>
+                                               SelectionChanged="OnLineRangeChanged">
+                      <x:String>7D</x:String>
+                      <x:String>30D</x:String>
+                      <x:String>90D</x:String>
                     </vela:VelaSegmentedControl>
                   </Grid>
 
-                  <vela:VelaDonutChart x:Name="ShowcaseDonut"
-                                       HorizontalAlignment="Center"
-                                       RingSize="228"
-                                       Thickness="28"
-                                       TotalLabel="Q1 visits" />
+                  <charts:VelaLineChart x:Name="ShowcaseLineChart"
+                                        Height="248"
+                                        ValuePrefix="$" />
+                </StackPanel>
+              </Border>
+
+              <!-- 2. VelaBarChart + 3. VelaDonutChart -->
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="cardTitle" Text="VelaBarChart" VerticalAlignment="Center" />
+                      <vela:VelaSegmentedControl x:Name="BarRangeSegmented"
+                                                 Grid.Column="1"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnBarRangeChanged">
+                        <x:String>Week A</x:String>
+                        <x:String>Week B</x:String>
+                      </vela:VelaSegmentedControl>
+                    </Grid>
+                    <charts:VelaBarChart x:Name="ShowcaseBarChart" Height="220" />
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="cardTitle" Text="VelaDonutChart" VerticalAlignment="Center" />
+                      <vela:VelaSegmentedControl x:Name="ChartDatasetSegmented"
+                                                 Grid.Column="1"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnChartDatasetChanged">
+                        <x:String>Q1</x:String>
+                        <x:String>Q2</x:String>
+                        <x:String>MRR</x:String>
+                      </vela:VelaSegmentedControl>
+                    </Grid>
+                    <charts:VelaDonutChart x:Name="ShowcaseDonut"
+                                           HorizontalAlignment="Center"
+                                           RingSize="196"
+                                           Thickness="24"
+                                           TotalLabel="Q1 visits" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- 4. VelaGauge + 5. VelaSparkline -->
+              <Grid ColumnDefinitions="1.15*,0.85*" ColumnSpacing="20">
+                <Border Classes="card">
+                  <StackPanel Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="cardTitle" Text="VelaGauge (Spring Arcs &amp; Thresholds)" VerticalAlignment="Center" />
+                      <vela:VelaButton Grid.Column="1" Variant="Secondary" Size="Small" Content="Randomize" Click="OnRandomizeGaugesClick" />
+                    </Grid>
+                    <UniformGrid Columns="3">
+                      <charts:VelaGauge x:Name="GaugeCpu" Label="CPU Load" Value="42" UseSemanticThresholds="True" Width="138" Height="124" StrokeThickness="12" />
+                      <charts:VelaGauge x:Name="GaugeMem" Label="Memory" Value="74" UseSemanticThresholds="True" Width="138" Height="124" StrokeThickness="12" />
+                      <charts:VelaGauge x:Name="GaugeGpu" Label="GPU Sync" Value="89" UseSemanticThresholds="False" Width="138" Height="124" StrokeThickness="12" />
+                    </UniformGrid>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                  <StackPanel Spacing="14">
+                    <TextBlock Classes="cardTitle" Text="VelaSparkline" />
+                    <StackPanel Spacing="12">
+                      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Active Sessions" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        <TextBlock Grid.Column="1" Text="4,218" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <charts:VelaSparkline x:Name="Spark1" Grid.Column="2" Width="96" Height="28" />
+                      </Grid>
+                      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Frame Budget" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        <TextBlock Grid.Column="1" Text="1.8 ms" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <charts:VelaSparkline x:Name="Spark2" Grid.Column="2" Width="96" Height="28" StrokeColor="#10A870" />
+                      </Grid>
+                      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Error Rate" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        <TextBlock Grid.Column="1" Text="0.04%" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <charts:VelaSparkline x:Name="Spark3" Grid.Column="2" Width="96" Height="28" StrokeColor="#EC564B" />
+                      </Grid>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- 6. VelaActivityHeatmap -->
+              <Border Classes="card">
+                <StackPanel Spacing="14">
+                  <TextBlock Classes="cardTitle" Text="VelaActivityHeatmap (36 Weeks)" />
+                  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <charts:VelaActivityHeatmap x:Name="ShowcaseHeatmap" Weeks="36" CellSize="13" CellGap="3.5" />
+                  </ScrollViewer>
                 </StackPanel>
               </Border>
             </StackPanel>
@@ -1220,4 +1309,4 @@
     <!-- Non-intrusive stacking toast overlay -->
     <vela:VelaToastHost x:Name="ToastHost" />
   </Grid>
-</Window>
+</UserControl>

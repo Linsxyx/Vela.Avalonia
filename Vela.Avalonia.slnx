@@ -1,8 +1,13 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Vela.Avalonia/Vela.Avalonia.csproj" />
+    <Project Path="src/Vela.Avalonia.Charts/Vela.Avalonia.Charts.csproj" />
   </Folder>
   <Folder Name="/samples/">
+    <Project Path="samples/Vela.Avalonia.Gallery.Shared/Vela.Avalonia.Gallery.Shared.csproj" />
     <Project Path="samples/Vela.Avalonia.Gallery/Vela.Avalonia.Gallery.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Vela.Avalonia.Tests/Vela.Avalonia.Tests.csproj" />
   </Folder>
 </Solution>

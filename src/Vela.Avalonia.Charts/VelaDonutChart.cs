@@ -4,8 +4,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Vela.Avalonia.Motion;
+using Vela.Avalonia.Tokens;
 
-namespace Vela.Avalonia.Controls;
+namespace Vela.Avalonia.Charts;
 
 public sealed record VelaDonutDatum(
     string Key,
@@ -101,7 +102,7 @@ public class VelaDonutChart : Control
     }
 
     private void OnThemeChanged(object? sender, EventArgs e) => InvalidateVisual();
-    private void OnAccentChanged(object? sender, Tokens.VelaAccent e) => InvalidateVisual();
+    private void OnAccentChanged(object? sender, VelaAccent e) => InvalidateVisual();
 
     protected override Size MeasureOverride(Size availableSize)
     {

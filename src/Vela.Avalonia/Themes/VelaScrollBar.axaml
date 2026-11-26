@@ -1,0 +1,72 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Clean, thin Arc-inspired overlay ScrollBar (quiet pill thumb, zero bulky arrows) -->
+  <ControlTheme x:Key="VelaScrollThumbTheme" TargetType="Thumb">
+    <Setter Property="Background" Value="{DynamicResource VelaBorderStrongBrush}" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Opacity" Value="0.55" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="Opacity" Value="0.88" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Background" Value="{DynamicResource VelaTextSecondaryBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="MinWidth" Value="10" />
+    <Setter Property="MinHeight" Value="10" />
+    <Setter Property="AllowAutoHide" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                Padding="2">
+          <Track x:Name="PART_Track"
+                 Minimum="{TemplateBinding Minimum}"
+                 Maximum="{TemplateBinding Maximum}"
+                 Value="{TemplateBinding Value, Mode=TwoWay}"
+                 ViewportSize="{TemplateBinding ViewportSize}"
+                 Orientation="{TemplateBinding Orientation}"
+                 IsDirectionReversed="True"
+                 DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}">
+            <Track.DecreaseButton>
+              <RepeatButton Background="Transparent" BorderThickness="0" Focusable="False" Opacity="0" />
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton Background="Transparent" BorderThickness="0" Focusable="False" Opacity="0" />
+            </Track.IncreaseButton>
+            <Thumb x:Name="PART_Thumb"
+                   Theme="{DynamicResource VelaScrollThumbTheme}"
+                   MinWidth="6"
+                   MinHeight="28" />
+          </Track>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:vertical">
+      <Setter Property="Width" Value="10" />
+    </Style>
+    <Style Selector="^:horizontal">
+      <Setter Property="Height" Value="10" />
+    </Style>
+    <Style Selector="^:horizontal /template/ Track#PART_Track">
+      <Setter Property="IsDirectionReversed" Value="False" />
+    </Style>
+    <Style Selector="^:horizontal /template/ Thumb#PART_Thumb">
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="MinHeight" Value="6" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

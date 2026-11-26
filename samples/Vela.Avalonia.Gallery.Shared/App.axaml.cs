@@ -21,6 +21,10 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow();
         }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new MainView();
+        }
 
         base.OnFrameworkInitializationCompleted();
     }

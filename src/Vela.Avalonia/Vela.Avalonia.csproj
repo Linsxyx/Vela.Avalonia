@@ -1,13 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Vela.Avalonia</PackageId>
-    <Version>0.1.0-alpha.1</Version>
+    <Version>0.1.0</Version>
     <Authors>Vela.Avalonia Contributors</Authors>
-    <Description>Motion-first, desktop-craft Avalonia 12 UI component library blending Arc UI physics with sleek desktop aesthetics.</Description>
+    <Description>Motion-first, performance-engineered Avalonia 12 UI component library with analytical spring physics, OKLCH design tokens, and optical Liquid Glass surfaces.</Description>
+    <PackageTags>avalonia;avaloniaui;ui;controls;theme;spring;motion;liquid-glass;net10</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />

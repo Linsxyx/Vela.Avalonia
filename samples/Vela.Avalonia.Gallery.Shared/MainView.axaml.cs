@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Vela.Avalonia.Charts;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.Motion;
 using Vela.Avalonia.Tokens;
@@ -110,7 +111,7 @@ internal sealed class HeavyStressPage : UserControl, IVelaNavigationAware
     }
 }
 
-public partial class MainWindow : Window
+public partial class MainView : UserControl
 {
     private static readonly VelaDonutDatum[][] Datasets =
     [
@@ -147,7 +148,7 @@ public partial class MainWindow : Window
     private Point _glassDragStartPointer;
     private Point _glassDragStartPos;
 
-    public MainWindow()
+    public MainView()
     {
         InitializeComponent();
 
@@ -178,7 +179,95 @@ public partial class MainWindow : Window
         BuildAccentSwatches();
         PopulateCommandPalette();
         InitPhase6Samples();
+        InitPhase7Charts();
         ApplyDataset(0);
+    }
+
+    private readonly Random _rng = new(42);
+
+    private void InitPhase7Charts()
+    {
+        ApplyLineRange(0);
+        ApplyBarRange(0);
+
+        Spark1.Values = [18, 22, 19, 27, 34, 31, 42, 46, 44, 58];
+        Spark2.Values = [4.2, 3.8, 3.5, 2.9, 2.6, 2.2, 2.1, 1.9, 1.85, 1.8];
+        Spark3.Values = [0.22, 0.18, 0.25, 0.14, 0.11, 0.09, 0.08, 0.05, 0.06, 0.04];
+
+        var entries = new List<VelaHeatmapEntry>();
+        var today = DateTime.Today;
+        var seed = new Random(2026);
+        for (var i = 0; i < 260; i++)
+        {
+            var d = today.AddDays(-i);
+            var roll = seed.NextDouble();
+            var count = roll < 0.28 ? 0 : roll < 0.55 ? seed.Next(1, 4) : roll < 0.82 ? seed.Next(4, 10) : seed.Next(10, 18);
+            entries.Add(new VelaHeatmapEntry(d, count));
+        }
+        ShowcaseHeatmap.Entries = entries;
+    }
+
+    private void OnLineRangeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ShowcaseLineChart is null || LineRangeSegmented is null) return;
+        ApplyLineRange(LineRangeSegmented.SelectedIndex);
+    }
+
+    private void ApplyLineRange(int idx)
+    {
+        if (idx == 0)
+        {
+            ShowcaseLineChart.Labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            ShowcaseLineChart.Series =
+            [
+                new("rev", "Net Revenue", [12400, 14800, 13900, 18200, 21600, 19400, 24100]),
+                new("prev", "Prior Period", [10200, 11400, 12100, 13800, 15200, 14900, 16800]),
+            ];
+        }
+        else if (idx == 1)
+        {
+            ShowcaseLineChart.Labels = ["W1", "W2", "W3", "W4", "W5", "W6", "W7"];
+            ShowcaseLineChart.Series =
+            [
+                new("rev", "Net Revenue", [32000, 38500, 41200, 39800, 46900, 52400, 58100]),
+                new("prev", "Prior Period", [26000, 29400, 31100, 33600, 35800, 39200, 42500]),
+            ];
+        }
+        else
+        {
+            ShowcaseLineChart.Labels = ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
+            ShowcaseLineChart.Series =
+            [
+                new("rev", "Net Revenue", [84000, 96000, 112000, 108000, 134000, 149000, 172000]),
+                new("prev", "Prior Period", [62000, 71000, 79000, 86000, 94000, 106000, 118000]),
+            ];
+        }
+    }
+
+    private void OnBarRangeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ShowcaseBarChart is null || BarRangeSegmented is null) return;
+        ApplyBarRange(BarRangeSegmented.SelectedIndex);
+    }
+
+    private void ApplyBarRange(int idx)
+    {
+        ShowcaseBarChart.Data = idx == 0
+            ? [
+                new("Mon", 420), new("Tue", 580), new("Wed", 510),
+                new("Thu", 760), new("Fri", 890), new("Sat", 640), new("Sun", 710),
+              ]
+            : [
+                new("Mon", 690), new("Tue", 520), new("Wed", 840),
+                new("Thu", 610), new("Fri", 720), new("Sat", 930), new("Sun", 580),
+              ];
+    }
+
+    private void OnRandomizeGaugesClick(object? sender, RoutedEventArgs e)
+    {
+        GaugeCpu.Value = _rng.Next(15, 96);
+        GaugeMem.Value = _rng.Next(25, 95);
+        GaugeGpu.Value = _rng.Next(10, 99);
     }
 
     private bool _metricsToggle;
