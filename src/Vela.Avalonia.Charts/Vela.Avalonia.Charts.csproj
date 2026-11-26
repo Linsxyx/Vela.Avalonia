@@ -1,19 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Vela.Avalonia.Charts</PackageId>
-    <Version>0.1.0</Version>
     <Authors>Vela.Avalonia Contributors</Authors>
-    <Description>Motion-first, theme-aware Skia vector data visualization controls for Vela.Avalonia.</Description>
+    <Description>Motion-first, theme-aware Skia vector data visualization controls (Line, Bar, Donut, Sparkline, Gauge, ActivityHeatmap) for Vela.Avalonia.</Description>
     <PackageTags>avalonia;avaloniaui;charts;dataviz;skia;vela;net10</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

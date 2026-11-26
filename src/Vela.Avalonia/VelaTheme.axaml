@@ -49,6 +49,7 @@
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaColorPicker.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaResizablePanels.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDockBar.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaWindow.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

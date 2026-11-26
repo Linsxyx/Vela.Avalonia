@@ -1,0 +1,147 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="VelaCaptionButtonTheme" TargetType="Button">
+    <Setter Property="Width" Value="34" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Bg"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.12" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_Bg">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^.close:pointerover /template/ Border#PART_Bg">
+      <Setter Property="Background" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^.close:pointerover">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaWindow}" TargetType="controls:VelaWindow">
+    <Setter Property="Background" Value="{DynamicResource VelaBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource VelaBackgroundBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Name="PART_TransparencyFallback"
+                  IsHitTestVisible="False"
+                  Background="{TemplateBinding TransparencyBackgroundFallback}" />
+          <Border Background="{TemplateBinding Background}">
+            <VisualLayerManager>
+              <DockPanel LastChildFill="True">
+                <!-- Optional Sleek Cross-Platform TitleBar -->
+                <Border x:Name="PART_TitleBar"
+                        DockPanel.Dock="Top"
+                        Height="{TemplateBinding TitleBarHeight}"
+                        Background="{DynamicResource VelaSidebarBackgroundBrush}"
+                        BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="{TemplateBinding TitleBarPadding}"
+                        IsVisible="{TemplateBinding IsTitleBarVisible}">
+                  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <!-- Left Slot (automatically inset 78px on macOS for traffic lights) -->
+                    <ContentPresenter Grid.Column="0"
+                                      Content="{TemplateBinding TitleBarLeftContent}"
+                                      VerticalAlignment="Center" />
+
+                    <!-- Center Slot / Default Quiet Window Title -->
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                      <ContentPresenter Content="{TemplateBinding TitleBarCenterContent}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{TemplateBinding TitleBarCenterContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                      <TextBlock Text="{TemplateBinding Title}"
+                                 FontSize="12.5"
+                                 FontWeight="Medium"
+                                 Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis"
+                                 IsHitTestVisible="False"
+                                 IsVisible="{TemplateBinding TitleBarCenterContent, Converter={x:Static ObjectConverters.IsNull}}" />
+                    </Grid>
+
+                    <!-- Right Slot + Windows/Linux Custom Caption Buttons -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="4"
+                                VerticalAlignment="Center">
+                      <ContentPresenter Content="{TemplateBinding TitleBarRightContent}"
+                                        VerticalAlignment="Center" />
+
+                      <StackPanel x:Name="PART_CaptionButtons"
+                                  Orientation="Horizontal"
+                                  Spacing="2"
+                                  Margin="4,0,0,0"
+                                  VerticalAlignment="Center"
+                                  IsVisible="{TemplateBinding ShowCustomCaptionButtons}">
+                        <Button x:Name="PART_MinimizeButton"
+                                Theme="{DynamicResource VelaCaptionButtonTheme}"
+                                ToolTip.Tip="Minimize">
+                          <PathIcon Width="10" Height="10"
+                                    Data="M2 11H22V13H2Z" />
+                        </Button>
+                        <Button x:Name="PART_MaximizeButton"
+                                Theme="{DynamicResource VelaCaptionButtonTheme}"
+                                ToolTip.Tip="Maximize">
+                          <PathIcon Width="10" Height="10"
+                                    Data="M4 4H20V20H4V4ZM6 6V18H18V6H6Z" />
+                        </Button>
+                        <Button x:Name="PART_CloseButton"
+                                Classes="close"
+                                Theme="{DynamicResource VelaCaptionButtonTheme}"
+                                ToolTip.Tip="Close">
+                          <PathIcon Width="10" Height="10"
+                                    Data="{DynamicResource VelaIconClose}" />
+                        </Button>
+                      </StackPanel>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+
+                <!-- Window Content -->
+                <ContentPresenter x:Name="PART_ContentPresenter"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Margin="{TemplateBinding Padding}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+              </DockPanel>
+            </VisualLayerManager>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:not(:custom-chrome) /template/ Border#PART_TitleBar">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
