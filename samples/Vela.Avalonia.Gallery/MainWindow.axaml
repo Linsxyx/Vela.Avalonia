@@ -196,7 +196,170 @@
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
 
-      <!-- Page 2: Forms & Overlays (New Batch 2 Controls!) -->
+      <!-- Page 2: Liquid Glass Lab (Native Avalonia 12.2 BackdropEffect + Clean-Room MIT SkSL Refraction!) -->
+      <vela:VelaNavItem Header="Liquid Glass"
+                        Category="Shader Glass Blur Refraction Skia"
+                        Icon="{DynamicResource VelaIconSparkles}"
+                        Badge="GPU">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="VelaLiquidGlass (GPU Optical Shader)" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Clean-room MIT implementation combining Avalonia 12.2's native BackdropEffect blur with an original SkSL rounded-box SDF lens refraction, chromatic dispersion, and Fresnel specular rim shader. Drag the glass pill across the stripes and shapes below." />
+              </StackPanel>
+
+              <!-- Interactive Optical Stage -->
+              <Border CornerRadius="20"
+                      BorderBrush="{DynamicResource VelaBorderBrush}"
+                      BorderThickness="1"
+                      ClipToBounds="True"
+                      Height="340">
+                <Grid>
+                  <!-- Colorful high-contrast background scene to make optical refraction unmistakable -->
+                  <Border>
+                    <Border.Background>
+                      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#EEF2FF" Offset="0" />
+                        <GradientStop Color="#FCE7F3" Offset="0.48" />
+                        <GradientStop Color="#FEF3C7" Offset="1" />
+                      </LinearGradientBrush>
+                    </Border.Background>
+                  </Border>
+
+                  <!-- Geometric color orbs & sharp typography behind the glass -->
+                  <Canvas IsHitTestVisible="False">
+                    <Ellipse Canvas.Left="46" Canvas.Top="28" Width="170" Height="170" Fill="#FF7747FF" Opacity="0.82" />
+                    <Ellipse Canvas.Left="210" Canvas.Top="135" Width="190" Height="190" Fill="#FF0562EF" Opacity="0.72" />
+                    <Ellipse Canvas.Left="430" Canvas.Top="24" Width="160" Height="160" Fill="#FFEC4899" Opacity="0.75" />
+                    <Ellipse Canvas.Left="580" Canvas.Top="120" Width="210" Height="210" Fill="#FF0DB879" Opacity="0.70" />
+                    <Border Canvas.Left="120" Canvas.Top="64" Width="620" Height="12" CornerRadius="6" Background="#FF18181B" Opacity="0.82" />
+                    <Border Canvas.Left="120" Canvas.Top="96" Width="540" Height="12" CornerRadius="6" Background="#FFF59E0B" Opacity="0.92" />
+                    <Border Canvas.Left="120" Canvas.Top="128" Width="580" Height="12" CornerRadius="6" Background="#FF18181B" Opacity="0.82" />
+                    <TextBlock Canvas.Left="84" Canvas.Top="186"
+                               Text="LIQUID GLASS · REFRACTION"
+                               FontSize="44"
+                               FontWeight="Bold"
+                               Foreground="#FF18181B"
+                               Opacity="0.86" />
+                    <TextBlock Canvas.Left="88" Canvas.Top="244"
+                               Text="Drag the pill over these stripes &amp; letters to inspect edge bending and prism dispersion."
+                               FontSize="15"
+                               FontWeight="Medium"
+                               Foreground="#FF27272A" />
+                  </Canvas>
+
+                  <!-- Draggable Liquid Glass Pill + Floating Glass Toolbar -->
+                  <Canvas x:Name="GlassStageCanvas">
+                    <vela:VelaLiquidGlass x:Name="DraggableGlassPill"
+                                          Canvas.Left="260"
+                                          Canvas.Top="78"
+                                          Width="270"
+                                          Height="112"
+                                          CornerRadius="56"
+                                          BlurRadius="4"
+                                          BevelWidth="20"
+                                          Refraction="0.9"
+                                          Dispersion="0.65"
+                                          Specular="0.95"
+                                          Cursor="SizeAll"
+                                          PointerPressed="OnGlassDragStart"
+                                          PointerMoved="OnGlassDragMove"
+                                          PointerReleased="OnGlassDragEnd">
+                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                        <TextBlock Text="Drag Me Around"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="SkSL SDF Lens · GPU"
+                                   FontSize="12"
+                                   Opacity="0.75"
+                                   HorizontalAlignment="Center" />
+                      </StackPanel>
+                    </vela:VelaLiquidGlass>
+
+                    <!-- Floating Glass Pill Dock -->
+                    <vela:VelaLiquidGlass x:Name="GlassDockSample"
+                                          Canvas.Left="24"
+                                          Canvas.Top="264"
+                                          CornerRadius="999"
+                                          Padding="12,6"
+                                          BlurRadius="8"
+                                          BevelWidth="14"
+                                          Refraction="0.75"
+                                          Dispersion="0.45"
+                                          Specular="0.9">
+                      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <vela:VelaBadge Tone="Success" ShowDot="True" IsPill="True" Content="Metal / Skia GPU" />
+                        <TextBlock Text="Floating Glass Bar" FontSize="13" FontWeight="Medium" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </vela:VelaLiquidGlass>
+                  </Canvas>
+                </Grid>
+              </Border>
+
+              <!-- Live Optical Parameter Tuning -->
+              <Border Classes="card" ClipToBounds="False">
+                <StackPanel Spacing="22" ClipToBounds="False">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="cardTitle" Text="Live Optical Parameters" VerticalAlignment="Center" />
+                    <vela:VelaSwitch x:Name="GlassRefractionSwitch"
+                                     Grid.Column="1"
+                                     Content="Enable SDF Refraction"
+                                     IsChecked="True"
+                                     IsCheckedChanged="OnGlassRefractionToggle" />
+                  </Grid>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="28" RowDefinitions="Auto,Auto" RowSpacing="24" ClipToBounds="False">
+                    <vela:VelaElasticSlider x:Name="GlassBlurSlider"
+                                            Label="Backdrop Blur Radius"
+                                            Minimum="0"
+                                            Maximum="20"
+                                            Value="4"
+                                            Step="1"
+                                            ValueSuffix=" px"
+                                            ValueChanged="OnGlassParamChanged" />
+
+                    <vela:VelaElasticSlider x:Name="GlassBevelSlider"
+                                            Grid.Column="1"
+                                            Label="Optical Bevel Width"
+                                            Minimum="4"
+                                            Maximum="36"
+                                            Value="20"
+                                            Step="1"
+                                            ValueSuffix=" px"
+                                            ValueChanged="OnGlassParamChanged" />
+
+                    <vela:VelaElasticSlider x:Name="GlassRefractionSlider"
+                                            Grid.Row="1"
+                                            Label="Refraction Index Strength"
+                                            Minimum="0"
+                                            Maximum="140"
+                                            Value="90"
+                                            Step="5"
+                                            ValueSuffix="%"
+                                            ValueChanged="OnGlassParamChanged" />
+
+                    <vela:VelaElasticSlider x:Name="GlassDispersionSlider"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Label="Chromatic Dispersion"
+                                            Minimum="0"
+                                            Maximum="140"
+                                            Value="65"
+                                            Step="5"
+                                            ValueSuffix="%"
+                                            ValueChanged="OnGlassParamChanged" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
+
+      <!-- Page 3: Forms & Overlays (New Batch 2 Controls!) -->
       <vela:VelaNavItem Header="Forms &amp; Overlays"
                         Category="Input CheckBox Badge Dialog Toast"
                         Icon="{DynamicResource VelaIconLayers}">

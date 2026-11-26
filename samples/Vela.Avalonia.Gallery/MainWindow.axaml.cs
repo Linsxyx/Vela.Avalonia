@@ -143,6 +143,9 @@ public partial class MainWindow : Window
 
     private readonly Dictionary<VelaAccent, Border> _swatchBorders = new();
     private bool _morphBusy;
+    private bool _draggingGlass;
+    private Point _glassDragStartPointer;
+    private Point _glassDragStartPos;
 
     public MainWindow()
     {
@@ -543,6 +546,64 @@ public partial class MainWindow : Window
             Side = VelaDrawerSide.Left,
             Width = 340,
         });
+    }
+
+    private void OnGlassDragStart(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(DraggableGlassPill).Properties.IsLeftButtonPressed)
+            return;
+
+        _draggingGlass = true;
+        _glassDragStartPointer = e.GetPosition(GlassStageCanvas);
+        _glassDragStartPos = new Point(Canvas.GetLeft(DraggableGlassPill), Canvas.GetTop(DraggableGlassPill));
+        e.Pointer.Capture(DraggableGlassPill);
+        e.Handled = true;
+    }
+
+    private void OnGlassDragMove(object? sender, PointerEventArgs e)
+    {
+        if (!_draggingGlass) return;
+        var current = e.GetPosition(GlassStageCanvas);
+        var nextX = _glassDragStartPos.X + (current.X - _glassDragStartPointer.X);
+        var nextY = _glassDragStartPos.Y + (current.Y - _glassDragStartPointer.Y);
+
+        var maxX = Math.Max(0, GlassStageCanvas.Bounds.Width - DraggableGlassPill.Bounds.Width);
+        var maxY = Math.Max(0, GlassStageCanvas.Bounds.Height - DraggableGlassPill.Bounds.Height);
+        Canvas.SetLeft(DraggableGlassPill, Math.Clamp(nextX, 0, maxX));
+        Canvas.SetTop(DraggableGlassPill, Math.Clamp(nextY, 0, maxY));
+        e.Handled = true;
+    }
+
+    private void OnGlassDragEnd(object? sender, PointerReleasedEventArgs e)
+    {
+        if (!_draggingGlass) return;
+        _draggingGlass = false;
+        e.Pointer.Capture(null);
+        e.Handled = true;
+    }
+
+    private void OnGlassRefractionToggle(object? sender, RoutedEventArgs e)
+    {
+        if (DraggableGlassPill is null || GlassRefractionSwitch is null) return;
+        var enabled = GlassRefractionSwitch.IsChecked == true;
+        DraggableGlassPill.EnableRefraction = enabled;
+        GlassDockSample.EnableRefraction = enabled;
+    }
+
+    private void OnGlassParamChanged(object? sender, double value)
+    {
+        if (DraggableGlassPill is null || GlassBlurSlider is null || GlassBevelSlider is null ||
+            GlassRefractionSlider is null || GlassDispersionSlider is null)
+            return;
+
+        DraggableGlassPill.BlurRadius = GlassBlurSlider.Value;
+        DraggableGlassPill.BevelWidth = GlassBevelSlider.Value;
+        DraggableGlassPill.Refraction = GlassRefractionSlider.Value / 100.0;
+        DraggableGlassPill.Dispersion = GlassDispersionSlider.Value / 100.0;
+
+        GlassDockSample.BlurRadius = Math.Max(0, GlassBlurSlider.Value);
+        GlassDockSample.Refraction = GlassRefractionSlider.Value / 100.0;
+        GlassDockSample.Dispersion = GlassDispersionSlider.Value / 100.0;
     }
 
     private void ApplyDataset(int index)
