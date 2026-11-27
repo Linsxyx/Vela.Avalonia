@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="Vela.Avalonia.Gallery.Localization.ChineseStrings">
   <!-- Shell & Navigation -->
   <x:String x:Key="StrAppTitle">Vela.Avalonia 演示工作室</x:String>
   <x:String x:Key="StrBrandTitle">Vela Studio</x:String>

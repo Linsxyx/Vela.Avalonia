@@ -6,6 +6,7 @@
     <WasmBuildNative>true</WasmBuildNative>
     <WasmMainJSPath>wwwroot/main.js</WasmMainJSPath>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ILLinkTreatWarningsAsErrors>true</ILLinkTreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

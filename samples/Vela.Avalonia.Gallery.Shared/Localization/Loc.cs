@@ -1,7 +1,6 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
 namespace Vela.Avalonia.Gallery.Localization;
 
@@ -13,9 +12,6 @@ public enum AppLanguage
 
 public sealed class Loc
 {
-    private static readonly Uri EnUri = new("avares://Vela.Avalonia.Gallery.Shared/Localization/Strings.en-US.axaml");
-    private static readonly Uri ZhUri = new("avares://Vela.Avalonia.Gallery.Shared/Localization/Strings.zh-CN.axaml");
-
     private IResourceProvider? _activeDictionary;
 
     public static Loc Instance { get; } = new();
@@ -37,11 +33,10 @@ public sealed class Loc
         if (!force && CurrentLanguage == language && _activeDictionary is not null)
             return;
 
-        CurrentLanguage = language;
-
         if (Application.Current is { } app)
         {
-            var dict = (IResourceProvider)AvaloniaXamlLoader.Load(language == AppLanguage.Zh ? ZhUri : EnUri);
+            // Direct constructors keep both compiled dictionaries reachable during WASM/AOT trimming.
+            IResourceProvider dict = language == AppLanguage.Zh ? new ChineseStrings() : new EnglishStrings();
             var merged = app.Resources.MergedDictionaries;
             if (_activeDictionary is not null)
             {
@@ -58,6 +53,7 @@ public sealed class Loc
             _activeDictionary = dict;
         }
 
+        CurrentLanguage = language;
         LanguageChanged?.Invoke(language);
     }
 

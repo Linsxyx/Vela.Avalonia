@@ -16,5 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Vela.Avalonia\Vela.Avalonia.csproj" />
     <ProjectReference Include="..\..\src\Vela.Avalonia.Charts\Vela.Avalonia.Charts.csproj" />
+    <ProjectReference Include="..\..\samples\Vela.Avalonia.Gallery.Shared\Vela.Avalonia.Gallery.Shared.csproj" />
   </ItemGroup>
 </Project>
