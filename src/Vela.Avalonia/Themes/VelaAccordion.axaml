@@ -20,6 +20,8 @@
     <Setter Property="BorderThickness" Value="0,0,0,1" />
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="Padding" Value="0,0,28,16" />
+    <Setter Property="HeaderPadding" Value="0,13" />
     <Setter Property="Template">
       <ControlTemplate>
         <Border BorderBrush="{TemplateBinding BorderBrush}"
@@ -28,28 +30,36 @@
             <Button x:Name="PART_Trigger"
                     Background="Transparent"
                     BorderThickness="0"
-                    Padding="0,13"
+                    Padding="{TemplateBinding HeaderPadding}"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch"
                     Cursor="Hand">
               <Button.Template>
                 <ControlTemplate>
-                  <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+                  <Border x:Name="PART_TriggerSurface"
+                          Background="{TemplateBinding Background}"
+                          CornerRadius="8"
+                          Padding="{TemplateBinding Padding}">
+                    <Border.Transitions>
+                      <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.12" />
+                      </Transitions>
+                    </Border.Transitions>
                     <ContentPresenter Content="{TemplateBinding Content}" />
                   </Border>
                 </ControlTemplate>
               </Button.Template>
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                 <ContentPresenter x:Name="PART_Header"
                                   Content="{TemplateBinding Header}"
                                   ContentTemplate="{TemplateBinding HeaderTemplate}"
                                   TextElement.FontWeight="Medium"
-                                  TextElement.Foreground="{DynamicResource VelaForegroundBrush}"
+                                  TextElement.Foreground="{TemplateBinding Foreground}"
                                   VerticalAlignment="Center" />
                 <PathIcon x:Name="PART_Chevron"
                           Grid.Column="1"
-                          Width="15"
-                          Height="15"
+                          Width="14"
+                          Height="14"
                           Data="{DynamicResource VelaIconChevronDown}"
                           Foreground="{DynamicResource VelaTextMutedBrush}"
                           VerticalAlignment="Center" />
@@ -58,7 +68,7 @@
 
             <!-- True physical spring height disclosure -->
             <controls:VelaCollapsePanel IsExpanded="{TemplateBinding IsExpanded}">
-              <Border Padding="0,0,28,16">
+              <Border Padding="{TemplateBinding Padding}">
                 <ContentPresenter Content="{TemplateBinding Content}"
                                   ContentTemplate="{TemplateBinding ContentTemplate}"
                                   TextElement.FontSize="{DynamicResource VelaTextSm}"

@@ -43,11 +43,15 @@ public class VelaDockItem : AvaloniaObject
     public static readonly StyledProperty<object?> TagProperty =
         AvaloniaProperty.Register<VelaDockItem, object?>(nameof(Tag));
 
+    public static readonly StyledProperty<string?> ToolTipProperty =
+        AvaloniaProperty.Register<VelaDockItem, string?>(nameof(ToolTip));
+
     public string? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
     public Geometry? Icon { get => GetValue(IconProperty); set => SetValue(IconProperty, value); }
     public string? Badge { get => GetValue(BadgeProperty); set => SetValue(BadgeProperty, value); }
     public bool IsEnabled { get => GetValue(IsEnabledProperty); set => SetValue(IsEnabledProperty, value); }
     public object? Tag { get => GetValue(TagProperty); set => SetValue(TagProperty, value); }
+    public string? ToolTip { get => GetValue(ToolTipProperty); set => SetValue(ToolTipProperty, value); }
 
     public event EventHandler? Click;
 
@@ -62,9 +66,18 @@ public class VelaDockItem : AvaloniaObject
 /// - Detached circular Search Orb that smoothly morphs into an expanded search pill while the tab bar
 ///   simultaneously compacts into an active-tab return orb (and cleanly restores on Escape/close/tap)
 /// </summary>
-[PseudoClasses(":search-expanded", ":solid", ":frosted", ":glass-card", ":glass")]
+[PseudoClasses(":search-expanded", ":solid", ":frosted", ":glass-card", ":glass", ":vertical", ":no-shadow")]
 public class VelaDockBar : TemplatedControl
 {
+    public static readonly StyledProperty<Orientation> OrientationProperty =
+        AvaloniaProperty.Register<VelaDockBar, Orientation>(nameof(Orientation), Orientation.Horizontal);
+
+    public static readonly StyledProperty<double> DockWidthProperty =
+        AvaloniaProperty.Register<VelaDockBar, double>(nameof(DockWidth), 78.0);
+
+    public static readonly StyledProperty<bool> ShowShadowProperty =
+        AvaloniaProperty.Register<VelaDockBar, bool>(nameof(ShowShadow), true);
+
     public static readonly StyledProperty<int> SelectedIndexProperty =
         AvaloniaProperty.Register<VelaDockBar, int>(
             nameof(SelectedIndex),
@@ -107,6 +120,9 @@ public class VelaDockBar : TemplatedControl
     public static readonly StyledProperty<double> ExpandedSearchWidthProperty =
         AvaloniaProperty.Register<VelaDockBar, double>(nameof(ExpandedSearchWidth), 276.0);
 
+    public Orientation Orientation { get => GetValue(OrientationProperty); set => SetValue(OrientationProperty, value); }
+    public double DockWidth { get => GetValue(DockWidthProperty); set => SetValue(DockWidthProperty, value); }
+    public bool ShowShadow { get => GetValue(ShowShadowProperty); set => SetValue(ShowShadowProperty, value); }
     public int SelectedIndex { get => GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
     public VelaDockItem? SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
     public VelaSurfaceMaterial Material { get => GetValue(MaterialProperty); set => SetValue(MaterialProperty, value); }
@@ -144,6 +160,7 @@ public class VelaDockBar : TemplatedControl
     private readonly SpringChannel _searchProgress = new(0.0, VelaMotionTokens.Springs.Morph);
     private readonly SpringRunner _runner;
 
+    private StackPanel? _rootStack;
     private Border? _tabsShell;
     private Border? _tabsBackdrop;
     private VelaLiquidGlassLens? _tabsLens;
@@ -169,8 +186,13 @@ public class VelaDockBar : TemplatedControl
     private bool _scrubbing;
     private bool _syncingSelection;
 
+    private bool IsVertical => Orientation == Orientation.Vertical;
+
     static VelaDockBar()
     {
+        OrientationProperty.Changed.AddClassHandler<VelaDockBar>((d, _) => d.OnOrientationChanged());
+        DockWidthProperty.Changed.AddClassHandler<VelaDockBar>((d, _) => d.OnOrientationChanged());
+        ShowShadowProperty.Changed.AddClassHandler<VelaDockBar>((d, _) => d.PseudoClasses.Set(":no-shadow", !d.ShowShadow));
         SelectedIndexProperty.Changed.AddClassHandler<VelaDockBar>((d, _) => d.OnSelectedIndexChanged());
         SelectedItemProperty.Changed.AddClassHandler<VelaDockBar>((d, _) => d.OnSelectedItemChanged());
         MaterialProperty.Changed.AddClassHandler<VelaDockBar>((d, _) => d.ApplyMaterial());
@@ -190,6 +212,7 @@ public class VelaDockBar : TemplatedControl
 
         DetachTemplateHandlers();
 
+        _rootStack = e.NameScope.Find<StackPanel>("PART_RootStack");
         _tabsShell = e.NameScope.Find<Border>("PART_TabsShell");
         _tabsBackdrop = e.NameScope.Find<Border>("PART_TabsBackdrop");
         _tabsLens = e.NameScope.Find<VelaLiquidGlassLens>("PART_TabsLens");
@@ -240,6 +263,8 @@ public class VelaDockBar : TemplatedControl
         _positionedIndex = -1;
         _searchProgress.Jump(IsSearchExpanded ? 1.0 : 0.0);
 
+        PseudoClasses.Set(":vertical", IsVertical);
+        PseudoClasses.Set(":no-shadow", !ShowShadow);
         ApplyMaterial();
         RebuildTabs();
         SyncSelectionFromIndex();
@@ -298,10 +323,25 @@ public class VelaDockBar : TemplatedControl
         SyncCompactReturnIcon();
     }
 
+    private void OnOrientationChanged()
+    {
+        PseudoClasses.Set(":vertical", IsVertical);
+        _hasPositioned = false;
+        _positionedIndex = -1;
+        RebuildTabs();
+        ApplySearchMorph();
+    }
+
     private void RebuildTabs()
     {
         if (_tabsHost is null)
             return;
+
+        if (_rootStack is not null)
+            _rootStack.Orientation = Orientation;
+        _tabsHost.Orientation = Orientation;
+        _tabsHost.HorizontalAlignment = IsVertical ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+        _tabsHost.VerticalAlignment = IsVertical ? VerticalAlignment.Top : VerticalAlignment.Center;
 
         _tabsHost.Children.Clear();
         _tabs.Clear();
@@ -370,17 +410,32 @@ public class VelaDockBar : TemplatedControl
                 Children = { iconLayer, label },
             };
 
-            var root = new Border
-            {
-                MinWidth = 78,
-                Height = Math.Max(42, DockHeight - 10),
-                Padding = new Thickness(12, 0),
-                CornerRadius = new CornerRadius(999),
-                Background = Brushes.Transparent,
-                Cursor = item.IsEnabled ? new Cursor(StandardCursorType.Hand) : Cursor.Default,
-                Opacity = item.IsEnabled ? 1.0 : 0.4,
-                Child = stack,
-            };
+            var root = IsVertical
+                ? new Border
+                {
+                    Width = Math.Max(48, DockWidth - 12),
+                    MinHeight = 54,
+                    Padding = new Thickness(6, 7),
+                    CornerRadius = new CornerRadius(999),
+                    Background = Brushes.Transparent,
+                    Cursor = item.IsEnabled ? new Cursor(StandardCursorType.Hand) : Cursor.Default,
+                    Opacity = item.IsEnabled ? 1.0 : 0.4,
+                    Child = stack,
+                }
+                : new Border
+                {
+                    MinWidth = 78,
+                    Height = Math.Max(42, DockHeight - 10),
+                    Padding = new Thickness(12, 0),
+                    CornerRadius = new CornerRadius(999),
+                    Background = Brushes.Transparent,
+                    Cursor = item.IsEnabled ? new Cursor(StandardCursorType.Hand) : Cursor.Default,
+                    Opacity = item.IsEnabled ? 1.0 : 0.4,
+                    Child = stack,
+                };
+
+            if (!string.IsNullOrEmpty(item.ToolTip))
+                global::Avalonia.Controls.ToolTip.SetTip(root, item.ToolTip);
 
             _tabs.Add(new TabVisual
             {
@@ -514,7 +569,7 @@ public class VelaDockBar : TemplatedControl
         _scrubbing = true;
         e.Pointer.Capture(_tabsTrack);
 
-        var idx = HitTestTab(e.GetPosition(_tabsTrack).X);
+        var idx = HitTestTab(e.GetPosition(_tabsTrack));
         if (idx >= 0)
             SelectIndex(idx, fireClick: false);
 
@@ -529,7 +584,7 @@ public class VelaDockBar : TemplatedControl
     private void OnTrackPointerMoved(object? sender, PointerEventArgs e)
     {
         if (!_scrubbing || _tabsTrack is null) return;
-        var idx = HitTestTab(e.GetPosition(_tabsTrack).X);
+        var idx = HitTestTab(e.GetPosition(_tabsTrack));
         if (idx >= 0 && idx != SelectedIndex)
             SelectIndex(idx, fireClick: false);
         e.Handled = true;
@@ -541,7 +596,7 @@ public class VelaDockBar : TemplatedControl
         _scrubbing = false;
         e.Pointer.Capture(null);
 
-        var idx = HitTestTab(e.GetPosition(_tabsTrack).X);
+        var idx = HitTestTab(e.GetPosition(_tabsTrack));
         if (idx >= 0)
             SelectIndex(idx, fireClick: true);
 
@@ -558,24 +613,25 @@ public class VelaDockBar : TemplatedControl
         _runner.Wake();
     }
 
-    private int HitTestTab(double localX)
+    private int HitTestTab(Point localPoint)
     {
         if (_tabsTrack is null || _tabs.Count == 0) return -1;
         var best = -1;
         var bestDist = double.PositiveInfinity;
+        var axisPos = IsVertical ? localPoint.Y : localPoint.X;
 
         for (var i = 0; i < _tabs.Count; i++)
         {
             var r = _tabs[i].Root;
             var p = r.TranslatePoint(new Point(0, 0), _tabsTrack);
             if (!p.HasValue) continue;
-            var left = p.Value.X;
-            var right = left + r.Bounds.Width;
-            if (localX >= left && localX <= right)
+            var start = IsVertical ? p.Value.Y : p.Value.X;
+            var end = start + (IsVertical ? r.Bounds.Height : r.Bounds.Width);
+            if (axisPos >= start && axisPos <= end)
                 return i;
 
-            var center = (left + right) * 0.5;
-            var dist = Math.Abs(localX - center);
+            var center = (start + end) * 0.5;
+            var dist = Math.Abs(axisPos - center);
             if (dist < bestDist)
             {
                 bestDist = dist;
@@ -702,31 +758,42 @@ public class VelaDockBar : TemplatedControl
         }
 
         var tab = _tabs[SelectedIndex].Root;
-        if (tab.Bounds.Width <= 0)
+        if (tab.Bounds.Width <= 0 || tab.Bounds.Height <= 0)
             return;
 
         var pos = tab.TranslatePoint(new Point(0, 0), _tabsTrack);
         if (!pos.HasValue)
             return;
 
-        var targetX = pos.Value.X;
-        var targetW = tab.Bounds.Width;
+        double targetPos;
+        double targetLen;
+        if (IsVertical)
+        {
+            targetPos = pos.Value.Y;
+            targetLen = tab.Bounds.Height;
+            _indicator.Width = tab.Bounds.Width;
+        }
+        else
+        {
+            targetPos = pos.Value.X;
+            targetLen = tab.Bounds.Width;
+            _indicator.Height = tab.Bounds.Height;
+        }
 
-        _indicator.Height = tab.Bounds.Height;
         _indicator.Opacity = Material == VelaSurfaceMaterial.LiquidGlass ? 0.62 : 1.0;
         _positionedIndex = SelectedIndex;
 
         if (!animate || !_hasPositioned || VelaMotionOptions.ReducedMotion)
         {
             _hasPositioned = true;
-            _pillX.Jump(targetX);
-            _pillW.Jump(targetW);
+            _pillX.Jump(targetPos);
+            _pillW.Jump(targetLen);
             ApplyIndicator();
             return;
         }
 
-        _pillX.SetTarget(targetX, VelaMotionTokens.Springs.Morph);
-        _pillW.SetTarget(targetW, VelaMotionTokens.Springs.Morph);
+        _pillX.SetTarget(targetPos, VelaMotionTokens.Springs.Morph);
+        _pillW.SetTarget(targetLen, VelaMotionTokens.Springs.Morph);
         _runner.Wake();
     }
 
@@ -747,8 +814,19 @@ public class VelaDockBar : TemplatedControl
         if (_indicator is null || _indTranslate is null || _indScale is null)
             return;
 
-        _indTranslate.X = _pillX.Value;
-        _indicator.Width = Math.Max(0, _pillW.Value);
+        if (IsVertical)
+        {
+            _indTranslate.X = 0;
+            _indTranslate.Y = _pillX.Value;
+            _indicator.Height = Math.Max(0, _pillW.Value);
+        }
+        else
+        {
+            _indTranslate.X = _pillX.Value;
+            _indTranslate.Y = 0;
+            _indicator.Width = Math.Max(0, _pillW.Value);
+        }
+
         var s = Math.Clamp(_pillScale.Value, 0.94, 1.08);
         _indScale.ScaleX = s;
         _indScale.ScaleY = s;
@@ -761,9 +839,17 @@ public class VelaDockBar : TemplatedControl
 
         if (_tabsShell is not null)
         {
-            var fullW = _fullTabsShellWidth > orbSize ? _fullTabsShellWidth : Math.Max(orbSize, _tabs.Count * 78.0 + 10.0);
-            _tabsShell.Width = fullW + (orbSize - fullW) * p;
-            _tabsShell.Height = orbSize;
+            if (IsVertical)
+            {
+                _tabsShell.Width = Math.Max(56.0, DockWidth);
+                _tabsShell.Height = double.NaN;
+            }
+            else
+            {
+                var fullW = _fullTabsShellWidth > orbSize ? _fullTabsShellWidth : Math.Max(orbSize, _tabs.Count * 78.0 + 10.0);
+                _tabsShell.Width = fullW + (orbSize - fullW) * p;
+                _tabsShell.Height = orbSize;
+            }
         }
 
         if (_tabsTrack is not null)

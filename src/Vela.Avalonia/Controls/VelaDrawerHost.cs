@@ -26,6 +26,10 @@ public sealed class VelaDrawerOptions
     public double Width { get; init; } = 390.0;
     public bool CloseOnBackdropClick { get; init; } = true;
     public VelaSurfaceMaterial Material { get; init; } = VelaSurfaceMaterial.Solid;
+    public bool ShowHeader { get; init; } = true;
+    public bool WrapInScrollViewer { get; init; } = true;
+    public Thickness? BodyPadding { get; init; }
+    public Control? HeaderAction { get; init; }
 }
 
 /// <summary>
@@ -283,71 +287,92 @@ public class VelaDrawerHost : ContentControl
     {
         var dock = new DockPanel();
 
-        var headerGrid = new Grid
+        if (opts.ShowHeader)
         {
-            ColumnDefinitions = new ColumnDefinitions("*,Auto"),
-            ColumnSpacing = 12,
-        };
-
-        var titleStack = new StackPanel { Spacing = 3 };
-        if (!string.IsNullOrEmpty(opts.Title))
-        {
-            titleStack.Children.Add(new TextBlock
+            var headerGrid = new Grid
             {
-                Text = opts.Title,
-                FontSize = 16.5,
-                FontWeight = FontWeight.SemiBold,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto"),
+                ColumnSpacing = 8,
+            };
+
+            var titleStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+            if (!string.IsNullOrEmpty(opts.Title))
+            {
+                titleStack.Children.Add(new TextBlock
+                {
+                    Text = opts.Title,
+                    FontSize = 16.5,
+                    FontWeight = FontWeight.SemiBold,
+                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                });
+            }
+            if (!string.IsNullOrEmpty(opts.Description))
+            {
+                titleStack.Children.Add(new TextBlock
+                {
+                    Text = opts.Description,
+                    FontSize = 13,
+                    TextWrapping = TextWrapping.Wrap,
+                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                });
+            }
+            headerGrid.Children.Add(titleStack);
+
+            if (opts.HeaderAction is not null)
+            {
+                opts.HeaderAction.VerticalAlignment = VerticalAlignment.Center;
+                Grid.SetColumn(opts.HeaderAction, 1);
+                headerGrid.Children.Add(opts.HeaderAction);
+            }
+
+            var closeBtn = new Button
+            {
+                Width = 30,
+                Height = 30,
+                CornerRadius = new CornerRadius(9),
+                VerticalAlignment = VerticalAlignment.Center,
+                Content = new PathIcon
+                {
+                    Width = 13,
+                    Height = 13,
+                    [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconClose").ToBinding(),
+                    [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                },
+            };
+            if (this.TryFindResource("VelaIconButtonTheme", ActualThemeVariant, out var themeObj) && themeObj is ControlTheme ct)
+                closeBtn.Theme = ct;
+            closeBtn.Click += (_, _) => Close();
+            Grid.SetColumn(closeBtn, 2);
+            headerGrid.Children.Add(closeBtn);
+
+            var dividerKey = opts.Material == VelaSurfaceMaterial.Solid ? "VelaBorderSubtleBrush" : "VelaGlassDividerBrush";
+            var headerBorder = new Border
+            {
+                Padding = new Thickness(20, 16),
+                BorderThickness = new Thickness(0, 0, 0, 1),
+                [!Border.BorderBrushProperty] = this.GetResourceObservable(dividerKey).ToBinding(),
+                Child = headerGrid,
+            };
+            DockPanel.SetDock(headerBorder, Dock.Top);
+            dock.Children.Add(headerBorder);
+        }
+
+        if (opts.WrapInScrollViewer)
+        {
+            dock.Children.Add(new ScrollViewer
+            {
+                Padding = opts.BodyPadding ?? new Thickness(20, 18),
+                Content = body,
             });
         }
-        if (!string.IsNullOrEmpty(opts.Description))
+        else
         {
-            titleStack.Children.Add(new TextBlock
+            dock.Children.Add(new Border
             {
-                Text = opts.Description,
-                FontSize = 13,
-                TextWrapping = TextWrapping.Wrap,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                Padding = opts.BodyPadding ?? new Thickness(0),
+                Child = body,
             });
         }
-        headerGrid.Children.Add(titleStack);
-
-        var closeBtn = new Button
-        {
-            Width = 30,
-            Height = 30,
-            CornerRadius = new CornerRadius(9),
-            VerticalAlignment = VerticalAlignment.Top,
-            Content = new PathIcon
-            {
-                Width = 13,
-                Height = 13,
-                [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconClose").ToBinding(),
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
-            },
-        };
-        if (this.TryFindResource("VelaIconButtonTheme", ActualThemeVariant, out var themeObj) && themeObj is ControlTheme ct)
-            closeBtn.Theme = ct;
-        closeBtn.Click += (_, _) => Close();
-        Grid.SetColumn(closeBtn, 1);
-        headerGrid.Children.Add(closeBtn);
-
-        var dividerKey = opts.Material == VelaSurfaceMaterial.Solid ? "VelaBorderSubtleBrush" : "VelaGlassDividerBrush";
-        var headerBorder = new Border
-        {
-            Padding = new Thickness(20, 18),
-            BorderThickness = new Thickness(0, 0, 0, 1),
-            [!Border.BorderBrushProperty] = this.GetResourceObservable(dividerKey).ToBinding(),
-            Child = headerGrid,
-        };
-        DockPanel.SetDock(headerBorder, Dock.Top);
-        dock.Children.Add(headerBorder);
-
-        dock.Children.Add(new ScrollViewer
-        {
-            Padding = new Thickness(20, 18),
-            Content = body,
-        });
 
         return dock;
     }

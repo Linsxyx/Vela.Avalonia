@@ -61,7 +61,32 @@ public class VelaMenuItem : StyledElement
     public ICommand? Command { get => GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
     public object? CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
 
+    [Content]
+    public ObservableCollection<VelaMenuItem> Items { get; } = new();
+
+    public bool HasSubItems => Items.Count > 0;
+
     public event EventHandler? Click;
+
+    public VelaMenuItem()
+    {
+        Items.CollectionChanged += (_, e) =>
+        {
+            if (e.OldItems is not null)
+            {
+                foreach (VelaMenuItem oldItem in e.OldItems)
+                    LogicalChildren.Remove(oldItem);
+            }
+            if (e.NewItems is not null)
+            {
+                foreach (VelaMenuItem newItem in e.NewItems)
+                {
+                    if (!LogicalChildren.Contains(newItem))
+                        LogicalChildren.Add(newItem);
+                }
+            }
+        };
+    }
 
     internal void Invoke()
     {

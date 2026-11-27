@@ -740,10 +740,10 @@ public class VelaNavigationView : TemplatedControl
             WireNavItem(footerNav, parent: null, section: null, isFooter: true);
         }
 
-        // Ensure valid selection
+        // Ensure valid selection (skip auto-selecting index 0 when Content explicitly drives a non-menu page)
         if (SelectedItem is null || !_navigableItems.Contains(SelectedItem))
         {
-            if (_navigableItems.Count > 0)
+            if (_navigableItems.Count > 0 && !(Content is not null && SelectedIndex < 0))
             {
                 var idx = Math.Clamp(SelectedIndex, 0, _navigableItems.Count - 1);
                 SetSelectionInternal(_navigableItems[idx], idx);
@@ -921,6 +921,24 @@ public class VelaNavigationView : TemplatedControl
             var idx = _navigableItems.IndexOf(item);
             SetSelectionInternal(item, idx >= 0 ? idx : SelectedIndex);
         }
+        else
+        {
+            _syncingSelection = true;
+            try
+            {
+                if (SelectedIndex != -1)
+                    SetCurrentValue(SelectedIndexProperty, -1);
+            }
+            finally
+            {
+                _syncingSelection = false;
+            }
+
+            UpdateSelectionFlags();
+            ActivateCurrentPage();
+            UpdateTopBreadcrumb();
+            UpdateIndicator(animate: false);
+        }
     }
 
     private void SetSelectionInternal(VelaNavItem item, int index)
@@ -1012,8 +1030,7 @@ public class VelaNavigationView : TemplatedControl
         var explicitContent = Content;
         if (explicitContent is not null)
         {
-            var key = (object?)SelectedItem ?? explicitContent;
-            _pageDeck.Activate(key, () => explicitContent);
+            _pageDeck.Activate(explicitContent, () => explicitContent);
             return;
         }
 

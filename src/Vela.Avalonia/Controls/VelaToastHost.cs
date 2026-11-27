@@ -21,8 +21,10 @@ public sealed class VelaToastOptions
 {
     public required string Title { get; init; }
     public string? Description { get; init; }
+    public Control? Content { get; init; }
     public VelaToastTone Tone { get; init; } = VelaToastTone.Neutral;
     public TimeSpan Duration { get; init; } = TimeSpan.FromSeconds(4);
+    public bool DismissOnClick { get; init; }
     public string? ActionLabel { get; init; }
     public Action? OnAction { get; init; }
 }
@@ -84,7 +86,9 @@ public class VelaToastHost : Panel
         });
     }
 
-    public void Show(VelaToastOptions options)
+    public void Show(VelaToastOptions options) => _ = ShowWithHandle(options);
+
+    public IDisposable ShowWithHandle(VelaToastOptions options)
     {
         var card = new ToastCard(options, OnCardDismissed);
         _activeToasts.Add(card);
@@ -96,6 +100,20 @@ public class VelaToastHost : Panel
             var oldest = _activeToasts[0];
             _activeToasts.RemoveAt(0);
             oldest.Dismiss();
+        }
+
+        return new ToastDismissHandle(card);
+    }
+
+    private sealed class ToastDismissHandle(ToastCard card) : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            Dispatcher.UIThread.Post(card.Dismiss);
         }
     }
 
@@ -135,6 +153,12 @@ public class VelaToastHost : Panel
             Bind(BoxShadowProperty, this.GetResourceObservable("VelaShadowRaised"));
 
             Child = BuildContent(options);
+
+            if (options.DismissOnClick)
+            {
+                Cursor = new Cursor(StandardCursorType.Hand);
+                PointerPressed += (_, _) => Dismiss();
+            }
 
             if (options.Duration > TimeSpan.Zero)
             {
@@ -277,6 +301,11 @@ public class VelaToastHost : Panel
                     TextWrapping = TextWrapping.Wrap,
                     [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
                 });
+            }
+
+            if (options.Content is not null)
+            {
+                textStack.Children.Add(options.Content);
             }
 
             Grid.SetColumn(textStack, 1);

@@ -83,9 +83,12 @@ public sealed class VelaCollapsePanel : Panel
             _opacitySpring.Jump(IsExpanded ? 1.0 : 0.0);
             Opacity = IsExpanded ? 1.0 : 0.0;
         }
-        else if (IsExpanded && !_heightSpring.IsAnimating && Math.Abs(_heightSpring.Value - maxH) > 0.5)
+        else if (IsExpanded && Math.Abs(_heightSpring.Target - maxH) > 0.5)
         {
-            _heightSpring.Jump(maxH);
+            if (_heightSpring.IsAnimating)
+                _heightSpring.SetTarget(maxH, VelaMotionTokens.Springs.Smooth);
+            else
+                _heightSpring.Jump(maxH);
         }
 
         var reportedH = Math.Max(0.0, _heightSpring.Value);
@@ -118,7 +121,11 @@ public class VelaAccordionItem : HeaderedContentControl
     public static readonly StyledProperty<bool> IsExpandedProperty =
         AvaloniaProperty.Register<VelaAccordionItem, bool>(nameof(IsExpanded), false, defaultBindingMode: BindingMode.TwoWay);
 
+    public static readonly StyledProperty<Thickness> HeaderPaddingProperty =
+        AvaloniaProperty.Register<VelaAccordionItem, Thickness>(nameof(HeaderPadding), new Thickness(0, 13));
+
     public bool IsExpanded { get => GetValue(IsExpandedProperty); set => SetValue(IsExpandedProperty, value); }
+    public Thickness HeaderPadding { get => GetValue(HeaderPaddingProperty); set => SetValue(HeaderPaddingProperty, value); }
 
     protected override Type StyleKeyOverride => typeof(VelaAccordionItem);
 

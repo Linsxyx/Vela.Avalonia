@@ -40,6 +40,8 @@
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="CornerRadius" Value="24" />
     <Setter Property="Padding" Value="20" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="RimThickness" Value="1.2" />
     <Setter Property="CardShadow" Value="{DynamicResource VelaShadowRaised}" />
     <Setter Property="Template">

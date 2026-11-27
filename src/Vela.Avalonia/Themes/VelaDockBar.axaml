@@ -8,13 +8,13 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <StackPanel Orientation="Horizontal"
+        <StackPanel x:Name="PART_RootStack"
+                    Orientation="Horizontal"
                     Spacing="10"
                     VerticalAlignment="Center"
                     ClipToBounds="False">
           <!-- Main Floating Tab Pill -->
           <Border x:Name="PART_TabsShell"
-                  Height="{TemplateBinding DockHeight}"
                   CornerRadius="999"
                   BorderThickness="1"
                   ClipToBounds="False"
@@ -192,6 +192,10 @@
     <Style Selector="^:glass /template/ Border#PART_Indicator">
       <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
       <Setter Property="Opacity" Value="0.62" />
+    </Style>
+
+    <Style Selector="^:no-shadow /template/ Border#PART_TabsShell, ^:no-shadow /template/ Border#PART_SearchShell">
+      <Setter Property="BoxShadow" Value="0 0 0 0 Transparent" />
     </Style>
   </ControlTheme>
 

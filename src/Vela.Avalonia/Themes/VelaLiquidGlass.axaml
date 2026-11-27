@@ -17,6 +17,8 @@
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="CornerRadius" Value="24" />
     <Setter Property="Padding" Value="18,14" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="GlassTint" Value="{DynamicResource VelaLiquidGlassTintBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource VelaLiquidGlassBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
