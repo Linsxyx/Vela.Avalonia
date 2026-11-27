@@ -19,6 +19,7 @@
   <x:String x:Key="StrNavLayout">Navigation &amp; Layout</x:String>
   <x:String x:Key="StrNavFeedback">Overlays &amp; Feedback</x:String>
   <x:String x:Key="StrNavDisplay">Data Display</x:String>
+  <x:String x:Key="StrNavDataViews">Tree &amp; Data Grid</x:String>
   <x:String x:Key="StrNavShaders">Shaders &amp; Glass</x:String>
   <x:String x:Key="StrNavCharts">Charts</x:String>
   <x:String x:Key="StrNavTray">System Tray</x:String>
@@ -253,6 +254,22 @@
   <x:String x:Key="StrEmptySearchDesc">Try widening your filter or clearing tags.</x:String>
   <x:String x:Key="StrEmptyDoneTitle">All checks passed</x:String>
   <x:String x:Key="StrEmptyDoneDesc">0 warnings · all packages up to date.</x:String>
+
+  <!-- Data Views (TreeView / DataGrid / TreeTable) -->
+  <x:String x:Key="StrExpandAll">Expand All</x:String>
+  <x:String x:Key="StrCollapseAll">Collapse All</x:String>
+  <x:String x:Key="StrGuideLines">Guides</x:String>
+  <x:String x:Key="StrCheckBoxes">Checkboxes</x:String>
+  <x:String x:Key="StrCompact">Compact</x:String>
+  <x:String x:Key="StrComfortable">Comfortable</x:String>
+  <x:String x:Key="StrStriped">Striped</x:String>
+  <x:String x:Key="StrGridLines">Grid lines</x:String>
+  <x:String x:Key="StrClearSort">Clear sort</x:String>
+  <x:String x:Key="StrFilterTreePlaceholder">Filter files &amp; folders (auto-expands matches)...</x:String>
+  <x:String x:Key="StrFilterServicesPlaceholder">Search services, regions, owners...</x:String>
+  <x:String x:Key="StrFilterModulesPlaceholder">Filter modules &amp; controls...</x:String>
+  <x:String x:Key="StrGridHint">Click headers to sort · Drag dividers to resize · Double-click divider to reset</x:String>
+  <x:String x:Key="StrTreeTableHint">Level-preserving hierarchical sort · Resizable columns · Spring chevron disclosure</x:String>
 
   <!-- Shaders & Glass -->
   <x:String x:Key="StrSdfRefraction">SDF Refraction</x:String>

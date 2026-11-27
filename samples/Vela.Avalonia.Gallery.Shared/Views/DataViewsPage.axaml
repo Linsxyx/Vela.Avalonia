@@ -1,0 +1,170 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.DataViewsPage"
+             x:DataType="vm:DataViewsViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavDataViews}" />
+
+      <!-- Section 1: VelaTreeView -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+              <TextBlock Classes="cardTitle" Text="VelaTreeView" />
+              <TextBlock Classes="statusText" Text="{Binding TreeStatusText}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrExpandAll}" Click="OnTreeExpandAll" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrCollapseAll}" Click="OnTreeCollapseAll" />
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+            <vela:VelaInput PlaceholderText="{DynamicResource StrFilterTreePlaceholder}"
+                            LeadingIcon="{DynamicResource VelaIconSearch}"
+                            Text="{Binding TreeFilter, Mode=TwoWay}"
+                            Size="Small"
+                            IsClearable="True" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrGuideLines}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding TreeShowGuides, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrCheckBoxes}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding TreeShowCheckBoxes, Mode=TwoWay}" />
+            </StackPanel>
+          </Grid>
+
+          <vela:VelaTreeView x:Name="ExplorerTree"
+                             Height="290"
+                             ItemsSource="{Binding ExplorerNodes}"
+                             FilterText="{Binding TreeFilter}"
+                             ShowGuideLines="{Binding TreeShowGuides}"
+                             ShowCheckBoxes="{Binding TreeShowCheckBoxes}"
+                             SelectionMode="Multiple"
+                             EmptyContent="{DynamicResource StrEmptySearchTitle}"
+                             SelectionChanged="OnTreeStateChanged"
+                             CheckedItemsChanged="OnTreeStateChanged"
+                             ItemInvoked="OnTreeItemInvoked" />
+        </StackPanel>
+      </Border>
+
+      <!-- Section 2: VelaDataGrid -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+              <TextBlock Classes="cardTitle" Text="VelaDataGrid" />
+              <TextBlock Classes="statusText" Text="{DynamicResource StrGridHint}" />
+            </StackPanel>
+
+            <vela:VelaSegmentedControl Grid.Column="1"
+                                       SelectedIndex="{Binding GridDensityIndex, Mode=TwoWay}">
+              <vela:VelaSegmentedItem Content="{DynamicResource StrCompact}" />
+              <vela:VelaSegmentedItem Content="{DynamicResource StrStandard}" />
+              <vela:VelaSegmentedItem Content="{DynamicResource StrComfortable}" />
+            </vela:VelaSegmentedControl>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="14">
+            <vela:VelaInput PlaceholderText="{DynamicResource StrFilterServicesPlaceholder}"
+                            LeadingIcon="{DynamicResource VelaIconSearch}"
+                            Text="{Binding GridSearchText, Mode=TwoWay}"
+                            Size="Small"
+                            IsClearable="True" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrCheckBoxes}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding GridShowCheckBoxes, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrStriped}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding GridAlternatingRows, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrGridLines}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding GridVerticalLines, Mode=TwoWay}" />
+            </StackPanel>
+          </Grid>
+
+          <vela:VelaDataGrid x:Name="ClusterGrid"
+                             Height="320"
+                             ItemsSource="{Binding ClusterRows}"
+                             SearchText="{Binding GridSearchText}"
+                             Density="{Binding GridDensity}"
+                             SelectionMode="Multiple"
+                             ShowCheckBoxes="{Binding GridShowCheckBoxes}"
+                             ShowAlternatingRows="{Binding GridAlternatingRows}"
+                             ShowVerticalGridLines="{Binding GridVerticalLines}"
+                             EmptyContent="{DynamicResource StrEmptySearchTitle}"
+                             SelectionChanged="OnGridStateChanged"
+                             SortChanged="OnGridSortChanged"
+                             RowDoubleTapped="OnGridRowDoubleTapped">
+            <vela:VelaDataGrid.FooterContent>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="statusText" Text="{Binding GridSummaryText}" VerticalAlignment="Center" />
+                <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="{DynamicResource StrClearSort}" Click="OnGridClearSort" />
+              </Grid>
+            </vela:VelaDataGrid.FooterContent>
+          </vela:VelaDataGrid>
+        </StackPanel>
+      </Border>
+
+      <!-- Section 3: VelaTreeTable -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+              <TextBlock Classes="cardTitle" Text="VelaTreeTable" />
+              <TextBlock Classes="statusText" Text="{DynamicResource StrTreeTableHint}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrExpandAll}" Click="OnTreeTableExpandAll" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrCollapseAll}" Click="OnTreeTableCollapseAll" />
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+            <vela:VelaInput PlaceholderText="{DynamicResource StrFilterModulesPlaceholder}"
+                            LeadingIcon="{DynamicResource VelaIconSearch}"
+                            Text="{Binding TreeTableSearchText, Mode=TwoWay}"
+                            Size="Small"
+                            IsClearable="True" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrGuideLines}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding TreeTableShowGuides, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrCheckBoxes}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding TreeTableShowCheckBoxes, Mode=TwoWay}" />
+            </StackPanel>
+          </Grid>
+
+          <vela:VelaTreeTable x:Name="ModulesTreeTable"
+                              Height="340"
+                              ItemsSource="{Binding ModuleRoots}"
+                              SearchText="{Binding TreeTableSearchText}"
+                              ShowGuideLines="{Binding TreeTableShowGuides}"
+                              ShowCheckBoxes="{Binding TreeTableShowCheckBoxes}"
+                              SelectionMode="Multiple"
+                              EmptyContent="{DynamicResource StrEmptySearchTitle}"
+                              SelectionChanged="OnTreeTableStateChanged"
+                              CheckedItemsChanged="OnTreeTableStateChanged"
+                              SortChanged="OnTreeTableSortChanged"
+                              RowDoubleTapped="OnTreeTableRowDoubleTapped">
+            <vela:VelaTreeTable.FooterContent>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="statusText" Text="{Binding TreeTableSummaryText}" VerticalAlignment="Center" />
+                <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="{DynamicResource StrClearSort}" Click="OnTreeTableClearSort" />
+              </Grid>
+            </vela:VelaTreeTable.FooterContent>
+          </vela:VelaTreeTable>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

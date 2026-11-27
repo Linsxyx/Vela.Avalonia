@@ -1,0 +1,83 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaTreeView}" TargetType="controls:VelaTreeView">
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="4,6" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Panel>
+            <ListBox x:Name="PART_List"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Padding="{TemplateBinding Padding}"
+                     SelectionMode="Single"
+                     Focusable="False"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+              <ListBox.ItemContainerTheme>
+                <ControlTheme TargetType="ListBoxItem">
+                  <Setter Property="Background" Value="Transparent" />
+                  <Setter Property="Padding" Value="0" />
+                  <Setter Property="Margin" Value="0" />
+                  <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                  <Setter Property="Focusable" Value="False" />
+                  <Setter Property="Template">
+                    <ControlTemplate>
+                      <ContentPresenter Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        HorizontalContentAlignment="Stretch" />
+                    </ControlTemplate>
+                  </Setter>
+                </ControlTheme>
+              </ListBox.ItemContainerTheme>
+            </ListBox>
+
+            <ContentPresenter x:Name="PART_EmptyHost"
+                              Content="{TemplateBinding EmptyContent}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Margin="24"
+                              IsVisible="False">
+              <ContentPresenter.Styles>
+                <Style Selector="TextBlock">
+                  <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+                  <Setter Property="FontSize" Value="13" />
+                </Style>
+              </ContentPresenter.Styles>
+            </ContentPresenter>
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-tree-row">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.12" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-tree-row:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-tree-row:selected">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentSubtleBrush}" />
+    </Style>
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-tree-row:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

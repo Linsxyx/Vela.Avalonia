@@ -231,6 +231,11 @@
                                   Header="{DynamicResource StrNavDisplay}"
                                   Category="MetricCard Counter Avatar Badge SettingsGroup EmptyState 指标 头像 徽章 设置"
                                   Icon="{DynamicResource VelaIconHome}" />
+                <vela:VelaNavItem Tag="dataviews"
+                                  Header="{DynamicResource StrNavDataViews}"
+                                  Category="TreeView DataGrid TreeTable Table Tree Sort Resize 树 表格 数据表格 树形表格"
+                                  Icon="{DynamicResource VelaIconTable}"
+                                  Badge="3" />
               </vela:VelaNavItem>
 
               <!-- Studio & Labs -->

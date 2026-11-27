@@ -19,6 +19,7 @@
   <x:String x:Key="StrNavLayout">导航与布局</x:String>
   <x:String x:Key="StrNavFeedback">浮层与反馈</x:String>
   <x:String x:Key="StrNavDisplay">数据展示</x:String>
+  <x:String x:Key="StrNavDataViews">树与数据表格</x:String>
   <x:String x:Key="StrNavShaders">着色器与液态玻璃</x:String>
   <x:String x:Key="StrNavCharts">数据图表</x:String>
   <x:String x:Key="StrNavTray">系统托盘</x:String>
@@ -253,6 +254,22 @@
   <x:String x:Key="StrEmptySearchDesc">请尝试放宽筛选条件或清除标签。</x:String>
   <x:String x:Key="StrEmptyDoneTitle">全部检查通过</x:String>
   <x:String x:Key="StrEmptyDoneDesc">0 警告 · 所有依赖已是最新。</x:String>
+
+  <!-- Data Views (TreeView / DataGrid / TreeTable) -->
+  <x:String x:Key="StrExpandAll">全部展开</x:String>
+  <x:String x:Key="StrCollapseAll">全部折叠</x:String>
+  <x:String x:Key="StrGuideLines">引导线</x:String>
+  <x:String x:Key="StrCheckBoxes">复选框</x:String>
+  <x:String x:Key="StrCompact">紧凑</x:String>
+  <x:String x:Key="StrComfortable">宽松</x:String>
+  <x:String x:Key="StrStriped">斑马纹</x:String>
+  <x:String x:Key="StrGridLines">竖向网格线</x:String>
+  <x:String x:Key="StrClearSort">清除排序</x:String>
+  <x:String x:Key="StrFilterTreePlaceholder">搜索文件或目录（自动展开匹配路径）...</x:String>
+  <x:String x:Key="StrFilterServicesPlaceholder">搜索服务、区域或负责人...</x:String>
+  <x:String x:Key="StrFilterModulesPlaceholder">搜索模块或控件...</x:String>
+  <x:String x:Key="StrGridHint">点击表头排序 · 拖动列边调整宽度 · 双击列边恢复默认</x:String>
+  <x:String x:Key="StrTreeTableHint">保留层级的树形排序 · 可拖拽列宽 · 弹簧旋转展开指示器</x:String>
 
   <!-- Shaders & Glass -->
   <x:String x:Key="StrSdfRefraction">SDF 折射</x:String>

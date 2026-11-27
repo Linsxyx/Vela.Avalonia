@@ -70,6 +70,7 @@ public partial class MainView : UserControl
             "layout" => new LayoutPage { DataContext = _viewModel.Layout },
             "feedback" => new FeedbackPage { DataContext = _viewModel.Feedback },
             "display" => new DataDisplayPage { DataContext = _viewModel.DataDisplay },
+            "dataviews" => new DataViewsPage { DataContext = _viewModel.DataViews },
             "shaders" => new ShadersPage { DataContext = _viewModel.Shaders },
             "charts" => new ChartsPage { DataContext = _viewModel.Charts },
             "tray" => new SystemTrayPage { DataContext = _viewModel.SystemTray },

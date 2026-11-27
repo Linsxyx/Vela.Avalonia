@@ -51,6 +51,9 @@
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaResizablePanels.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDockBar.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaWindow.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeView.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDataGrid.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeTable.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

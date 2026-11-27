@@ -21,6 +21,7 @@ public partial class MainViewModel : ViewModelBase
     public LayoutViewModel Layout { get; }
     public FeedbackViewModel Feedback { get; }
     public DataDisplayViewModel DataDisplay { get; }
+    public DataViewsViewModel DataViews { get; }
     public ShadersViewModel Shaders { get; }
     public ChartsViewModel Charts { get; }
     public SystemTrayViewModel SystemTray { get; }
@@ -114,6 +115,7 @@ public partial class MainViewModel : ViewModelBase
         Layout = new LayoutViewModel(shell);
         Feedback = new FeedbackViewModel(shell);
         DataDisplay = new DataDisplayViewModel(shell);
+        DataViews = new DataViewsViewModel(shell);
         Shaders = new ShadersViewModel(shell);
         Charts = new ChartsViewModel();
         SystemTray = new SystemTrayViewModel(shell, ToggleDarkMode, ToggleLanguage);
@@ -214,6 +216,7 @@ public partial class MainViewModel : ViewModelBase
         yield return NavCmd(loc.Get("StrNavLayout"), "layout", "VelaIconLayers", "G N");
         yield return NavCmd(loc.Get("StrNavFeedback"), "feedback", "VelaIconBell", "G F");
         yield return NavCmd(loc.Get("StrNavDisplay"), "display", "VelaIconHome", "G D");
+        yield return NavCmd(loc.Get("StrNavDataViews"), "dataviews", "VelaIconTable", "G V");
         yield return NavCmd(loc.Get("StrNavShaders"), "shaders", "VelaIconSparkles", "G S");
         yield return NavCmd(loc.Get("StrNavCharts"), "charts", "VelaIconChart", "G C");
         yield return NavCmd(loc.Get("StrNavTray"), "tray", "VelaIconBell", "G T");

@@ -1,0 +1,122 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaDataGrid}" TargetType="controls:VelaDataGrid">
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                BoxShadow="{DynamicResource VelaShadowResting}"
+                ClipToBounds="True">
+          <Grid RowDefinitions="Auto,*,Auto">
+            <!-- Sticky Column Header -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="0,0,0,1">
+              <ScrollViewer x:Name="PART_HeaderScroll"
+                            HorizontalScrollBarVisibility="Hidden"
+                            VerticalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="PART_HeaderPanel"
+                            Orientation="Horizontal" />
+              </ScrollViewer>
+            </Border>
+
+            <!-- Virtualized Body -->
+            <Panel Grid.Row="1">
+              <ListBox x:Name="PART_List"
+                       Background="Transparent"
+                       BorderThickness="0"
+                       Padding="0"
+                       SelectionMode="Single"
+                       Focusable="False"
+                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                       ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemContainerTheme>
+                  <ControlTheme TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Template">
+                      <ControlTemplate>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalContentAlignment="Left" />
+                      </ControlTemplate>
+                    </Setter>
+                  </ControlTheme>
+                </ListBox.ItemContainerTheme>
+              </ListBox>
+
+              <ContentPresenter x:Name="PART_EmptyHost"
+                                Content="{TemplateBinding EmptyContent}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="24"
+                                IsVisible="False">
+                <ContentPresenter.Styles>
+                  <Style Selector="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+                    <Setter Property="FontSize" Value="13" />
+                  </Style>
+                </ContentPresenter.Styles>
+              </ContentPresenter>
+            </Panel>
+
+            <!-- Optional Footer Bar (Pagination / Summary) -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource VelaSurfaceBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="12,8"
+                    IsVisible="{TemplateBinding FooterContent, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <ContentPresenter Content="{TemplateBinding FooterContent}" />
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Header cell hover & active sort feedback -->
+    <Style Selector="^ /template/ StackPanel#PART_HeaderPanel Border.vela-table-header-cell">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.12" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="^ /template/ StackPanel#PART_HeaderPanel Border.vela-table-header-cell:sortable:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    </Style>
+
+    <!-- Body row states -->
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-table-row">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.10" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-table-row:alternate">
+      <Setter Property="Background" Value="{DynamicResource VelaBackgroundBrush}" />
+    </Style>
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-table-row:pointerover">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^ /template/ ListBox#PART_List Border.vela-table-row:selected">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentSubtleBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
