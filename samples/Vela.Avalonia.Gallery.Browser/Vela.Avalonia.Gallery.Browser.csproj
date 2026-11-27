@@ -16,4 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Vela.Avalonia.Gallery.Shared\Vela.Avalonia.Gallery.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\Fonts\*.otf" />
+  </ItemGroup>
 </Project>
