@@ -139,6 +139,51 @@ public partial class DataViewsViewModel : ViewModelBase
     [ObservableProperty]
     public partial string TreeTableSummaryText { get; set; } = string.Empty;
 
+    // ListBox state
+    public ObservableCollection<string> ReleaseChannels { get; } =
+    [
+        "Stable (v0.1.0)",
+        "Beta (v0.2.0-rc.1)",
+        "Nightly (main)",
+        "WebAssembly Preview",
+        "Native AOT macOS arm64",
+        "Native AOT Windows x64",
+    ];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ListBoxVariant))]
+    public partial int ListBoxVariantIndex { get; set; } = 0;
+
+    public VelaListBoxVariant ListBoxVariant => ListBoxVariantIndex switch
+    {
+        1 => VelaListBoxVariant.Inset,
+        2 => VelaListBoxVariant.Plain,
+        _ => VelaListBoxVariant.Card,
+    };
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ListBoxDensity))]
+    public partial int ListBoxDensityIndex { get; set; } = 1;
+
+    public VelaDataDensity ListBoxDensity => ListBoxDensityIndex switch
+    {
+        0 => VelaDataDensity.Compact,
+        2 => VelaDataDensity.Comfortable,
+        _ => VelaDataDensity.Standard,
+    };
+
+    [ObservableProperty]
+    public partial bool ListBoxShowIndicator { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool ListBoxShowCheckmarks { get; set; }
+
+    [ObservableProperty]
+    public partial bool ListBoxShowDividers { get; set; }
+
+    [ObservableProperty]
+    public partial string ListBoxStatusText { get; set; } = string.Empty;
+
     public DataViewsViewModel(IGalleryShellService shell)
     {
         _shell = shell;
@@ -194,6 +239,16 @@ public partial class DataViewsViewModel : ViewModelBase
             : $"{visibleCount} visible rows · {selectedCount} selected · {checkedCount} checked";
     }
 
+    public void UpdateListBoxStatus(object? selectedPrimary, int multiSelectedCount)
+    {
+        var label = (selectedPrimary as VelaListBoxItem)?.Content?.ToString()
+                    ?? selectedPrimary?.ToString()
+                    ?? Loc.Instance.Pick("None", "无");
+        ListBoxStatusText = Loc.Instance.IsChinese
+            ? $"当前选中: {label} · 多选渠道已选 {multiSelectedCount} 项（双击或按 Enter 触发）"
+            : $"Selected: {label} · {multiSelectedCount} channels selected (double-click or Enter to invoke)";
+    }
+
     public void NotifyItemInvoked(string source, string label)
     {
         _shell.ShowToast(
@@ -210,6 +265,8 @@ public partial class DataViewsViewModel : ViewModelBase
             UpdateGridSummary(ClusterRows.Count, 0, null);
         if (string.IsNullOrEmpty(TreeTableSummaryText))
             UpdateTreeTableSummary(10, 0, 0);
+        if (string.IsNullOrEmpty(ListBoxStatusText))
+            UpdateListBoxStatus("Vela Studio", 0);
     }
 
     private void BuildExplorerTree()

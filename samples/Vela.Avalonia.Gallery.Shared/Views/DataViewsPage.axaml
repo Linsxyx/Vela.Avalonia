@@ -8,6 +8,97 @@
     <StackPanel Classes="pageRoot">
       <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavDataViews}" />
 
+      <!-- Section 0: VelaListBox -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+              <TextBlock Classes="cardTitle" Text="VelaListBox" />
+              <TextBlock Classes="statusText" Text="{Binding ListBoxStatusText}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <vela:VelaSegmentedControl SelectedIndex="{Binding ListBoxVariantIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="{DynamicResource StrListBoxCard}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrListBoxInset}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrListBoxPlain}" />
+              </vela:VelaSegmentedControl>
+
+              <vela:VelaSegmentedControl SelectedIndex="{Binding ListBoxDensityIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="{DynamicResource StrCompact}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrStandard}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrComfortable}" />
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+          </Grid>
+
+          <WrapPanel Orientation="Horizontal" ItemSpacing="18" LineSpacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrListBoxIndicator}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding ListBoxShowIndicator, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrListBoxCheckmarks}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding ListBoxShowCheckmarks, Mode=TwoWay}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrListBoxDividers}" VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding ListBoxShowDividers, Mode=TwoWay}" />
+            </StackPanel>
+          </WrapPanel>
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+            <vela:VelaListBox x:Name="WorkspaceListBox"
+                              Height="260"
+                              SelectedIndex="0"
+                              Variant="{Binding ListBoxVariant}"
+                              Density="{Binding ListBoxDensity}"
+                              ShowSelectionIndicator="{Binding ListBoxShowIndicator}"
+                              ShowCheckmarks="{Binding ListBoxShowCheckmarks}"
+                              ShowDividers="{Binding ListBoxShowDividers}"
+                              Header="{DynamicResource StrListBoxWorkspaceHeader}"
+                              SelectionChanged="OnListBoxStateChanged"
+                              ItemInvoked="OnListBoxItemInvoked">
+              <vela:VelaListBoxItem Content="Vela Studio"
+                                    Description="Motion-first Avalonia 12 component library"
+                                    Icon="{DynamicResource VelaIconSparkles}"
+                                    Badge="v0.1.0" />
+              <vela:VelaListBoxItem Content="Design Tokens"
+                                    Description="OKLCH neutral &amp; accent color palettes"
+                                    Icon="{DynamicResource VelaIconPalette}"
+                                    Badge="8 accents" />
+              <vela:VelaListBoxItem Content="Shader Lab"
+                                    Description="SkSL Liquid Glass &amp; ambient backdrops"
+                                    Icon="{DynamicResource VelaIconLayers}"
+                                    Badge="GPU" />
+              <vela:VelaListBoxItem Content="Data Views"
+                                    Description="Virtualized ListBox, TreeView &amp; DataGrid"
+                                    Icon="{DynamicResource VelaIconTable}"
+                                    Badge="AOT" />
+              <vela:VelaListBoxItem Content="Legacy Archive"
+                                    Description="Read-only deprecated workspace"
+                                    Icon="{DynamicResource VelaIconFolder}"
+                                    IsEnabled="False" />
+            </vela:VelaListBox>
+
+            <vela:VelaListBox x:Name="ChannelsListBox"
+                              Grid.Column="1"
+                              Height="260"
+                              ItemsSource="{Binding ReleaseChannels}"
+                              SelectionMode="Multiple,Toggle"
+                              Variant="{Binding ListBoxVariant}"
+                              Density="{Binding ListBoxDensity}"
+                              ShowSelectionIndicator="{Binding ListBoxShowIndicator}"
+                              ShowCheckmarks="True"
+                              ShowDividers="{Binding ListBoxShowDividers}"
+                              Header="{DynamicResource StrListBoxMultiHeader}"
+                              EmptyContent="{DynamicResource StrEmptySearchTitle}"
+                              SelectionChanged="OnListBoxStateChanged"
+                              ItemInvoked="OnListBoxItemInvoked" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
       <!-- Section 1: VelaTreeView -->
       <Border Classes="card">
         <StackPanel Spacing="14">

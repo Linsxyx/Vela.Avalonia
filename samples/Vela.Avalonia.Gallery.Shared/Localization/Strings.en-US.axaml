@@ -270,6 +270,14 @@
   <x:String x:Key="StrFilterModulesPlaceholder">Filter modules &amp; controls...</x:String>
   <x:String x:Key="StrGridHint">Click headers to sort · Drag dividers to resize · Double-click divider to reset</x:String>
   <x:String x:Key="StrTreeTableHint">Level-preserving hierarchical sort · Resizable columns · Spring chevron disclosure</x:String>
+  <x:String x:Key="StrListBoxCard">Card</x:String>
+  <x:String x:Key="StrListBoxInset">Inset</x:String>
+  <x:String x:Key="StrListBoxPlain">Plain</x:String>
+  <x:String x:Key="StrListBoxIndicator">Indicator</x:String>
+  <x:String x:Key="StrListBoxCheckmarks">Checkmarks</x:String>
+  <x:String x:Key="StrListBoxDividers">Dividers</x:String>
+  <x:String x:Key="StrListBoxWorkspaceHeader">Workspaces</x:String>
+  <x:String x:Key="StrListBoxMultiHeader">Multi-Select Channels</x:String>
 
   <!-- Shaders & Glass -->
   <x:String x:Key="StrSdfRefraction">SDF Refraction</x:String>

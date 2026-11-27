@@ -190,4 +190,59 @@ public class VelaControlsLogicTests
         Assert.Equal(VelaDialogTone.Neutral, opts.Tone);
         Assert.Equal(80.0, opts.GlassBlurRadius);
     }
+
+    [Fact]
+    public void VelaListBox_UpdatesVariantDensityEmptyAndItemOwnerPseudoClasses()
+    {
+        var list = new VelaListBox();
+
+        // Defaults: Card + Standard + Empty + ShowSelectionIndicator=true
+        Assert.Equal(VelaListBoxVariant.Card, list.Variant);
+        Assert.Equal(VelaDataDensity.Standard, list.Density);
+        Assert.True(list.ShowSelectionIndicator);
+        Assert.False(list.ShowCheckmarks);
+        Assert.False(list.ShowDividers);
+        Assert.Contains(":card", list.Classes);
+        Assert.Contains(":standard", list.Classes);
+        Assert.Contains(":empty", list.Classes);
+
+        var itemA = new VelaListBoxItem { Content = "Alpha", Description = "First" };
+        var itemB = new VelaListBoxItem { Content = "Beta", Badge = "NEW" };
+        list.ItemsSource = new[] { itemA, itemB };
+
+        Assert.Equal(2, list.ItemCount);
+        Assert.DoesNotContain(":empty", list.Classes);
+
+        list.Variant = VelaListBoxVariant.Inset;
+        list.Density = VelaDataDensity.Compact;
+        list.ShowCheckmarks = true;
+        list.ShowDividers = true;
+
+        Assert.Contains(":inset", list.Classes);
+        Assert.DoesNotContain(":card", list.Classes);
+        Assert.Contains(":compact", list.Classes);
+
+        // Verify item-level owner state synchronization directly
+        itemA.SyncOwnerState(list.Variant, list.Density, list.ShowSelectionIndicator, list.ShowCheckmarks, showDivider: true);
+        Assert.Contains(":inset", itemA.Classes);
+        Assert.Contains(":compact", itemA.Classes);
+        Assert.Contains(":selection-indicator", itemA.Classes);
+        Assert.Contains(":checkmark", itemA.Classes);
+        Assert.Contains(":divider", itemA.Classes);
+
+        itemA.ClearOwnerState();
+        Assert.DoesNotContain(":inset", itemA.Classes);
+        Assert.DoesNotContain(":divider", itemA.Classes);
+
+        // Verify ItemInvoked event
+        object? invoked = null;
+        list.ItemInvoked += (_, e) => invoked = e.Item;
+        list.RaiseItemInvoked(itemB);
+        Assert.Same(itemB, invoked);
+
+        // Clearing items restores :empty state
+        list.ItemsSource = Array.Empty<VelaListBoxItem>();
+        Assert.Equal(0, list.ItemCount);
+        Assert.Contains(":empty", list.Classes);
+    }
 }

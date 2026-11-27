@@ -1,0 +1,307 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaListBoxItem}" TargetType="controls:VelaListBoxItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="FontSize" Value="13.5" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Padding" Value="12,7" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="0">
+          <Border x:Name="PART_Row"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  MinHeight="{TemplateBinding MinHeight}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12" />
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12" />
+              </Transitions>
+            </Border.Transitions>
+
+            <Grid>
+              <!-- Overlay 3px vertical accent selection pill (zero horizontal layout jitter) -->
+              <Border x:Name="PART_SelectionBar"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      Width="3"
+                      Height="16"
+                      Margin="3,0,0,0"
+                      CornerRadius="999"
+                      Background="{DynamicResource VelaControlOnBrush}"
+                      Opacity="0"
+                      RenderTransformOrigin="50%,50%"
+                      RenderTransform="scaleY(0.45)"
+                      IsHitTestVisible="False">
+                <Border.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.18" Easing="CubicEaseOut" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+
+              <DockPanel Margin="{TemplateBinding Padding}" LastChildFill="True">
+                <!-- Optional Leading Icon -->
+                <PathIcon x:Name="PART_Icon"
+                          DockPanel.Dock="Left"
+                          Width="15"
+                          Height="15"
+                          Margin="0,0,10,0"
+                          Data="{TemplateBinding Icon}"
+                          Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                          VerticalAlignment="Center"
+                          IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Optional Trailing Selection Checkmark -->
+                <PathIcon x:Name="PART_Check"
+                          DockPanel.Dock="Right"
+                          Width="14"
+                          Height="14"
+                          Margin="8,0,0,0"
+                          Data="{DynamicResource VelaIconCheck}"
+                          Foreground="{DynamicResource VelaControlOnBrush}"
+                          VerticalAlignment="Center"
+                          Opacity="0"
+                          IsVisible="False">
+                  <PathIcon.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+                    </Transitions>
+                  </PathIcon.Transitions>
+                </PathIcon>
+
+                <!-- Optional Trailing Badge / Metadata -->
+                <ContentPresenter x:Name="PART_Badge"
+                                  DockPanel.Dock="Right"
+                                  Margin="10,0,0,0"
+                                  VerticalAlignment="Center"
+                                  Content="{TemplateBinding Badge}"
+                                  TextElement.FontSize="12"
+                                  TextElement.Foreground="{DynamicResource VelaTextMutedBrush}"
+                                  IsVisible="{TemplateBinding Badge, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Primary Content + Optional Subtitle Description -->
+                <Grid RowDefinitions="*,Auto" VerticalAlignment="Center">
+                  <ContentPresenter x:Name="PART_ContentPresenter"
+                                    Grid.Row="0"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                  <TextBlock x:Name="PART_Description"
+                             Grid.Row="1"
+                             Margin="0,2,0,0"
+                             Text="{TemplateBinding Description}"
+                             FontSize="12"
+                             Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                             TextTrimming="CharacterEllipsis"
+                             IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </Grid>
+              </DockPanel>
+            </Grid>
+          </Border>
+
+          <!-- Optional 1px Hairline Divider -->
+          <Border x:Name="PART_Divider"
+                  Height="1"
+                  Margin="10,2,10,1"
+                  Background="{DynamicResource VelaBorderSubtleBrush}"
+                  IsVisible="False" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Density presets -->
+    <Style Selector="^:compact">
+      <Setter Property="MinHeight" Value="30" />
+      <Setter Property="Padding" Value="11,4" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="^:comfortable">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="Padding" Value="13,9" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="CornerRadius" Value="10" />
+    </Style>
+
+    <!-- Hover & Pressed states -->
+    <Style Selector="^:pointerover:not(:selected) /template/ Border#PART_Row">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:inset:pointerover:not(:selected) /template/ Border#PART_Row">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    </Style>
+
+    <!-- Selected state -->
+    <Style Selector="^:selected /template/ Border#PART_Row">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentSubtleBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ PathIcon#PART_Icon">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:selection-indicator:selected /template/ Border#PART_SelectionBar">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scaleY(1)" />
+    </Style>
+
+    <!-- Checkmark mode -->
+    <Style Selector="^:checkmark /template/ PathIcon#PART_Check">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:checkmark:selected /template/ PathIcon#PART_Check">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Divider mode -->
+    <Style Selector="^:divider /template/ Border#PART_Divider">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Keyboard Focus -->
+    <Style Selector="^:focus-visible /template/ Border#PART_Row">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
+    </Style>
+
+    <!-- Disabled -->
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaListBox}" TargetType="controls:VelaListBox">
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="5" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="ScrollViewer.IsScrollChainingEnabled" Value="True" />
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <VirtualizingStackPanel />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid RowDefinitions="Auto,*,Auto">
+            <!-- Optional Header Bar -->
+            <Border x:Name="PART_HeaderBorder"
+                    Grid.Row="0"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="12,9"
+                    IsVisible="{TemplateBinding Header, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <ContentPresenter Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                TextElement.FontSize="12.5"
+                                TextElement.FontWeight="SemiBold"
+                                TextElement.Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+            </Border>
+
+            <!-- Virtualized Scroll Body + Empty State -->
+            <Panel Grid.Row="1">
+              <ScrollViewer x:Name="PART_ScrollViewer"
+                            Background="Transparent"
+                            HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                            VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                            IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                            AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+                <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                Margin="{TemplateBinding Padding}"
+                                ItemsPanel="{TemplateBinding ItemsPanel}" />
+              </ScrollViewer>
+
+              <ContentPresenter x:Name="PART_EmptyHost"
+                                Content="{TemplateBinding EmptyContent}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="24"
+                                IsVisible="False">
+                <ContentPresenter.Styles>
+                  <Style Selector="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource VelaTextMutedBrush}" />
+                    <Setter Property="FontSize" Value="13" />
+                  </Style>
+                </ContentPresenter.Styles>
+              </ContentPresenter>
+            </Panel>
+
+            <!-- Optional Footer Bar -->
+            <Border x:Name="PART_FooterBorder"
+                    Grid.Row="2"
+                    Background="{DynamicResource VelaSurfaceBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="12,8"
+                    IsVisible="{TemplateBinding Footer, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <ContentPresenter Content="{TemplateBinding Footer}"
+                                ContentTemplate="{TemplateBinding FooterTemplate}"
+                                TextElement.FontSize="12.5"
+                                TextElement.Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Surface variants -->
+    <Style Selector="^:plain">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="^:plain /template/ Border#PART_HeaderBorder">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^:plain /template/ Border#PART_FooterBorder">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:inset">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderSubtleBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Padding" Value="5" />
+    </Style>
+    <Style Selector="^:inset /template/ Border#PART_HeaderBorder">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^:inset /template/ Border#PART_FooterBorder">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

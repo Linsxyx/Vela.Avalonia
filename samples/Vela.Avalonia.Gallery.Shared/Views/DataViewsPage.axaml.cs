@@ -185,6 +185,21 @@ public partial class DataViewsPage : UserControl
             ModulesTreeTable.VisibleCount,
             ModulesTreeTable.SelectedItems.Count,
             ModulesTreeTable.CheckedItems.Count);
+
+        vm.UpdateListBoxStatus(
+            WorkspaceListBox.SelectedItem,
+            ChannelsListBox.SelectedItems?.Count ?? 0);
+    }
+
+    private void OnListBoxStateChanged(object? sender, SelectionChangedEventArgs e) => SyncStatuses();
+
+    private void OnListBoxItemInvoked(object? sender, VelaDataItemEventArgs e)
+    {
+        if (DataContext is DataViewsViewModel vm)
+        {
+            var label = (e.Item as VelaListBoxItem)?.Content?.ToString() ?? e.Item.ToString() ?? string.Empty;
+            vm.NotifyItemInvoked("VelaListBox", label);
+        }
     }
 
     private void OnTreeExpandAll(object? sender, RoutedEventArgs e)

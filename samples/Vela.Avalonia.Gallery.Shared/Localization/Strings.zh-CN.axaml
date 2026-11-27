@@ -270,6 +270,14 @@
   <x:String x:Key="StrFilterModulesPlaceholder">搜索模块或控件...</x:String>
   <x:String x:Key="StrGridHint">点击表头排序 · 拖动列边调整宽度 · 双击列边恢复默认</x:String>
   <x:String x:Key="StrTreeTableHint">保留层级的树形排序 · 可拖拽列宽 · 弹簧旋转展开指示器</x:String>
+  <x:String x:Key="StrListBoxCard">卡片</x:String>
+  <x:String x:Key="StrListBoxInset">内凹</x:String>
+  <x:String x:Key="StrListBoxPlain">无边框</x:String>
+  <x:String x:Key="StrListBoxIndicator">指示条</x:String>
+  <x:String x:Key="StrListBoxCheckmarks">勾选图标</x:String>
+  <x:String x:Key="StrListBoxDividers">分割线</x:String>
+  <x:String x:Key="StrListBoxWorkspaceHeader">工作区列表</x:String>
+  <x:String x:Key="StrListBoxMultiHeader">多选发布渠道</x:String>
 
   <!-- Shaders & Glass -->
   <x:String x:Key="StrSdfRefraction">SDF 折射</x:String>
