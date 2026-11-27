@@ -291,6 +291,22 @@ public class VelaTrayIconTests
     }
 
     [Fact]
+    public void ResolveEffectivePresentation_UsesNativeOnLinuxForFlyoutModes()
+    {
+        // Linux resolves floating VelaMenu / VelaPopover to native DBusMenu
+        Assert.Equal(VelaTrayPresentation.Native, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.VelaMenu, isLinux: true));
+        Assert.Equal(VelaTrayPresentation.Native, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.VelaPopover, isLinux: true));
+        Assert.Equal(VelaTrayPresentation.Native, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.Native, isLinux: true));
+        Assert.Equal(VelaTrayPresentation.CommandOnly, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.CommandOnly, isLinux: true));
+
+        // macOS & Windows preserve all 4 modes
+        Assert.Equal(VelaTrayPresentation.VelaMenu, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.VelaMenu, isLinux: false));
+        Assert.Equal(VelaTrayPresentation.VelaPopover, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.VelaPopover, isLinux: false));
+        Assert.Equal(VelaTrayPresentation.Native, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.Native, isLinux: false));
+        Assert.Equal(VelaTrayPresentation.CommandOnly, VelaTrayIcon.ResolveEffectivePresentation(VelaTrayPresentation.CommandOnly, isLinux: false));
+    }
+
+    [Fact]
     public void VelaTrayIcon_CloseToTrayInterceptionRules()
     {
         // Intercepts user window close when CloseToTray is active

@@ -168,6 +168,14 @@ public class VelaTrayIcon : StyledElement, IDisposable
     /// <summary>Whether the Vela floating flyout window is currently visible.</summary>
     public bool IsFlyoutOpen => _flyoutWindow is { IsVisible: true };
 
+    /// <summary>
+    /// Effective presentation mode after applying platform policy.
+    /// On Linux, <see cref="VelaTrayPresentation.VelaMenu"/> and <see cref="VelaTrayPresentation.VelaPopover"/>
+    /// automatically resolve to <see cref="VelaTrayPresentation.Native"/> (<c>StatusNotifierItem</c> / <c>DBusMenu</c>).
+    /// </summary>
+    public VelaTrayPresentation EffectivePresentation =>
+        ResolveEffectivePresentation(Presentation, OperatingSystem.IsLinux());
+
     /// <summary>Whether the current runtime supports desktop system tray icons.</summary>
     public static bool IsPlatformSupported =>
         Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime;
@@ -303,10 +311,10 @@ public class VelaTrayIcon : StyledElement, IDisposable
         TargetWindow = null;
     }
 
-    /// <summary>Shows the Vela floating menu or popover flyout window.</summary>
+    /// <summary>Shows the Vela floating menu or popover flyout window (macOS &amp; Windows).</summary>
     public void ShowFlyout(PixelPoint? anchorPoint = null)
     {
-        if (_isDisposed)
+        if (_isDisposed || OperatingSystem.IsLinux())
             return;
 
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime)
@@ -510,6 +518,15 @@ public class VelaTrayIcon : StyledElement, IDisposable
         return !hasColoredOverlay;
     }
 
+    internal static VelaTrayPresentation ResolveEffectivePresentation(
+        VelaTrayPresentation requested,
+        bool isLinux)
+    {
+        if (isLinux && requested is VelaTrayPresentation.VelaMenu or VelaTrayPresentation.VelaPopover)
+            return VelaTrayPresentation.Native;
+        return requested;
+    }
+
     internal static bool ShouldInterceptWindowClose(
         bool closeToTray,
         bool allowRealClose,
@@ -559,7 +576,7 @@ public class VelaTrayIcon : StyledElement, IDisposable
             return;
         }
 
-        switch (Presentation)
+        switch (EffectivePresentation)
         {
             case VelaTrayPresentation.VelaMenu:
             case VelaTrayPresentation.VelaPopover:
@@ -609,7 +626,8 @@ public class VelaTrayIcon : StyledElement, IDisposable
 
         // On macOS, Avalonia's TrayIcon.Clicked is never raised (only NativeMenu works).
         // Use the native AppKit NSStatusItem bridge for interactive modes so clicks respond immediately.
-        var useMacStatusItem = OperatingSystem.IsMacOS() && Presentation != VelaTrayPresentation.Native;
+        var effective = EffectivePresentation;
+        var useMacStatusItem = OperatingSystem.IsMacOS() && effective != VelaTrayPresentation.Native;
         if (useMacStatusItem)
         {
             DisposeNativeAvaloniaTray(app);
@@ -643,7 +661,7 @@ public class VelaTrayIcon : StyledElement, IDisposable
 
                 // Assign Menu BEFORE adding to TrayIcon.Icons: Avalonia.Native caches the initial
                 // NativeMenu reference on attach and throws if replaced with a different instance later.
-                if (Presentation == VelaTrayPresentation.Native)
+                if (effective == VelaTrayPresentation.Native)
                 {
                     _nativeMenu = new NativeMenu();
                     PopulateNativeMenu(_nativeMenu);
@@ -727,7 +745,7 @@ public class VelaTrayIcon : StyledElement, IDisposable
         if (_nativeTray is null)
             return;
 
-        if (Presentation == VelaTrayPresentation.Native)
+        if (EffectivePresentation == VelaTrayPresentation.Native)
         {
             HideFlyout();
             if (createdNativeNow)
@@ -904,7 +922,7 @@ public class VelaTrayIcon : StyledElement, IDisposable
     private void OnAppThemeChanged(object? sender, EventArgs e)
     {
         ScheduleIconRefresh();
-        if (Presentation == VelaTrayPresentation.Native)
+        if (EffectivePresentation == VelaTrayPresentation.Native)
             SyncPresentation();
     }
 
@@ -934,13 +952,13 @@ public class VelaTrayIcon : StyledElement, IDisposable
             }
         }
 
-        if (Presentation == VelaTrayPresentation.Native)
+        if (EffectivePresentation == VelaTrayPresentation.Native)
             SyncPresentation();
     }
 
     private void OnMenuItemPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        if (Presentation == VelaTrayPresentation.Native)
+        if (EffectivePresentation == VelaTrayPresentation.Native)
             SyncPresentation();
     }
 

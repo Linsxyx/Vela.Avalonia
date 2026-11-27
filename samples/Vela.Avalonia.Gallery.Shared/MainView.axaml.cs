@@ -1454,9 +1454,12 @@ public partial class MainView : UserControl
             return;
         }
 
-        if (_trayIcon.Presentation is VelaTrayPresentation.Native or VelaTrayPresentation.CommandOnly)
+        if (_trayIcon.EffectivePresentation is VelaTrayPresentation.Native or VelaTrayPresentation.CommandOnly)
         {
-            ToastHost.Show("Presentation Mode", $"Current mode is {_trayIcon.Presentation}. Switch to VelaMenu or VelaPopover to open a Vela flyout.", VelaToastTone.Info);
+            var reason = OperatingSystem.IsLinux()
+                ? "Linux uses OS-native DBusMenu (StatusNotifierItem) for tray menus."
+                : $"Current mode is {_trayIcon.EffectivePresentation}. Switch to VelaMenu or VelaPopover to open a Vela flyout.";
+            ToastHost.Show("Presentation Mode", reason, VelaToastTone.Info);
             return;
         }
 
