@@ -218,7 +218,7 @@ public class VelaCommandPalette : ContentControl
             {
                 CornerRadius = new CornerRadius(20),
                 BorderThickness = new Thickness(1),
-                ClipToBounds = true,
+                ClipToBounds = false,
                 [!Border.BackgroundProperty] = host.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding(),
                 [!Border.BorderBrushProperty] = host.GetResourceObservable("VelaBorderBrush").ToBinding(),
                 [!Border.BoxShadowProperty] = host.GetResourceObservable("VelaShadowFloating").ToBinding(),

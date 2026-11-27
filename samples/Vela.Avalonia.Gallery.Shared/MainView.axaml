@@ -863,6 +863,7 @@
                       <vela:VelaSegmentedControl x:Name="OverlayMaterialSegmented" SelectedIndex="2">
                         <x:String>Solid</x:String>
                         <x:String>Frosted</x:String>
+                        <x:String>GlassCard</x:String>
                         <x:String>LiquidGlass</x:String>
                       </vela:VelaSegmentedControl>
                       <StackPanel Orientation="Horizontal" Spacing="8">
@@ -996,6 +997,14 @@
                                        Size="Small"
                                        Content="Custom Form Dialog"
                                        Click="OnShowCustomDialogClick" />
+                      <vela:VelaButton Variant="Secondary"
+                                       Size="Small"
+                                       Content="Glass Card Dialog"
+                                       Click="OnShowGlassCardDialogClick" />
+                      <vela:VelaButton Variant="Secondary"
+                                       Size="Small"
+                                       Content="Pinned Glass (Bounce)"
+                                       Click="OnShowPinnedGlassDialogClick" />
                     </WrapPanel>
                   </StackPanel>
                 </Border>

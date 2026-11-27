@@ -62,7 +62,7 @@ public class VelaDockItem : AvaloniaObject
 /// - Detached circular Search Orb that smoothly morphs into an expanded search pill while the tab bar
 ///   simultaneously compacts into an active-tab return orb (and cleanly restores on Escape/close/tap)
 /// </summary>
-[PseudoClasses(":search-expanded", ":solid", ":frosted", ":glass")]
+[PseudoClasses(":search-expanded", ":solid", ":frosted", ":glass-card", ":glass")]
 public class VelaDockBar : TemplatedControl
 {
     public static readonly StyledProperty<int> SelectedIndexProperty =
@@ -654,11 +654,13 @@ public class VelaDockBar : TemplatedControl
     {
         PseudoClasses.Set(":solid", Material == VelaSurfaceMaterial.Solid);
         PseudoClasses.Set(":frosted", Material == VelaSurfaceMaterial.Frosted);
+        PseudoClasses.Set(":glass-card", Material == VelaSurfaceMaterial.GlassCard);
         PseudoClasses.Set(":glass", Material == VelaSurfaceMaterial.LiquidGlass);
 
         var blur = Material switch
         {
             VelaSurfaceMaterial.Frosted => new BlurEffect { Radius = 18 },
+            VelaSurfaceMaterial.GlassCard => new BlurEffect { Radius = 64 },
             VelaSurfaceMaterial.LiquidGlass => new BlurEffect { Radius = 10 },
             _ => null,
         };

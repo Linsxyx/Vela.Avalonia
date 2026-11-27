@@ -113,7 +113,7 @@ public class VelaDrawerHost : ContentControl
                 Margin = new Thickness(12),
                 CornerRadius = new CornerRadius(20),
                 BorderThickness = new Thickness(1),
-                ClipToBounds = true,
+                ClipToBounds = false,
                 RenderTransform = _sheetTranslate,
                 [!Border.BackgroundProperty] = host.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding(),
                 [!Border.BorderBrushProperty] = host.GetResourceObservable("VelaBorderBrush").ToBinding(),
@@ -156,11 +156,34 @@ public class VelaDrawerHost : ContentControl
         _sheet.HorizontalAlignment = opts.Side == VelaDrawerSide.Left ? HorizontalAlignment.Left : HorizontalAlignment.Right;
         var chrome = BuildDrawerChrome(body, opts);
 
-        if (opts.Material == VelaSurfaceMaterial.LiquidGlass)
+        if (opts.Material == VelaSurfaceMaterial.GlassCard)
         {
             _sheet.BackdropEffect = null;
             _sheet.Background = Brushes.Transparent;
+            _sheet.BorderBrush = Brushes.Transparent;
             _sheet.BorderThickness = new Thickness(0);
+            _sheet.BoxShadow = default;
+            _sheet.ClipToBounds = false;
+            _sheet.Child = new VelaGlassCard
+            {
+                CornerRadius = new CornerRadius(20),
+                Padding = new Thickness(0),
+                BlurRadius = 80,
+                BlurBackground = true,
+                TintLevel = VelaGlassTintLevel.HighContrast,
+                RimThickness = new Thickness(1.2),
+                Content = chrome,
+                [!VelaGlassCard.CardShadowProperty] = this.GetResourceObservable("VelaShadowFloating").ToBinding(),
+            };
+        }
+        else if (opts.Material == VelaSurfaceMaterial.LiquidGlass)
+        {
+            _sheet.BackdropEffect = null;
+            _sheet.Background = Brushes.Transparent;
+            _sheet.BorderBrush = Brushes.Transparent;
+            _sheet.BorderThickness = new Thickness(0);
+            _sheet.BoxShadow = default;
+            _sheet.ClipToBounds = false;
             _sheet.Child = new VelaLiquidGlass
             {
                 CornerRadius = new CornerRadius(20),
@@ -175,17 +198,35 @@ public class VelaDrawerHost : ContentControl
         }
         else if (opts.Material == VelaSurfaceMaterial.Frosted)
         {
-            _sheet.BackdropEffect = new BlurEffect { Radius = 14 };
-            _sheet.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaLiquidGlassTintBrush"));
+            _sheet.ClipToBounds = false;
+            _sheet.BackdropEffect = null;
+            _sheet.Background = Brushes.Transparent;
+            _sheet.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaGlassCardOuterHairlineBrush"));
+            _sheet.Bind(Border.BoxShadowProperty, this.GetResourceObservable("VelaShadowFloating"));
             _sheet.BorderThickness = new Thickness(1);
-            _sheet.Child = chrome;
+            _sheet.Child = new Border
+            {
+                CornerRadius = new CornerRadius(20),
+                ClipToBounds = true,
+                BackdropEffect = new BlurEffect { Radius = 14 },
+                Child = chrome,
+                [!Border.BackgroundProperty] = this.GetResourceObservable("VelaLiquidGlassTintBrush").ToBinding(),
+            };
         }
         else
         {
+            _sheet.ClipToBounds = false;
             _sheet.BackdropEffect = null;
             _sheet.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaSurfaceRaisedBrush"));
+            _sheet.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaBorderBrush"));
+            _sheet.Bind(Border.BoxShadowProperty, this.GetResourceObservable("VelaShadowFloating"));
             _sheet.BorderThickness = new Thickness(1);
-            _sheet.Child = chrome;
+            _sheet.Child = new Border
+            {
+                CornerRadius = new CornerRadius(20),
+                ClipToBounds = true,
+                Child = chrome,
+            };
         }
 
         var offscreenX = opts.Side == VelaDrawerSide.Left ? -(opts.Width + 24) : (opts.Width + 24);
@@ -291,11 +332,12 @@ public class VelaDrawerHost : ContentControl
         Grid.SetColumn(closeBtn, 1);
         headerGrid.Children.Add(closeBtn);
 
+        var dividerKey = opts.Material == VelaSurfaceMaterial.Solid ? "VelaBorderSubtleBrush" : "VelaGlassDividerBrush";
         var headerBorder = new Border
         {
             Padding = new Thickness(20, 18),
             BorderThickness = new Thickness(0, 0, 0, 1),
-            [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+            [!Border.BorderBrushProperty] = this.GetResourceObservable(dividerKey).ToBinding(),
             Child = headerGrid,
         };
         DockPanel.SetDock(headerBorder, Dock.Top);

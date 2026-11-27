@@ -14,6 +14,7 @@
   </ResourceDictionary.ThemeDictionaries>
 
   <ControlTheme x:Key="{x:Type controls:VelaLiquidGlass}" TargetType="controls:VelaLiquidGlass">
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="CornerRadius" Value="24" />
     <Setter Property="Padding" Value="18,14" />
     <Setter Property="GlassTint" Value="{DynamicResource VelaLiquidGlassTintBrush}" />

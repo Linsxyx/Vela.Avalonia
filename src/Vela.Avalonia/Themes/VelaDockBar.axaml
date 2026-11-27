@@ -3,18 +3,21 @@
                     xmlns:controls="using:Vela.Avalonia.Controls">
 
   <ControlTheme x:Key="{x:Type controls:VelaDockBar}" TargetType="controls:VelaDockBar">
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="HorizontalAlignment" Value="Center" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Orientation="Horizontal"
                     Spacing="10"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center"
+                    ClipToBounds="False">
           <!-- Main Floating Tab Pill -->
           <Border x:Name="PART_TabsShell"
                   Height="{TemplateBinding DockHeight}"
                   CornerRadius="999"
                   BorderThickness="1"
+                  ClipToBounds="False"
                   BoxShadow="{DynamicResource VelaShadowFloating}">
             <Border CornerRadius="999" ClipToBounds="True">
               <Grid>
@@ -77,6 +80,7 @@
                   Height="{TemplateBinding DockHeight}"
                   CornerRadius="999"
                   BorderThickness="1"
+                  ClipToBounds="False"
                   BoxShadow="{DynamicResource VelaShadowFloating}"
                   IsVisible="{TemplateBinding ShowSearch}">
             <Border CornerRadius="999" ClipToBounds="True">
@@ -166,6 +170,15 @@
     <Style Selector="^:frosted /template/ Border#PART_TabsSurface, ^:frosted /template/ Border#PART_SearchSurface">
       <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
       <Setter Property="Opacity" Value="0.72" />
+    </Style>
+
+    <!-- SukiUI-inspired GlassCard Material -->
+    <Style Selector="^:glass-card /template/ Border#PART_TabsShell, ^:glass-card /template/ Border#PART_SearchShell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaGlassCloseBorderBrush}" />
+    </Style>
+    <Style Selector="^:glass-card /template/ Border#PART_TabsSurface, ^:glass-card /template/ Border#PART_SearchSurface">
+      <Setter Property="Background" Value="{DynamicResource VelaGlassCardBlurTintHighBrush}" />
+      <Setter Property="Opacity" Value="1.0" />
     </Style>
 
     <!-- LiquidGlass Material (real GPU optical refraction + Fresnel rim) -->

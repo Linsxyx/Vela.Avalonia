@@ -3,6 +3,7 @@
                     xmlns:controls="using:Vela.Avalonia.Controls">
 
   <ControlTheme x:Key="{x:Type controls:VelaMetricCard}" TargetType="controls:VelaMetricCard">
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />

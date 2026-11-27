@@ -3,6 +3,7 @@
                     xmlns:controls="using:Vela.Avalonia.Controls">
 
   <ControlTheme x:Key="{x:Type controls:VelaFloatingBar}" TargetType="controls:VelaFloatingBar">
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">

@@ -22,6 +22,7 @@
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAlert.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAccordion.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaLiquidGlass.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaGlassCard.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaConfirmMorph.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaScrubInput.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaFloatingBar.axaml" />

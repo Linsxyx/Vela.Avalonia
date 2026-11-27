@@ -13,4 +13,10 @@ public enum VelaSurfaceMaterial
 
     /// <summary>Full optical Liquid Glass surface with SkSL SDF bevel refraction, dispersion, and specular rim.</summary>
     LiquidGlass,
+
+    /// <summary>
+    /// SukiUI-inspired deep frosted glass card with high-radius retained GPU blur,
+    /// high-contrast milky/cool-slate tint veil, and aspect-compensated diagonal luminous rim border.
+    /// </summary>
+    GlassCard,
 }

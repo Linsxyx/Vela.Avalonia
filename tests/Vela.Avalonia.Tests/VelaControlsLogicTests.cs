@@ -1,4 +1,6 @@
+using Avalonia;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Tokens;
 using Xunit;
 
 namespace Vela.Avalonia.Tests;
@@ -136,5 +138,56 @@ public class VelaControlsLogicTests
         hold.Reset();
         Assert.False(hold.IsConfirmed);
         Assert.Equal("Hold to delete", hold.DisplayLabel);
+    }
+
+    [Fact]
+    public void VelaGlassCard_HasSukiInspiredDefaults()
+    {
+        var card = new VelaGlassCard();
+        Assert.Equal(80.0, card.BlurRadius);
+        Assert.True(card.BlurBackground);
+        Assert.Equal(VelaGlassTintLevel.HighContrast, card.TintLevel);
+        Assert.Equal(new Thickness(1.2), card.RimThickness);
+    }
+
+    [Fact]
+    public void VelaGlassRimBorder_ComputesAspectCompensatedDiagonalGradient()
+    {
+        var (sqStart, sqEnd) = VelaGlassRimBorder.ComputeDiagonalGradientPoints(new Size(300, 300));
+        var (wideStart, wideEnd) = VelaGlassRimBorder.ComputeDiagonalGradientPoints(new Size(440, 220));
+        var (emptyStart, emptyEnd) = VelaGlassRimBorder.ComputeDiagonalGradientPoints(new Size(0, 0));
+
+        // Wide rectangle (aspect 2:1) expands vertical gradient endpoints further than square
+        Assert.Equal(0.2, sqStart.Point.X, 4);
+        Assert.Equal(0.8, sqEnd.Point.X, 4);
+        Assert.True(wideStart.Point.Y < sqStart.Point.Y);
+        Assert.True(wideEnd.Point.Y > sqEnd.Point.Y);
+
+        // Degenerate zero bounds fall back safely without NaN/Infinity
+        Assert.True(double.IsFinite(emptyStart.Point.Y));
+        Assert.True(double.IsFinite(emptyEnd.Point.Y));
+    }
+
+    [Fact]
+    public void VelaDialogHost_ResolvesDefaultAndOverrideMaterialAndStyle()
+    {
+        var host = new VelaDialogHost();
+        Assert.Equal(VelaSurfaceMaterial.Solid, host.DefaultMaterial);
+        Assert.Equal(VelaDialogStyle.Standard, host.DefaultStyle);
+
+        host.DefaultMaterial = VelaSurfaceMaterial.GlassCard;
+        host.DefaultStyle = VelaDialogStyle.Centered;
+
+        Assert.Equal(VelaSurfaceMaterial.GlassCard, VelaDialogHost.ResolveMaterial(null, host.DefaultMaterial));
+        Assert.Equal(VelaSurfaceMaterial.LiquidGlass, VelaDialogHost.ResolveMaterial(VelaSurfaceMaterial.LiquidGlass, host.DefaultMaterial));
+
+        Assert.Equal(VelaDialogStyle.Centered, VelaDialogHost.ResolveStyle(null, host.DefaultStyle));
+        Assert.Equal(VelaDialogStyle.Standard, VelaDialogHost.ResolveStyle(VelaDialogStyle.Standard, host.DefaultStyle));
+
+        var opts = new VelaDialogOptions();
+        Assert.Null(opts.Material);
+        Assert.Null(opts.Style);
+        Assert.Equal(VelaDialogTone.Neutral, opts.Tone);
+        Assert.Equal(80.0, opts.GlassBlurRadius);
     }
 }

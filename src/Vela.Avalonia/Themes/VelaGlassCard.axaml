@@ -1,0 +1,100 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <!-- SukiUI-inspired high-clarity milky glass tint & luminous diagonal rim -->
+      <SolidColorBrush x:Key="VelaGlassCardBlurTintSubtleBrush" Color="#59FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassCardBlurTintHighBrush" Color="#78FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassCardSheenBrush" Color="#70FDFEFE" />
+      <SolidColorBrush x:Key="VelaGlassCardOuterHairlineBrush" Color="#220F172A" />
+      <Color x:Key="VelaGlassRimStartColor">#F5FFFFFF</Color>
+      <Color x:Key="VelaGlassRimMidColor">#2494A3B8</Color>
+      <Color x:Key="VelaGlassRimEndColor">#A8CBD5E1</Color>
+
+      <!-- Glass-aware chrome helpers (dividers & close buttons on glass overlays) -->
+      <SolidColorBrush x:Key="VelaGlassDividerBrush" Color="#1A0F172A" />
+      <SolidColorBrush x:Key="VelaGlassCloseBackgroundBrush" Color="#140F172A" />
+      <SolidColorBrush x:Key="VelaGlassCloseBorderBrush" Color="#200F172A" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <!-- SukiUI-inspired deep cool blue-slate smoky glass tint & luminous diagonal rim -->
+      <SolidColorBrush x:Key="VelaGlassCardBlurTintSubtleBrush" Color="#99262B3A" />
+      <SolidColorBrush x:Key="VelaGlassCardBlurTintHighBrush" Color="#B3262B3A" />
+      <SolidColorBrush x:Key="VelaGlassCardSheenBrush" Color="#1EAAAAAA" />
+      <SolidColorBrush x:Key="VelaGlassCardOuterHairlineBrush" Color="#14FFFFFF" />
+      <Color x:Key="VelaGlassRimStartColor">#72FFFFFF</Color>
+      <Color x:Key="VelaGlassRimMidColor">#0AFFFFFF</Color>
+      <Color x:Key="VelaGlassRimEndColor">#40FFFFFF</Color>
+
+      <!-- Glass-aware chrome helpers (dividers & close buttons on glass overlays) -->
+      <SolidColorBrush x:Key="VelaGlassDividerBrush" Color="#1CFFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassCloseBackgroundBrush" Color="#18FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassCloseBorderBrush" Color="#26FFFFFF" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <ControlTheme x:Key="{x:Type controls:VelaGlassCard}" TargetType="controls:VelaGlassCard">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="CornerRadius" Value="24" />
+    <Setter Property="Padding" Value="20" />
+    <Setter Property="RimThickness" Value="1.2" />
+    <Setter Property="CardShadow" Value="{DynamicResource VelaShadowRaised}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border CornerRadius="{TemplateBinding CornerRadius}"
+                BoxShadow="{TemplateBinding CardShadow}">
+          <Panel>
+            <!-- Layer 1: Retained high-radius GPU BackdropEffect blur + contrast tint veil -->
+            <Border x:Name="PART_BlurBackdrop"
+                    IsVisible="{TemplateBinding BlurBackground}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True"
+                    BackdropEffectCache="Retained"
+                    IsHitTestVisible="False" />
+
+            <!-- Layer 2: Subtle outer framing hairline (keeps light-mode glass crisp on white backgrounds) -->
+            <Border CornerRadius="{TemplateBinding CornerRadius}"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource VelaGlassCardOuterHairlineBrush}"
+                    Background="Transparent"
+                    IsHitTestVisible="False" />
+
+            <!-- Layer 3: Frosted sheen + aspect-ratio-compensated diagonal luminous specular rim -->
+            <controls:VelaGlassRimBorder x:Name="PART_RimBorder"
+                                         CornerRadius="{TemplateBinding CornerRadius}"
+                                         Background="{DynamicResource VelaGlassCardSheenBrush}"
+                                         BorderThickness="{TemplateBinding RimThickness}"
+                                         RimStartColor="{DynamicResource VelaGlassRimStartColor}"
+                                         RimMidColor="{DynamicResource VelaGlassRimMidColor}"
+                                         RimEndColor="{DynamicResource VelaGlassRimEndColor}"
+                                         IsHitTestVisible="False" />
+
+            <!-- Layer 4: Clipped sharp foreground content -->
+            <Border CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Border>
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^[TintLevel=None] /template/ Border#PART_BlurBackdrop">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^[TintLevel=Standard] /template/ Border#PART_BlurBackdrop">
+      <Setter Property="Background" Value="{DynamicResource VelaGlassCardBlurTintSubtleBrush}" />
+    </Style>
+    <Style Selector="^[TintLevel=HighContrast] /template/ Border#PART_BlurBackdrop">
+      <Setter Property="Background" Value="{DynamicResource VelaGlassCardBlurTintHighBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

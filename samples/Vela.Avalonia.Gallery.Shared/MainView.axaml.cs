@@ -302,7 +302,8 @@ public partial class MainView : UserControl
     private VelaSurfaceMaterial GetSelectedOverlayMaterial() => OverlayMaterialSegmented.SelectedIndex switch
     {
         1 => VelaSurfaceMaterial.Frosted,
-        2 => VelaSurfaceMaterial.LiquidGlass,
+        2 => VelaSurfaceMaterial.GlassCard,
+        3 => VelaSurfaceMaterial.LiquidGlass,
         _ => VelaSurfaceMaterial.Solid,
     };
 
@@ -312,10 +313,12 @@ public partial class MainView : UserControl
         var ok = await DialogHost.ShowConfirmAsync(new VelaConfirmDialogOptions
         {
             Title = $"Dialog · {material} Material",
-            Description = "Every Vela overlay defaults to Solid and can opt into Frosted (BackdropEffect) or full optical LiquidGlass with one property.",
+            Description = "Every Vela overlay defaults to Solid and can opt into Frosted, Suki-inspired GlassCard (deep retained blur + diagonal specular rim), or full optical LiquidGlass with one property.",
             ConfirmText = "Looks great",
             CancelText = "Close",
             Material = material,
+            Style = material == VelaSurfaceMaterial.GlassCard ? VelaDialogStyle.Centered : VelaDialogStyle.Standard,
+            Tone = material == VelaSurfaceMaterial.GlassCard ? VelaDialogTone.Accent : VelaDialogTone.Neutral,
         });
 
         if (ok)
@@ -735,6 +738,45 @@ public partial class MainView : UserControl
         {
             ToastHost.Show("Project created", $"Workspace \"{createdName}\" is ready.", VelaToastTone.Success);
         }
+    }
+
+    private async void OnShowGlassCardDialogClick(object? sender, RoutedEventArgs e)
+    {
+        var ok = await DialogHost.ShowConfirmAsync(new VelaConfirmDialogOptions
+        {
+            Title = "Enable Cloud Sync?",
+            Description = "Your theme preferences, workspace layouts, and pinned panels will sync smoothly across desktop devices using Suki-inspired frosted glass styling.",
+            ConfirmText = "Enable Sync",
+            CancelText = "Not now",
+            Material = VelaSurfaceMaterial.GlassCard,
+            Style = VelaDialogStyle.Centered,
+            Tone = VelaDialogTone.Accent,
+        });
+
+        ToastHost.Show(
+            ok ? "Cloud Sync enabled" : "Sync skipped",
+            ok ? "Workspace preferences are now synced." : "You can enable Cloud Sync anytime in Settings.",
+            ok ? VelaToastTone.Success : VelaToastTone.Neutral);
+    }
+
+    private async void OnShowPinnedGlassDialogClick(object? sender, RoutedEventArgs e)
+    {
+        var ok = await DialogHost.ShowConfirmAsync(new VelaConfirmDialogOptions
+        {
+            Title = "Revoke Production API Key?",
+            Description = "This dialog is pinned — clicking the dimmed backdrop bounces it back on spring physics until you choose an explicit action.",
+            ConfirmText = "Revoke Key",
+            CancelText = "Keep Active",
+            IsDestructive = true,
+            CloseOnBackdropClick = false,
+            ShowCloseButton = false,
+            Material = VelaSurfaceMaterial.GlassCard,
+            Style = VelaDialogStyle.Centered,
+            Tone = VelaDialogTone.Danger,
+        });
+
+        if (ok)
+            ToastHost.Show("API key revoked", "All active tokens using this key were invalidated.", VelaToastTone.Danger);
     }
 
     private void OnToastSuccessClick(object? sender, RoutedEventArgs e)
