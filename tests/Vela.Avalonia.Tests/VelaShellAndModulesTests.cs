@@ -2,6 +2,7 @@ using System.Windows.Input;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using SkiaSharp;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.Tokens;
 using Xunit;
@@ -173,5 +174,23 @@ public class VelaShellAndModulesTests
         Assert.Equal(Stretch.UniformToFill, layer.Stretch);
         Assert.Equal(0.0, layer.OverlayOpacity);
         Assert.False(layer.IsHitTestVisible);
+    }
+
+    [Fact]
+    public void VelaLiquidGlassLens_ClampsSnapshotRegionToDeviceClipBounds()
+    {
+        var fullDeviceRect = new SKRect(40, 448, 360, 516);
+
+        // Full window redraw: keeps complete control bounds
+        var fullClip = new SKRectI(0, 0, 2000, 1400);
+        Assert.Equal(new SKRectI(40, 448, 360, 516), VelaLiquidGlassLens.ComputeSnapshotRegion(fullDeviceRect, fullClip));
+
+        // Partial dirty-rect redraw overlapping only the right endcap: never reads stale pixels left of clip.Left
+        var partialClip = new SKRectI(326, 400, 700, 600);
+        Assert.Equal(new SKRectI(326, 448, 360, 516), VelaLiquidGlassLens.ComputeSnapshotRegion(fullDeviceRect, partialClip));
+
+        // Disjoint dirty-rect: returns empty
+        var disjointClip = new SKRectI(400, 400, 700, 600);
+        Assert.True(VelaLiquidGlassLens.ComputeSnapshotRegion(fullDeviceRect, disjointClip).IsEmpty);
     }
 }

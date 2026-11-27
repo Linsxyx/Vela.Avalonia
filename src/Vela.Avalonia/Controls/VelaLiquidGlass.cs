@@ -73,6 +73,21 @@ public sealed class VelaLiquidGlassLens : Control
             isDark));
     }
 
+    internal static SKRectI ComputeSnapshotRegion(SKRect deviceRect, SKRectI deviceClipBounds)
+    {
+        if (deviceClipBounds.IsEmpty)
+            return SKRectI.Empty;
+
+        var left = Math.Max(Math.Max(0, deviceClipBounds.Left), (int)MathF.Floor(deviceRect.Left));
+        var top = Math.Max(Math.Max(0, deviceClipBounds.Top), (int)MathF.Floor(deviceRect.Top));
+        var right = Math.Min(deviceClipBounds.Right, (int)MathF.Ceiling(deviceRect.Right));
+        var bottom = Math.Min(deviceClipBounds.Bottom, (int)MathF.Ceiling(deviceRect.Bottom));
+
+        return right > left && bottom > top
+            ? new SKRectI(left, top, right, bottom)
+            : SKRectI.Empty;
+    }
+
     private sealed class LiquidGlassDrawOp : ICustomDrawOperation
     {
         private static readonly SKRuntimeEffect? ShaderEffect = CompileShader();
@@ -160,15 +175,11 @@ public sealed class VelaLiquidGlassLens : Control
             radii[3] = ClampR(_corners.BottomLeft);
 
             var localRect = SKRect.Create(w, h);
-            // Refraction bends inward (-n), so sampling stays cleanly inside the frosted glass bounds.
+            // Intersect with DeviceClipBounds so partial dirty-rect redraws never snapshot stale
+            // previous-frame foreground/refraction pixels outside the freshly cleared clip region.
             var deviceRect = totalMatrix.MapRect(localRect);
-
-            var left = Math.Max(0, (int)MathF.Floor(deviceRect.Left));
-            var top = Math.Max(0, (int)MathF.Floor(deviceRect.Top));
-            var right = Math.Max(left + 1, (int)MathF.Ceiling(deviceRect.Right));
-            var bottom = Math.Max(top + 1, (int)MathF.Ceiling(deviceRect.Bottom));
-            var region = new SKRectI(left, top, right, bottom);
-            if (region.Width <= 0 || region.Height <= 0)
+            var region = ComputeSnapshotRegion(deviceRect, canvas.DeviceClipBounds);
+            if (region.IsEmpty)
                 return;
 
             using var snapshot = surface.Snapshot(region);
