@@ -90,6 +90,8 @@ public class VelaLineChart : Control
         VelaTheme.AccentChanged += OnAccentChanged;
         if (!_hasRevealed && Series is { Count: > 0 })
             OnSeriesChanged();
+        else if (_hasRevealed)
+            _runner.Wake();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

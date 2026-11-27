@@ -91,6 +91,8 @@ public class VelaDonutChart : Control
         VelaTheme.AccentChanged += OnAccentChanged;
         if (!_hasRevealed && Data is { Count: > 0 })
             OnDataChanged();
+        else if (_hasRevealed)
+            _runner.Wake();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

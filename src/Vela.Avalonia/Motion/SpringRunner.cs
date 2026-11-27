@@ -18,6 +18,7 @@ public sealed class SpringRunner
     private readonly Func<double, bool> _onTick;
     private TopLevelSpringPump? _pump;
     private bool _running;
+    private bool _pendingAttach;
 
     public bool IsRunning => _running;
 
@@ -35,10 +36,15 @@ public sealed class SpringRunner
         var topLevel = TopLevel.GetTopLevel(_owner);
         if (topLevel is null)
         {
-            _onTick(0.016);
+            if (_onTick(0.016) && !_pendingAttach)
+            {
+                _pendingAttach = true;
+                _owner.AttachedToVisualTree += OnOwnerAttachedToVisualTree;
+            }
             return;
         }
 
+        ClearPendingAttach();
         _running = true;
         _pump = Pumps.GetValue(topLevel, static tl => new TopLevelSpringPump(tl));
         _pump.Add(this);
@@ -46,12 +52,28 @@ public sealed class SpringRunner
 
     public void Stop()
     {
+        ClearPendingAttach();
         if (!_running)
             return;
 
         _running = false;
         _pump?.Remove(this);
         _pump = null;
+    }
+
+    private void OnOwnerAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        ClearPendingAttach();
+        Wake();
+    }
+
+    private void ClearPendingAttach()
+    {
+        if (!_pendingAttach)
+            return;
+
+        _pendingAttach = false;
+        _owner.AttachedToVisualTree -= OnOwnerAttachedToVisualTree;
     }
 
     private bool Step(double dt)
