@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 using Vela.Avalonia.Gallery.ViewModels;
 using Vela.Avalonia.Tokens;
@@ -15,6 +16,7 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         Theme = Styles.OfType<VelaTheme>().FirstOrDefault();
+        Loc.Instance.InitializeFromSystem();
     }
 
     public override void OnFrameworkInitializationCompleted()

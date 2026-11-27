@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 using Vela.Avalonia.Gallery.ViewModels;
 using Vela.Avalonia.Gallery.Views;
@@ -15,6 +16,7 @@ public partial class MainView : UserControl
     {
         InitializeComponent();
         RootNav.PageFactory = CreatePage;
+        Loc.Instance.LanguageChanged += OnLanguageChanged;
     }
 
     public void Initialize(GalleryShellService shell, MainViewModel viewModel, VelaTrayIcon? trayIcon = null)
@@ -31,14 +33,27 @@ public partial class MainView : UserControl
             navigationView: RootNav,
             navigateAction: NavigateToKey);
 
-        CommandPalette.Commands.Clear();
-        foreach (var cmd in viewModel.BuildCommandPaletteItems())
-            CommandPalette.Commands.Add(cmd);
+        RebuildCommandPalette();
 
         if (trayIcon is not null)
             viewModel.SystemTray.AttachTrayIcon(trayIcon);
         else
             viewModel.SystemTray.EnsurePreviewTrayAttached();
+    }
+
+    private void OnLanguageChanged(AppLanguage _)
+    {
+        RebuildCommandPalette();
+    }
+
+    private void RebuildCommandPalette()
+    {
+        if (_viewModel is null)
+            return;
+
+        CommandPalette.Commands.Clear();
+        foreach (var cmd in _viewModel.BuildCommandPaletteItems())
+            CommandPalette.Commands.Add(cmd);
     }
 
     private object? CreatePage(object item)

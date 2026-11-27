@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.ViewModels;
 
 namespace Vela.Avalonia.Gallery.Views;
@@ -11,6 +12,22 @@ public partial class ActionsPage : UserControl
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+        SyncFloatingBarLabels();
+        Loc.Instance.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(AppLanguage _) => SyncFloatingBarLabels();
+
+    private void SyncFloatingBarLabels()
+    {
+        var loc = Loc.Instance;
+        if (ShowcaseFloatingBar.Items.Count >= 5)
+        {
+            ShowcaseFloatingBar.Items[0].Label = loc.Get("StrEdit");
+            ShowcaseFloatingBar.Items[1].Label = loc.Get("StrCopy");
+            ShowcaseFloatingBar.Items[2].Label = loc.Get("StrShare");
+            ShowcaseFloatingBar.Items[4].ToolTipText = loc.Get("StrDelete");
+        }
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)
@@ -30,9 +47,9 @@ public partial class ActionsPage : UserControl
         HoldNeutralBtn.Reset();
     }
 
-    private void OnSplitProdClick(object? sender, EventArgs e) => _vm?.SetSplitModeCommand.Execute("Deploy now");
-    private void OnSplitStagingClick(object? sender, EventArgs e) => _vm?.SetSplitModeCommand.Execute("Deploy staging");
-    private void OnSplitDownloadClick(object? sender, EventArgs e) => _vm?.SetSplitModeCommand.Execute("Download");
+    private void OnSplitProdClick(object? sender, EventArgs e) => _vm?.SetSplitModeCommand.Execute("StrDeployNow");
+    private void OnSplitStagingClick(object? sender, EventArgs e) => _vm?.SetSplitModeCommand.Execute("StrDeployStaging");
+    private void OnSplitDownloadClick(object? sender, EventArgs e) => _vm?.SetSplitModeCommand.Execute("StrDownload");
     private void OnSplitRollbackClick(object? sender, EventArgs e) => _vm?.SplitRollbackCommand.Execute(null);
     private void OnSplitCopyLinkClick(object? sender, EventArgs e) => _vm?.SplitCopyLinkCommand.Execute(null);
     private void OnSplitExportMdClick(object? sender, EventArgs e) => _vm?.SplitExportMdCommand.Execute(null);

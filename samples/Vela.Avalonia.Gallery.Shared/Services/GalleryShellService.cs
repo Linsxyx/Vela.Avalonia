@@ -4,6 +4,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Tokens;
 
 namespace Vela.Avalonia.Gallery.Services;
@@ -61,22 +62,23 @@ public sealed class GalleryShellService : IGalleryShellService
         if (_dialogHost is null)
             return null;
 
+        var loc = Loc.Instance;
         var nameInput = new VelaInput
         {
-            Label = "Project name",
+            Label = loc.Get("StrProjectName"),
             PlaceholderText = "Vela Desktop Studio",
             IsClearable = true,
         };
 
-        var cancelBtn = new VelaButton { Variant = VelaButtonVariant.Secondary, Size = VelaControlSize.Small, Content = "Cancel" };
-        var createBtn = new VelaButton { Variant = VelaButtonVariant.Primary, Size = VelaControlSize.Small, Content = "Create" };
+        var cancelBtn = new VelaButton { Variant = VelaButtonVariant.Secondary, Size = VelaControlSize.Small, Content = loc.Get("StrCancel") };
+        var createBtn = new VelaButton { Variant = VelaButtonVariant.Primary, Size = VelaControlSize.Small, Content = loc.Get("StrCreate") };
 
         cancelBtn.Click += (_, _) => _dialogHost.Close(null);
         createBtn.Click += (_, _) =>
         {
             if (string.IsNullOrWhiteSpace(nameInput.Text))
             {
-                nameInput.ErrorMessage = "Project name is required.";
+                nameInput.ErrorMessage = loc.Get("StrProjectRequired");
                 return;
             }
             _dialogHost.Close(nameInput.Text.Trim());
@@ -100,8 +102,8 @@ public sealed class GalleryShellService : IGalleryShellService
 
         return await _dialogHost.ShowAsync<string>(content, new VelaDialogOptions
         {
-            Title = "New Project",
-            Description = "Enter a workspace name.",
+            Title = loc.Get("StrNewProject"),
+            Description = loc.Get("StrEnterWorkspaceName"),
         });
     }
 

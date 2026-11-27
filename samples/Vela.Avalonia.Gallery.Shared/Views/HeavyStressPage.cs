@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 
 namespace Vela.Avalonia.Gallery.Views;
 
@@ -15,11 +16,18 @@ public sealed class HeavyStressPage : UserControl, IVelaNavigationAware
     private readonly int _instanceId;
     private int _attachCount;
     private int _navigatedToCount;
+    private readonly TextBlock _titleText;
     private readonly TextBlock _statsText;
 
     public HeavyStressPage()
     {
         _instanceId = ++_totalInstancesCreated;
+
+        _titleText = new TextBlock
+        {
+            FontSize = 20,
+            FontWeight = FontWeight.SemiBold,
+        };
 
         _statsText = new TextBlock
         {
@@ -71,13 +79,18 @@ public sealed class HeavyStressPage : UserControl, IVelaNavigationAware
                 Spacing = 14,
                 Children =
                 {
-                    new TextBlock { Text = "Stress Test (500 Nodes)", FontSize = 20, FontWeight = FontWeight.SemiBold },
+                    _titleText,
                     _statsText,
                     wrap,
                 },
             },
         };
+
+        UpdateStats();
+        Loc.Instance.LanguageChanged += OnLanguageChanged;
     }
+
+    private void OnLanguageChanged(AppLanguage _) => UpdateStats();
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -98,6 +111,7 @@ public sealed class HeavyStressPage : UserControl, IVelaNavigationAware
 
     private void UpdateStats()
     {
-        _statsText.Text = $"Instance #{_instanceId} · Attaches: {_attachCount} · Visits: {_navigatedToCount}";
+        _titleText.Text = Loc.Instance.Get("StrStressTitle");
+        _statsText.Text = Loc.Instance.Format("StrStressStatsFormat", _instanceId, _attachCount, _navigatedToCount);
     }
 }

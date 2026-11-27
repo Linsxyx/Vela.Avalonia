@@ -2,6 +2,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 
 namespace Vela.Avalonia.Gallery.ViewModels;
@@ -35,10 +36,10 @@ public partial class DataDisplayViewModel : ViewModelBase
     public partial VelaAvatarStatus AvatarStatus { get; set; } = VelaAvatarStatus.Online;
 
     [ObservableProperty]
-    public partial string EmptyTitle { get; set; } = "Inbox is clear";
+    public partial string EmptyTitle { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string EmptyDescription { get; set; } = "Reviews and mentions will appear here.";
+    public partial string EmptyDescription { get; set; } = string.Empty;
 
     [ObservableProperty]
     public partial Geometry? EmptyIcon { get; set; }
@@ -46,7 +47,8 @@ public partial class DataDisplayViewModel : ViewModelBase
     public DataDisplayViewModel(IGalleryShellService shell)
     {
         _shell = shell;
-        EmptyIcon = _shell.FindIcon("VelaIconInbox");
+        ApplyEmptyState();
+        Loc.Instance.LanguageChanged += _ => ApplyEmptyState();
     }
 
     public void EnsureIconsLoaded()
@@ -74,35 +76,50 @@ public partial class DataDisplayViewModel : ViewModelBase
     private void CycleEmptyState()
     {
         _emptyStateIdx = (_emptyStateIdx + 1) % 3;
+        ApplyEmptyState();
+    }
+
+    private void ApplyEmptyState()
+    {
+        var loc = Loc.Instance;
         switch (_emptyStateIdx)
         {
             case 0:
                 EmptyIcon = _shell.FindIcon("VelaIconInbox");
-                EmptyTitle = "Inbox is clear";
-                EmptyDescription = "Reviews and mentions will appear here.";
+                EmptyTitle = loc.Get("StrEmptyInboxTitle");
+                EmptyDescription = loc.Get("StrEmptyInboxDesc");
                 break;
             case 1:
                 EmptyIcon = _shell.FindIcon("VelaIconSearch");
-                EmptyTitle = "No results";
-                EmptyDescription = "Try widening your filter or clearing tags.";
+                EmptyTitle = loc.Get("StrEmptySearchTitle");
+                EmptyDescription = loc.Get("StrEmptySearchDesc");
                 break;
             default:
                 EmptyIcon = _shell.FindIcon("VelaIconCheckCircle");
-                EmptyTitle = "All checks passed";
-                EmptyDescription = "0 warnings · all packages up to date.";
+                EmptyTitle = loc.Get("StrEmptyDoneTitle");
+                EmptyDescription = loc.Get("StrEmptyDoneDesc");
                 break;
         }
     }
 
     [RelayCommand]
     private void CreateWorkflow() =>
-        _shell.ShowToast("Workflow created", "Default CI pipeline ready.", VelaToastTone.Success);
+        _shell.ShowToast(
+            Loc.Instance.Pick("Workflow created", "工作流已创建"),
+            Loc.Instance.Pick("Default CI pipeline ready.", "默认 CI 流水线已就绪。"),
+            VelaToastTone.Success);
 
     [RelayCommand]
     private void CopyEndpoint() =>
-        _shell.ShowToast("Copied", "Endpoint copied to clipboard.", VelaToastTone.Success);
+        _shell.ShowToast(
+            Loc.Instance.Pick("Copied", "已复制"),
+            Loc.Instance.Pick("Endpoint copied.", "接口地址已复制。"),
+            VelaToastTone.Success);
 
     [RelayCommand]
     private void OpenDiagnostics() =>
-        _shell.ShowToast("Diagnostics", "Springs idle · 0 shader warnings.", VelaToastTone.Info);
+        _shell.ShowToast(
+            Loc.Instance.Get("StrDiagnostics"),
+            Loc.Instance.Pick("Springs idle · 0 shader warnings.", "弹簧空载 · 0 着色器警告。"),
+            VelaToastTone.Info);
 }

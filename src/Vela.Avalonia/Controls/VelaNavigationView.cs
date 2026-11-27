@@ -45,6 +45,13 @@ public class VelaNavSectionHeader : TemplatedControl
     public static readonly DirectProperty<VelaNavSectionHeader, double> DividerOpacityProperty =
         AvaloniaProperty.RegisterDirect<VelaNavSectionHeader, double>(nameof(DividerOpacity), o => o.DividerOpacity);
 
+    internal VelaNavigationView? Owner { get; set; }
+
+    static VelaNavSectionHeader()
+    {
+        HeaderProperty.Changed.AddClassHandler<VelaNavSectionHeader>((sec, _) => sec.Owner?.UpdateTopBreadcrumb());
+    }
+
     public string? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
 
     private double _labelOpacity = 1.0;
@@ -151,7 +158,8 @@ public class VelaNavItem : TemplatedControl
 
     internal VelaNavigationView? Owner { get; set; }
     internal VelaNavItem? ParentItem { get; set; }
-    internal string? SectionTitle { get; set; }
+    internal VelaNavSectionHeader? SectionHeader { get; set; }
+    internal string? SectionTitle => SectionHeader?.Header;
     internal bool IsFooterItem { get; set; }
     internal bool IsNavigable => PageContent is not null || PageFactory is not null || Children.Count == 0;
 
@@ -172,7 +180,11 @@ public class VelaNavItem : TemplatedControl
             item.PseudoClasses.Set(":has-badge", item.Badge is not null));
         IconProperty.Changed.AddClassHandler<VelaNavItem>((item, _) =>
             item.PseudoClasses.Set(":has-icon", item.Icon is not null));
-        HeaderProperty.Changed.AddClassHandler<VelaNavItem>((item, _) => item.SyncCompactTooltip());
+        HeaderProperty.Changed.AddClassHandler<VelaNavItem>((item, _) =>
+        {
+            item.SyncCompactTooltip();
+            item.Owner?.UpdateTopBreadcrumb();
+        });
         IsSelectedProperty.Changed.AddClassHandler<VelaNavItem>((item, _) =>
             item.PseudoClasses.Set(":selected", item.IsSelected));
         IsExpandedProperty.Changed.AddClassHandler<VelaNavItem>((item, _) => item.OnExpandedChanged());
@@ -244,7 +256,7 @@ public class VelaNavItem : TemplatedControl
                 oldP.Children.Remove(child);
             child.ParentItem = this;
             child.Owner = Owner;
-            child.SectionTitle = SectionTitle;
+            child.SectionHeader = SectionHeader;
             child.IsFooterItem = IsFooterItem;
             child.PseudoClasses.Set(":child", true);
             child.SetLayoutMode(_isCompact, _isTop, LabelOpacity);
@@ -616,13 +628,14 @@ public class VelaNavigationView : TemplatedControl
     internal void RebuildNavIndex()
     {
         _navigableItems.Clear();
-        string? currentSection = null;
+        VelaNavSectionHeader? currentSection = null;
 
         foreach (var entry in Items)
         {
             if (entry is VelaNavSectionHeader sec)
             {
-                currentSection = sec.Header;
+                sec.Owner = this;
+                currentSection = sec;
             }
             else if (entry is VelaNavItem nav)
             {
@@ -652,11 +665,11 @@ public class VelaNavigationView : TemplatedControl
         }
     }
 
-    private void WireNavItem(VelaNavItem nav, VelaNavItem? parent, string? section, bool isFooter)
+    private void WireNavItem(VelaNavItem nav, VelaNavItem? parent, VelaNavSectionHeader? section, bool isFooter)
     {
         nav.Owner = this;
         nav.ParentItem = parent;
-        nav.SectionTitle = section;
+        nav.SectionHeader = section;
         nav.IsFooterItem = isFooter;
 
         if (nav.IsNavigable)
@@ -854,7 +867,7 @@ public class VelaNavigationView : TemplatedControl
             nav.IsSelected = ReferenceEquals(nav, active);
     }
 
-    private void UpdateTopBreadcrumb()
+    internal void UpdateTopBreadcrumb()
     {
         if (_topBreadcrumb is null)
             return;

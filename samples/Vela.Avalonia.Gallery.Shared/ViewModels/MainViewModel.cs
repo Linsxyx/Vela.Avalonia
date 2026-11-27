@@ -3,6 +3,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 using Vela.Avalonia.Motion;
 using Vela.Avalonia.Tokens;
@@ -12,6 +13,7 @@ namespace Vela.Avalonia.Gallery.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     private readonly IGalleryShellService _shell;
+    private bool _syncingLanguage;
 
     public ActionsViewModel Actions { get; }
     public InputsViewModel Inputs { get; }
@@ -30,6 +32,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial bool IsDarkMode { get; set; }
+
+    [ObservableProperty]
+    public partial int LanguageIndex { get; set; }
 
     [ObservableProperty]
     public partial bool IsPaneOpen { get; set; } = true;
@@ -88,7 +93,7 @@ public partial class MainViewModel : ViewModelBase
         TransitionModeIndex == 1 ? VelaPageTransitionMode.CompositorFade : VelaPageTransitionMode.Instant;
 
     [ObservableProperty]
-    public partial string TelemetryText { get; set; } = "Ready · KeepAlive · Instant";
+    public partial string TelemetryText { get; set; } = string.Empty;
 
     [ObservableProperty]
     public partial bool LastSwitchCacheHit { get; set; } = true;
@@ -99,6 +104,10 @@ public partial class MainViewModel : ViewModelBase
     {
         _shell = shell;
 
+        _syncingLanguage = true;
+        LanguageIndex = Loc.Instance.IsChinese ? 1 : 0;
+        _syncingLanguage = false;
+
         Actions = new ActionsViewModel(shell);
         Inputs = new InputsViewModel();
         Pickers = new PickersViewModel(shell);
@@ -107,7 +116,7 @@ public partial class MainViewModel : ViewModelBase
         DataDisplay = new DataDisplayViewModel(shell);
         Shaders = new ShadersViewModel(shell);
         Charts = new ChartsViewModel();
-        SystemTray = new SystemTrayViewModel(shell, ToggleDarkMode);
+        SystemTray = new SystemTrayViewModel(shell, ToggleDarkMode, ToggleLanguage);
 
         foreach (var accent in Enum.GetValues<VelaAccent>())
         {
@@ -116,6 +125,23 @@ public partial class MainViewModel : ViewModelBase
         }
 
         RefreshSwatchRings();
+        TelemetryText = Loc.Instance.Pick("Ready · KeepAlive · Instant", "就绪 · KeepAlive · 即时");
+
+        Loc.Instance.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(AppLanguage lang)
+    {
+        _syncingLanguage = true;
+        LanguageIndex = lang == AppLanguage.Zh ? 1 : 0;
+        _syncingLanguage = false;
+        TelemetryText = Loc.Instance.Pick("Ready · KeepAlive · Instant", "就绪 · KeepAlive · 即时");
+    }
+
+    partial void OnLanguageIndexChanged(int value)
+    {
+        if (_syncingLanguage) return;
+        Loc.Instance.SetLanguage(value == 1 ? AppLanguage.Zh : AppLanguage.En);
     }
 
     partial void OnIsDarkModeChanged(bool value)
@@ -136,101 +162,115 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void SelectAccent(VelaAccent accent)
-    {
-        SelectedAccent = accent;
-    }
+    private void SelectAccent(VelaAccent accent) => SelectedAccent = accent;
 
     [RelayCommand]
-    private void ToggleDarkMode()
-    {
-        IsDarkMode = !IsDarkMode;
-    }
+    private void ToggleDarkMode() => IsDarkMode = !IsDarkMode;
 
     [RelayCommand]
-    private void TogglePane()
-    {
-        IsPaneOpen = !IsPaneOpen;
-    }
+    private void ToggleLanguage() => Loc.Instance.ToggleLanguage();
 
     [RelayCommand]
-    private void OpenCommandPalette()
-    {
-        _shell.OpenCommandPalette();
-    }
+    private void TogglePane() => IsPaneOpen = !IsPaneOpen;
+
+    [RelayCommand]
+    private void OpenCommandPalette() => _shell.OpenCommandPalette();
 
     [RelayCommand]
     private void ClearPageCache()
     {
         _shell.ClearInactivePageCache();
-        TelemetryText = "Inactive page cache cleared";
-        _shell.ShowToast("Cache cleared", "Inactive cached pages evicted.", VelaToastTone.Success);
+        TelemetryText = Loc.Instance.Pick("Inactive page cache cleared", "已清理非活跃页面缓存");
+        _shell.ShowToast(
+            Loc.Instance.Pick("Cache cleared", "缓存已清理"),
+            Loc.Instance.Pick("Inactive cached pages evicted.", "已释放所有非活跃缓存页面。"),
+            VelaToastTone.Success);
     }
 
     public void RecordPageSwitch(VelaPageSwitchMetrics m)
     {
         var label = (m.PageKey as VelaNavItem)?.Header ?? m.PageKey?.ToString() ?? "Page";
-        var hit = m.IsCacheHit ? "HIT" : "MISS";
+        var hit = m.IsCacheHit
+            ? Loc.Instance.Pick("HIT", "命中")
+            : Loc.Instance.Pick("MISS", "新建");
         LastSwitchCacheHit = m.IsCacheHit;
-        TelemetryText = $"{label} · {m.Elapsed.TotalMilliseconds:0.00} ms · {hit} · {m.CachedCount} cached";
+        TelemetryText = Loc.Instance.IsChinese
+            ? $"{label} · {m.Elapsed.TotalMilliseconds:0.00} ms · {hit} · 已缓存 {m.CachedCount}"
+            : $"{label} · {m.Elapsed.TotalMilliseconds:0.00} ms · {hit} · {m.CachedCount} cached";
     }
 
     public IEnumerable<VelaCommandItem> BuildCommandPaletteItems()
     {
+        var loc = Loc.Instance;
         Geometry? Icon(string key) => _shell.FindIcon(key);
+        var pagesGroup = loc.Get("StrCmdGroupPages");
+        var appearGroup = loc.Get("StrCmdGroupAppearance");
+        var actionsGroup = loc.Get("StrCmdGroupActions");
 
-        yield return NavCmd("Overview", "Shell, theme & cache", "overview", "VelaIconCompass", "G O");
-        yield return NavCmd("Actions", "Buttons, split, copy, confirm", "actions", "VelaIconComponents", "G A");
-        yield return NavCmd("Inputs & Sliders", "Input, tags, switches, sliders", "inputs", "VelaIconSliders", "G I");
-        yield return NavCmd("Pickers & Menus", "RadioCards, select, calendar, color", "pickers", "VelaIconCalendar", "G P");
-        yield return NavCmd("Navigation & Layout", "DockBar, tabs, stepper, split panes", "layout", "VelaIconLayers", "G N");
-        yield return NavCmd("Overlays & Feedback", "Dialogs, drawers, toasts, progress", "feedback", "VelaIconBell", "G F");
-        yield return NavCmd("Data Display", "KPIs, badges, avatars, settings", "display", "VelaIconHome", "G D");
-        yield return NavCmd("Shaders & Glass", "Liquid Glass & SkSL shaders", "shaders", "VelaIconSparkles", "G S");
-        yield return NavCmd("Charts", "6 vector chart types", "charts", "VelaIconChart", "G C");
-        yield return NavCmd("System Tray", "Tray icon & flyout studio", "tray", "VelaIconBell", "G T");
-        yield return NavCmd("Stress Test", "500-node VelaPageDeck benchmark", "stress", "VelaIconTrendingUp", "G B");
+        yield return NavCmd(loc.Get("StrNavOverview"), "overview", "VelaIconCompass", "G O");
+        yield return NavCmd(loc.Get("StrNavActions"), "actions", "VelaIconComponents", "G A");
+        yield return NavCmd(loc.Get("StrNavInputs"), "inputs", "VelaIconSliders", "G I");
+        yield return NavCmd(loc.Get("StrNavPickers"), "pickers", "VelaIconCalendar", "G P");
+        yield return NavCmd(loc.Get("StrNavLayout"), "layout", "VelaIconLayers", "G N");
+        yield return NavCmd(loc.Get("StrNavFeedback"), "feedback", "VelaIconBell", "G F");
+        yield return NavCmd(loc.Get("StrNavDisplay"), "display", "VelaIconHome", "G D");
+        yield return NavCmd(loc.Get("StrNavShaders"), "shaders", "VelaIconSparkles", "G S");
+        yield return NavCmd(loc.Get("StrNavCharts"), "charts", "VelaIconChart", "G C");
+        yield return NavCmd(loc.Get("StrNavTray"), "tray", "VelaIconBell", "G T");
+        yield return NavCmd(loc.Get("StrNavStress"), "stress", "VelaIconTrendingUp", "G B");
 
         yield return new VelaCommandItem
         {
-            Title = "Toggle Dark Mode",
-            Group = "Appearance",
+            Title = loc.Get("StrCmdSwitchLang"),
+            Group = appearGroup,
+            Icon = Icon("VelaIconGlobe"),
+            Shortcut = "⌘L",
+            Execute = ToggleLanguage,
+        };
+        yield return new VelaCommandItem
+        {
+            Title = loc.Get("StrCmdToggleDark"),
+            Group = appearGroup,
             Icon = Icon("VelaIconPalette"),
             Shortcut = "⌘D",
             Execute = ToggleDarkMode,
         };
         yield return new VelaCommandItem
         {
-            Title = "Toggle Sidebar",
-            Group = "Appearance",
+            Title = loc.Get("StrCmdToggleSidebar"),
+            Group = appearGroup,
             Icon = Icon("VelaIconSidebar"),
             Shortcut = "⌘\\",
             Execute = TogglePane,
         };
         yield return new VelaCommandItem
         {
-            Title = "Toggle Palette Liquid Glass",
-            Group = "Appearance",
+            Title = loc.Get("StrCmdTogglePaletteGlass"),
+            Group = appearGroup,
             Icon = Icon("VelaIconSparkles"),
             Execute = () =>
             {
                 CommandPaletteGlass = !CommandPaletteGlass;
-                _shell.ShowToast("Command Palette", CommandPaletteGlass ? "Liquid Glass enabled" : "Solid mode enabled", VelaToastTone.Info);
+                _shell.ShowToast(
+                    loc.Pick("Command Palette", "命令面板"),
+                    CommandPaletteGlass
+                        ? loc.Pick("Liquid Glass enabled", "已开启液态玻璃模式")
+                        : loc.Pick("Solid mode enabled", "已切换为纯色模式"),
+                    VelaToastTone.Info);
             },
         };
         yield return new VelaCommandItem
         {
-            Title = "Clear Inactive Page Cache",
-            Group = "Actions",
+            Title = loc.Get("StrCmdClearCache"),
+            Group = actionsGroup,
             Icon = Icon("VelaIconTrash"),
             Execute = ClearPageCache,
         };
 
-        VelaCommandItem NavCmd(string title, string desc, string key, string iconKey, string shortcut) => new()
+        VelaCommandItem NavCmd(string title, string key, string iconKey, string shortcut) => new()
         {
             Title = title,
-            Description = desc,
-            Group = "Pages",
+            Group = pagesGroup,
             Icon = Icon(iconKey),
             Shortcut = shortcut,
             Execute = () => _shell.NavigateTo(key),

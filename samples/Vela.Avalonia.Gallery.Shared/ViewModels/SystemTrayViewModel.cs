@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 using Vela.Avalonia.Tokens;
 
@@ -21,18 +22,20 @@ public partial class SystemTrayViewModel : ViewModelBase
 
     private readonly IGalleryShellService _shell;
     private readonly Action _toggleTheme;
+    private readonly Action _toggleLanguage;
     private VelaTrayIcon? _trayIcon;
     private Bitmap? _lightBmp;
     private Bitmap? _darkBmp;
+    private bool _isDesktopSupported;
 
     [ObservableProperty]
-    public partial string PlatformBadgeText { get; set; } = "Desktop Tray Active";
+    public partial string PlatformBadgeText { get; set; } = string.Empty;
 
     [ObservableProperty]
     public partial VelaBadgeTone PlatformBadgeTone { get; set; } = VelaBadgeTone.Success;
 
     [ObservableProperty]
-    public partial string StatusText { get; set; } = "Tray active";
+    public partial string StatusText { get; set; } = string.Empty;
 
     [ObservableProperty]
     public partial Bitmap? PreviewLightBitmap { get; set; }
@@ -95,10 +98,20 @@ public partial class SystemTrayViewModel : ViewModelBase
     [ObservableProperty]
     public partial bool ShowIconPlate { get; set; }
 
-    public SystemTrayViewModel(IGalleryShellService shell, Action toggleTheme)
+    public SystemTrayViewModel(IGalleryShellService shell, Action toggleTheme, Action toggleLanguage)
     {
         _shell = shell;
         _toggleTheme = toggleTheme;
+        _toggleLanguage = toggleLanguage;
+        RefreshLocalizedDefaults();
+        Loc.Instance.LanguageChanged += _ => RefreshLocalizedDefaults();
+    }
+
+    private void RefreshLocalizedDefaults()
+    {
+        var loc = Loc.Instance;
+        PlatformBadgeText = loc.Get(_isDesktopSupported ? "StrTrayDesktopActive" : "StrTrayPreviewMode");
+        StatusText = loc.Get("StrTrayActiveStatus");
     }
 
     public void EnsurePreviewTrayAttached()
@@ -135,9 +148,9 @@ public partial class SystemTrayViewModel : ViewModelBase
         _trayIcon.FlyoutOpened += OnFlyoutOpened;
         _trayIcon.FlyoutClosed += OnFlyoutClosed;
 
-        var supported = VelaTrayIcon.IsPlatformSupported && _trayIcon.IsAttached;
-        PlatformBadgeText = supported ? "Desktop Active" : "Preview Mode";
-        PlatformBadgeTone = supported ? VelaBadgeTone.Success : VelaBadgeTone.Info;
+        _isDesktopSupported = VelaTrayIcon.IsPlatformSupported && _trayIcon.IsAttached;
+        PlatformBadgeText = Loc.Instance.Get(_isDesktopSupported ? "StrTrayDesktopActive" : "StrTrayPreviewMode");
+        PlatformBadgeTone = _isDesktopSupported ? VelaBadgeTone.Success : VelaBadgeTone.Info;
 
         RefreshPreviews();
     }
@@ -213,7 +226,7 @@ public partial class SystemTrayViewModel : ViewModelBase
             3 => VelaTrayPresentation.CommandOnly,
             _ => VelaTrayPresentation.VelaMenu,
         };
-        StatusText = $"Presentation: {_trayIcon.Presentation}";
+        StatusText = Loc.Instance.Pick($"Presentation: {_trayIcon.Presentation}", $"模式：{_trayIcon.Presentation}");
     }
 
     partial void OnMaterialIndexChanged(int value)
@@ -226,7 +239,7 @@ public partial class SystemTrayViewModel : ViewModelBase
             3 => VelaSurfaceMaterial.LiquidGlass,
             _ => VelaSurfaceMaterial.Solid,
         };
-        StatusText = $"Material: {_trayIcon.SurfaceMaterial}";
+        StatusText = Loc.Instance.Pick($"Material: {_trayIcon.SurfaceMaterial}", $"材质：{_trayIcon.SurfaceMaterial}");
     }
 
     partial void OnPlacementIndexChanged(int value)
@@ -240,7 +253,7 @@ public partial class SystemTrayViewModel : ViewModelBase
             4 => VelaTrayFlyoutPlacement.BottomLeft,
             _ => VelaTrayFlyoutPlacement.Auto,
         };
-        StatusText = $"Placement: {_trayIcon.FlyoutPlacement}";
+        StatusText = Loc.Instance.Pick($"Placement: {_trayIcon.FlyoutPlacement}", $"位置：{_trayIcon.FlyoutPlacement}");
     }
 
     partial void OnCloseToTrayChanged(bool value)
@@ -267,15 +280,19 @@ public partial class SystemTrayViewModel : ViewModelBase
     [RelayCommand]
     private void OpenFlyout()
     {
+        var loc = Loc.Instance;
         if (_trayIcon is null) return;
         if (!VelaTrayIcon.IsPlatformSupported)
         {
-            _shell.ShowToast("Desktop only", "Tray flyout runs on desktop targets.", VelaToastTone.Info);
+            _shell.ShowToast(loc.Pick("Desktop only", "仅桌面端支持"), loc.Pick("Tray flyout runs on desktop targets.", "浮窗仅在桌面平台运行。"), VelaToastTone.Info);
             return;
         }
         if (_trayIcon.EffectivePresentation is VelaTrayPresentation.Native or VelaTrayPresentation.CommandOnly)
         {
-            _shell.ShowToast("Presentation", $"Mode is {_trayIcon.EffectivePresentation}. Switch to VelaMenu or VelaPopover.", VelaToastTone.Info);
+            _shell.ShowToast(
+                loc.Get("StrPresentation"),
+                loc.Pick($"Mode is {_trayIcon.EffectivePresentation}. Switch to VelaMenu or VelaPopover.", $"当前为 {_trayIcon.EffectivePresentation}，请切至 VelaMenu 或 VelaPopover。"),
+                VelaToastTone.Info);
             return;
         }
         _trayIcon.ShowFlyout();
@@ -284,12 +301,13 @@ public partial class SystemTrayViewModel : ViewModelBase
     [RelayCommand]
     private void HideWindowBriefly()
     {
+        var loc = Loc.Instance;
         if (_trayIcon is null || !VelaTrayIcon.IsPlatformSupported)
         {
-            _shell.ShowToast("Desktop only", "Available on desktop targets.", VelaToastTone.Info);
+            _shell.ShowToast(loc.Pick("Desktop only", "仅桌面端支持"), loc.Pick("Available on desktop targets.", "仅在桌面平台可用。"), VelaToastTone.Info);
             return;
         }
-        StatusText = "Hidden to tray (restoring in 3s)...";
+        StatusText = loc.Pick("Hidden to tray (restoring in 3s)...", "已隐藏至托盘（3 秒后自动恢复）...");
         _trayIcon.HideWindowToTray();
 
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
@@ -297,7 +315,7 @@ public partial class SystemTrayViewModel : ViewModelBase
         {
             timer.Stop();
             _trayIcon?.RestoreWindow();
-            StatusText = "Window restored";
+            StatusText = Loc.Instance.Pick("Window restored", "主窗口已恢复");
         };
         timer.Start();
     }
@@ -307,7 +325,9 @@ public partial class SystemTrayViewModel : ViewModelBase
     {
         if (_trayIcon is null) return;
         _trayIcon.IsVisible = !_trayIcon.IsVisible;
-        StatusText = _trayIcon.IsVisible ? "Tray visible" : "Tray hidden";
+        StatusText = _trayIcon.IsVisible
+            ? Loc.Instance.Pick("Tray visible", "托盘已显示")
+            : Loc.Instance.Pick("Tray hidden", "托盘已隐藏");
     }
 
     [RelayCommand]
@@ -315,29 +335,41 @@ public partial class SystemTrayViewModel : ViewModelBase
     {
         _trayIcon?.HideFlyout();
         _trayIcon?.RestoreWindow();
-        StatusText = "Restored from tray";
+        StatusText = Loc.Instance.Pick("Restored from tray", "已从托盘恢复窗口");
     }
 
     [RelayCommand]
     private void TrayToggleTheme()
     {
         _toggleTheme();
-        StatusText = "Theme toggled via tray";
+        StatusText = Loc.Instance.Pick("Theme toggled via tray", "已通过托盘切换主题");
+    }
+
+    [RelayCommand]
+    private void TraySwitchLanguage()
+    {
+        _toggleLanguage();
+        StatusText = Loc.Instance.Pick("Switched to English", "已切换为中文");
     }
 
     [RelayCommand]
     private void TrayToggleSync()
     {
         IsBackgroundSyncEnabled = !IsBackgroundSyncEnabled;
-        StatusText = IsBackgroundSyncEnabled ? "Sync enabled" : "Sync paused";
+        StatusText = IsBackgroundSyncEnabled
+            ? Loc.Instance.Pick("Sync enabled", "已开启后台同步")
+            : Loc.Instance.Pick("Sync paused", "已暂停后台同步");
     }
 
     [RelayCommand]
     private void TraySendToast()
     {
         _trayIcon?.RestoreWindow();
-        _shell.ShowToast("System Tray", "Triggered from tray menu.", VelaToastTone.Success);
-        StatusText = "Toast sent from tray";
+        _shell.ShowToast(
+            Loc.Instance.Get("StrNavTray"),
+            Loc.Instance.Pick("Triggered from tray menu.", "来自系统托盘菜单的通知。"),
+            VelaToastTone.Success);
+        StatusText = Loc.Instance.Pick("Toast sent from tray", "已从托盘发送通知");
     }
 
     [RelayCommand]
@@ -352,9 +384,9 @@ public partial class SystemTrayViewModel : ViewModelBase
     }
 
     private void OnRenderedIconChanged(object? sender, EventArgs e) => RefreshPreviews();
-    private void OnTrayClicked(object? sender, EventArgs e) => StatusText = $"Clicked ({_trayIcon?.Presentation})";
-    private void OnFlyoutOpened(object? sender, EventArgs e) => StatusText = $"Opened {_trayIcon?.Presentation}";
-    private void OnFlyoutClosed(object? sender, EventArgs e) => StatusText = "Flyout closed";
+    private void OnTrayClicked(object? sender, EventArgs e) => StatusText = Loc.Instance.Pick($"Clicked ({_trayIcon?.Presentation})", $"点击托盘（{_trayIcon?.Presentation}）");
+    private void OnFlyoutOpened(object? sender, EventArgs e) => StatusText = Loc.Instance.Pick($"Opened {_trayIcon?.Presentation}", $"打开浮窗（{_trayIcon?.Presentation}）");
+    private void OnFlyoutClosed(object? sender, EventArgs e) => StatusText = Loc.Instance.Pick("Flyout closed", "浮窗已关闭");
 
     private void RefreshPreviews()
     {

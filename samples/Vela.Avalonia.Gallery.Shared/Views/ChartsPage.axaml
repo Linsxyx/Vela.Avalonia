@@ -7,7 +7,7 @@
              x:DataType="vm:ChartsViewModel">
   <ScrollViewer Classes="pageScroll">
     <StackPanel Classes="pageRoot">
-      <TextBlock Classes="pageTitle" Text="Charts" />
+      <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavCharts}" />
 
       <!-- 1. Line Chart -->
       <Border Classes="card">
@@ -15,9 +15,9 @@
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Classes="cardTitle" Text="VelaLineChart" VerticalAlignment="Center" />
             <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding LineRangeIndex, Mode=TwoWay}">
-              <x:String>7D</x:String>
-              <x:String>30D</x:String>
-              <x:String>90D</x:String>
+              <vela:VelaSegmentedItem Content="7D" />
+              <vela:VelaSegmentedItem Content="30D" />
+              <vela:VelaSegmentedItem Content="90D" />
             </vela:VelaSegmentedControl>
           </Grid>
 
@@ -35,8 +35,8 @@
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Classes="cardTitle" Text="VelaBarChart" VerticalAlignment="Center" />
               <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding BarRangeIndex, Mode=TwoWay}">
-                <x:String>Week A</x:String>
-                <x:String>Week B</x:String>
+                <vela:VelaSegmentedItem Content="{DynamicResource StrWeekA}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrWeekB}" />
               </vela:VelaSegmentedControl>
             </Grid>
             <charts:VelaBarChart Height="212" Data="{Binding BarData}" />
@@ -48,9 +48,9 @@
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Classes="cardTitle" Text="VelaDonutChart" VerticalAlignment="Center" />
               <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding DonutDatasetIndex, Mode=TwoWay}">
-                <x:String>Q1</x:String>
-                <x:String>Q2</x:String>
-                <x:String>MRR</x:String>
+                <vela:VelaSegmentedItem Content="Q1" />
+                <vela:VelaSegmentedItem Content="Q2" />
+                <vela:VelaSegmentedItem Content="MRR" />
               </vela:VelaSegmentedControl>
             </Grid>
             <charts:VelaDonutChart HorizontalAlignment="Center"
@@ -71,12 +71,12 @@
               <vela:VelaButton Grid.Column="1"
                                Variant="Secondary"
                                Size="Small"
-                               Content="Randomize"
+                               Content="{DynamicResource StrRandomize}"
                                Command="{Binding RandomizeGaugesCommand}" />
             </Grid>
             <UniformGrid Columns="3">
               <charts:VelaGauge Label="CPU" Value="{Binding CpuLoad}" UseSemanticThresholds="True" Width="134" Height="120" StrokeThickness="12" />
-              <charts:VelaGauge Label="Memory" Value="{Binding MemoryLoad}" UseSemanticThresholds="True" Width="134" Height="120" StrokeThickness="12" />
+              <charts:VelaGauge Label="{DynamicResource StrMemory}" Value="{Binding MemoryLoad}" UseSemanticThresholds="True" Width="134" Height="120" StrokeThickness="12" />
               <charts:VelaGauge Label="GPU" Value="{Binding GpuSync}" UseSemanticThresholds="False" Width="134" Height="120" StrokeThickness="12" />
             </UniformGrid>
           </StackPanel>
@@ -87,17 +87,17 @@
             <TextBlock Classes="cardTitle" Text="VelaSparkline" />
             <StackPanel Spacing="12">
               <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                <TextBlock Text="Sessions" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <TextBlock Text="{DynamicResource StrSessions}" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                 <TextBlock Grid.Column="1" Text="4,218" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                 <charts:VelaSparkline Grid.Column="2" Width="92" Height="26" Values="{Binding SparkSessions}" />
               </Grid>
               <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                <TextBlock Text="Frame Budget" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <TextBlock Text="{DynamicResource StrFrameBudget}" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                 <TextBlock Grid.Column="1" Text="1.8 ms" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                 <charts:VelaSparkline Grid.Column="2" Width="92" Height="26" StrokeColor="#10A870" Values="{Binding SparkBudget}" />
               </Grid>
               <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                <TextBlock Text="Error Rate" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <TextBlock Text="{DynamicResource StrErrorRate}" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                 <TextBlock Grid.Column="1" Text="0.04%" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
                 <charts:VelaSparkline Grid.Column="2" Width="92" Height="26" StrokeColor="#EC564B" Values="{Binding SparkErrors}" />
               </Grid>

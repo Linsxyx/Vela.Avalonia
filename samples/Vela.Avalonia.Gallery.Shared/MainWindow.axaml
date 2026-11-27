@@ -5,16 +5,16 @@
                  xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
                  x:Class="Vela.Avalonia.Gallery.MainWindow"
                  x:DataType="vm:MainViewModel"
-                 Title="Vela.Avalonia Studio"
+                 Title="{DynamicResource StrAppTitle}"
                  TitleBarHeight="36"
                  Width="1180"
                  Height="780"
                  MinWidth="860"
                  MinHeight="620"
-                 FontFamily="Inter, sans-serif">
+                 FontFamily="Inter, PingFang SC, Microsoft YaHei UI, sans-serif">
   <vela:VelaWindow.TrayIcon>
     <vela:VelaTrayIcon x:Name="AppTrayIcon"
-                       ToolTipText="Vela Studio"
+                       ToolTipText="{DynamicResource StrBrandTitle}"
                        IconGeometry="{DynamicResource VelaIconSparkles}"
                        BadgeVariant="Dot"
                        BadgeTone="Accent"
@@ -35,7 +35,7 @@
                       VerticalAlignment="Center" />
           </Border>
           <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-            <TextBlock Text="Vela Studio"
+            <TextBlock Text="{DynamicResource StrBrandTitle}"
                        FontSize="13"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource VelaForegroundBrush}" />
@@ -46,27 +46,31 @@
           <vela:VelaBadge Grid.Column="2"
                           Tone="Success"
                           IsPill="True"
-                          Content="Online"
+                          Content="{DynamicResource StrOnline}"
                           VerticalAlignment="Center" />
         </Grid>
       </vela:VelaTrayIcon.FlyoutHeader>
 
-      <vela:VelaMenuItem Header="Show Window"
+      <vela:VelaMenuItem Header="{DynamicResource StrTrayShowWindow}"
                          Icon="{DynamicResource VelaIconHome}"
                          Shortcut="⌘O"
                          Command="{Binding SystemTray.TrayRestoreWindowCommand}" />
-      <vela:VelaMenuItem Header="Toggle Theme"
+      <vela:VelaMenuItem Header="{DynamicResource StrTrayToggleTheme}"
                          Icon="{DynamicResource VelaIconPalette}"
                          Shortcut="⌘T"
                          Command="{Binding SystemTray.TrayToggleThemeCommand}" />
-      <vela:VelaMenuItem Header="Background Sync"
+      <vela:VelaMenuItem Header="{DynamicResource StrTraySwitchLang}"
+                         Icon="{DynamicResource VelaIconGlobe}"
+                         Shortcut="⌘L"
+                         Command="{Binding SystemTray.TraySwitchLanguageCommand}" />
+      <vela:VelaMenuItem Header="{DynamicResource StrTrayBgSync}"
                          IsChecked="{Binding SystemTray.IsBackgroundSyncEnabled}"
                          Command="{Binding SystemTray.TrayToggleSyncCommand}" />
-      <vela:VelaMenuItem Header="Send Toast"
+      <vela:VelaMenuItem Header="{DynamicResource StrTraySendToast}"
                          Icon="{DynamicResource VelaIconBell}"
                          Command="{Binding SystemTray.TraySendToastCommand}" />
       <vela:VelaMenuItem IsSeparator="True" />
-      <vela:VelaMenuItem Header="Quit"
+      <vela:VelaMenuItem Header="{DynamicResource StrTrayQuit}"
                          Icon="{DynamicResource VelaIconClose}"
                          Shortcut="⌘Q"
                          IsDestructive="True"
@@ -75,7 +79,7 @@
       <vela:VelaTrayIcon.PopoverContent>
         <StackPanel x:Name="TrayPopoverRoot" Spacing="12" Width="252" Margin="6,4" x:DataType="vm:MainViewModel">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Quick Controls"
+            <TextBlock Text="{DynamicResource StrQuickControls}"
                        FontSize="13.5"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource VelaForegroundBrush}"
@@ -89,7 +93,7 @@
                   BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
                   BorderThickness="1">
             <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-              <TextBlock Text="Background Sync" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" />
+              <TextBlock Text="{DynamicResource StrTrayBgSync}" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" />
               <vela:VelaSwitch Grid.Column="1" IsChecked="{Binding SystemTray.IsBackgroundSyncEnabled, Mode=TwoWay}" />
             </Grid>
           </Border>
@@ -97,13 +101,13 @@
           <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
             <vela:VelaButton Variant="Primary"
                              Size="Small"
-                             Content="Open Studio"
+                             Content="{DynamicResource StrOpenStudio}"
                              HorizontalAlignment="Stretch"
                              Command="{Binding SystemTray.TrayRestoreWindowCommand}" />
             <vela:VelaButton Grid.Column="1"
                              Variant="Secondary"
                              Size="Small"
-                             Content="Quit"
+                             Content="{DynamicResource StrTrayQuit}"
                              HorizontalAlignment="Stretch"
                              Command="{Binding SystemTray.TrayQuitCommand}" />
           </Grid>

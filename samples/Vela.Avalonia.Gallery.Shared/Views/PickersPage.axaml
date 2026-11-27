@@ -6,7 +6,7 @@
              x:DataType="vm:PickersViewModel">
   <ScrollViewer Classes="pageScroll">
     <StackPanel Classes="pageRoot">
-      <TextBlock Classes="pageTitle" Text="Pickers &amp; Menus" />
+      <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavPickers}" />
 
       <!-- Row 1: VelaRadioCards -->
       <Border Classes="card">
@@ -14,23 +14,23 @@
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Classes="cardTitle" Text="VelaRadioCards" VerticalAlignment="Center" />
             <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding RadioLayoutIndex, Mode=TwoWay}">
-              <x:String>Grid</x:String>
-              <x:String>List</x:String>
+              <vela:VelaSegmentedItem Content="{DynamicResource StrGrid}" />
+              <vela:VelaSegmentedItem Content="{DynamicResource StrList}" />
             </vela:VelaSegmentedControl>
           </Grid>
 
           <vela:VelaRadioCards Layout="{Binding RadioCardsLayout}"
                                SelectedIndex="{Binding SelectedPlanCardIndex, Mode=TwoWay}">
-            <vela:VelaRadioCardItem Header="Starter"
-                                    Description="Solo builders &amp; OSS"
+            <vela:VelaRadioCardItem Header="{DynamicResource StrPlanStarter}"
+                                    Description="{DynamicResource StrPlanStarterDesc}"
                                     Meta="$0 / mo"
                                     Icon="{DynamicResource VelaIconHome}" />
-            <vela:VelaRadioCardItem Header="Studio Pro"
-                                    Description="Desktop apps, shaders &amp; charts"
+            <vela:VelaRadioCardItem Header="{DynamicResource StrPlanPro}"
+                                    Description="{DynamicResource StrPlanProDesc}"
                                     Meta="$24 / mo"
                                     Icon="{DynamicResource VelaIconSparkles}" />
-            <vela:VelaRadioCardItem Header="Enterprise"
-                                    Description="Custom tokens &amp; SLA"
+            <vela:VelaRadioCardItem Header="{DynamicResource StrPlanEnterprise}"
+                                    Description="{DynamicResource StrPlanEnterpriseDesc}"
                                     Meta="$89 / mo"
                                     Icon="{DynamicResource VelaIconLayers}" />
           </vela:VelaRadioCards>
@@ -43,8 +43,8 @@
           <StackPanel Spacing="14">
             <TextBlock Classes="cardTitle" Text="VelaSelect, VelaComboBox &amp; VelaDatePicker" />
 
-            <vela:VelaSelect Label="Region"
-                             PlaceholderText="Choose region..."
+            <vela:VelaSelect Label="{DynamicResource StrRegion}"
+                             PlaceholderText="{DynamicResource StrChooseRegion}"
                              SelectedIndex="{Binding SelectedRegionIndex, Mode=TwoWay}">
               <x:String>Tokyo (ap-northeast-1)</x:String>
               <x:String>Singapore (ap-southeast-1)</x:String>
@@ -52,13 +52,13 @@
               <x:String>Frankfurt (eu-central-1)</x:String>
             </vela:VelaSelect>
 
-            <vela:VelaComboBox Label="Framework"
-                               PlaceholderText="Filter frameworks..."
+            <vela:VelaComboBox Label="{DynamicResource StrFramework}"
+                               PlaceholderText="{DynamicResource StrFilterFrameworks}"
                                ItemsSource="{Binding Frameworks}"
                                SelectedItem="{Binding SelectedFramework, Mode=TwoWay}" />
 
-            <vela:VelaDatePicker Label="Release Date"
-                                 PlaceholderText="Pick date..."
+            <vela:VelaDatePicker Label="{DynamicResource StrReleaseDate}"
+                                 PlaceholderText="{DynamicResource StrPickDate}"
                                  SelectedDate="{Binding SelectedReleaseDate, Mode=TwoWay}" />
           </StackPanel>
         </Border>
@@ -74,31 +74,31 @@
       <!-- Row 3: Menus, Popover & ContextMenu -->
       <Border Classes="card">
         <StackPanel Spacing="14">
-          <TextBlock Classes="cardTitle" Text="Menus, Popover &amp; ContextMenu" />
+          <TextBlock Classes="cardTitle" Text="{DynamicResource StrMenusPopoverCtx}" />
 
           <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
             <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10" VerticalAlignment="Center">
-              <vela:VelaDropdownButton Content="Actions"
+              <vela:VelaDropdownButton Content="{DynamicResource StrActionsMenu}"
                                        LeadingIcon="{DynamicResource VelaIconList}">
-                <vela:VelaMenuItem Header="Rename" Icon="{DynamicResource VelaIconEdit}" Shortcut="⌘R" Click="OnRenameClick" />
-                <vela:VelaMenuItem Header="Duplicate" Icon="{DynamicResource VelaIconCopy}" Shortcut="⌘D" Click="OnDuplicateClick" />
-                <vela:VelaMenuItem Header="Share link" Icon="{DynamicResource VelaIconShare}" Shortcut="⇧⌘C" Click="OnShareClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrRename}" Icon="{DynamicResource VelaIconEdit}" Shortcut="⌘R" Click="OnRenameClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrDuplicate}" Icon="{DynamicResource VelaIconCopy}" Shortcut="⌘D" Click="OnDuplicateClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrShareLink}" Icon="{DynamicResource VelaIconShare}" Shortcut="⇧⌘C" Click="OnShareClick" />
                 <vela:VelaMenuItem IsSeparator="True" />
-                <vela:VelaMenuItem Header="Delete" Icon="{DynamicResource VelaIconTrash}" Shortcut="⌫" IsDestructive="True" Click="OnDeleteClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrDelete}" Icon="{DynamicResource VelaIconTrash}" Shortcut="⌫" IsDestructive="True" Click="OnDeleteClick" />
               </vela:VelaDropdownButton>
 
               <vela:VelaPopover IsOpen="{Binding IsPopoverOpen, Mode=TwoWay}"
                                 Placement="BottomEdgeAlignedLeft">
-                <vela:VelaButton Variant="Secondary" Size="Small" Content="Open Popover" />
+                <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrOpenPopover}" />
                 <vela:VelaPopover.PopoverContent>
                   <StackPanel Spacing="10" Width="220">
-                    <TextBlock Text="Display" FontSize="13.5" FontWeight="SemiBold" />
-                    <vela:VelaCheckBox Content="Performance bar" IsChecked="True" />
-                    <vela:VelaCheckBox Content="Snap detents" IsChecked="True" />
+                    <TextBlock Text="{DynamicResource StrDisplay}" FontSize="13.5" FontWeight="SemiBold" />
+                    <vela:VelaCheckBox Content="{DynamicResource StrPerformanceBar}" IsChecked="True" />
+                    <vela:VelaCheckBox Content="{DynamicResource StrSnapDetents}" IsChecked="True" />
                     <vela:VelaButton Variant="Primary"
                                      Size="Small"
                                      HorizontalAlignment="Right"
-                                     Content="Done"
+                                     Content="{DynamicResource StrDone}"
                                      Command="{Binding ClosePopoverCommand}" />
                   </StackPanel>
                 </vela:VelaPopover.PopoverContent>
@@ -114,25 +114,25 @@
                     Cursor="Hand">
               <Border.ContextMenu>
                 <ContextMenu>
-                  <MenuItem Header="Edit" InputGesture="Ctrl+E" Command="{Binding MenuActionCommand}" CommandParameter="ctx-edit">
+                  <MenuItem Header="{DynamicResource StrEdit}" InputGesture="Ctrl+E" Command="{Binding MenuActionCommand}" CommandParameter="ctx-edit">
                     <MenuItem.Icon>
                       <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconEdit}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                     </MenuItem.Icon>
                   </MenuItem>
-                  <MenuItem Header="Copy path" InputGesture="Ctrl+C" Command="{Binding MenuActionCommand}" CommandParameter="ctx-copy">
+                  <MenuItem Header="{DynamicResource StrCopyPath}" InputGesture="Ctrl+C" Command="{Binding MenuActionCommand}" CommandParameter="ctx-copy">
                     <MenuItem.Icon>
                       <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconCopy}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                     </MenuItem.Icon>
                   </MenuItem>
                   <Separator />
-                  <MenuItem Classes="danger" Header="Delete" InputGesture="Delete" Command="{Binding MenuActionCommand}" CommandParameter="ctx-delete">
+                  <MenuItem Classes="danger" Header="{DynamicResource StrDelete}" InputGesture="Delete" Command="{Binding MenuActionCommand}" CommandParameter="ctx-delete">
                     <MenuItem.Icon>
                       <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconTrash}" Foreground="{DynamicResource VelaDangerBrush}" />
                     </MenuItem.Icon>
                   </MenuItem>
                 </ContextMenu>
               </Border.ContextMenu>
-              <TextBlock Text="Right-click for ContextMenu"
+              <TextBlock Text="{DynamicResource StrRightClickHint}"
                          FontSize="12.5"
                          FontWeight="Medium"
                          Foreground="{DynamicResource VelaTextSecondaryBrush}"
@@ -150,7 +150,7 @@
 
           <WrapPanel Orientation="Horizontal" ItemSpacing="20" LineSpacing="14">
             <vela:VelaColorPicker IsInline="True"
-                                  Label="Surface"
+                                  Label="{DynamicResource StrSurface}"
                                   SelectedColor="{Binding InlineColor, Mode=TwoWay}" />
 
             <StackPanel Spacing="12" Width="240" VerticalAlignment="Top">
@@ -166,7 +166,7 @@
                            VerticalAlignment="Bottom" />
               </Border>
 
-              <vela:VelaColorPicker Label="Secondary Accent"
+              <vela:VelaColorPicker Label="{DynamicResource StrSecondaryAccent}"
                                     SelectedColor="{Binding SecondaryColor, Mode=TwoWay}" />
             </StackPanel>
           </WrapPanel>

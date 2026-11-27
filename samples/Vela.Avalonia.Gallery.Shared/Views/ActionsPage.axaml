@@ -6,7 +6,7 @@
              x:DataType="vm:ActionsViewModel">
   <ScrollViewer Classes="pageScroll">
     <StackPanel Classes="pageRoot">
-      <TextBlock Classes="pageTitle" Text="Actions" />
+      <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavActions}" />
 
       <!-- Row 1: VelaButton + VelaSplitButton / VelaCopyButton -->
       <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
@@ -15,11 +15,11 @@
             <TextBlock Classes="cardTitle" Text="VelaButton" />
 
             <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-              <vela:VelaButton Variant="Primary" Content="Primary" />
-              <vela:VelaButton Variant="Secondary" Content="Secondary" />
-              <vela:VelaButton Variant="Ghost" Content="Ghost" />
-              <vela:VelaButton Variant="Danger" Content="Danger" />
-              <vela:VelaButton Variant="Secondary" Content="Disabled" IsEnabled="False" />
+              <vela:VelaButton Variant="Primary" Content="{DynamicResource StrPrimary}" />
+              <vela:VelaButton Variant="Secondary" Content="{DynamicResource StrSecondary}" />
+              <vela:VelaButton Variant="Ghost" Content="{DynamicResource StrGhost}" />
+              <vela:VelaButton Variant="Danger" Content="{DynamicResource StrDanger}" />
+              <vela:VelaButton Variant="Secondary" Content="{DynamicResource StrDisabled}" IsEnabled="False" />
             </WrapPanel>
 
             <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
@@ -27,8 +27,8 @@
                                IsLoading="{Binding IsSaving}"
                                Content="{Binding SaveButtonText}"
                                Command="{Binding SaveChangesCommand}" />
-              <vela:VelaButton Variant="Secondary" Size="Small" Content="Small" />
-              <vela:VelaButton Variant="Secondary" Size="Large" Content="Large" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrSmall}" />
+              <vela:VelaButton Variant="Secondary" Size="Large" Content="{DynamicResource StrLarge}" />
             </WrapPanel>
           </StackPanel>
         </Border>
@@ -45,19 +45,19 @@
                                     LeadingIcon="{DynamicResource VelaIconRocket}"
                                     Content="{Binding SplitButtonLabel}"
                                     Command="{Binding ExecuteSplitPrimaryCommand}">
-                <vela:VelaMenuItem Header="Production" Icon="{DynamicResource VelaIconRocket}" Shortcut="⌘⏎" Click="OnSplitProdClick" />
-                <vela:VelaMenuItem Header="Staging" Icon="{DynamicResource VelaIconGlobe}" Shortcut="⇧⌘⏎" Click="OnSplitStagingClick" />
-                <vela:VelaMenuItem Header="Download" Icon="{DynamicResource VelaIconDownload}" Click="OnSplitDownloadClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrProduction}" Icon="{DynamicResource VelaIconRocket}" Shortcut="⌘⏎" Click="OnSplitProdClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrStaging}" Icon="{DynamicResource VelaIconGlobe}" Shortcut="⇧⌘⏎" Click="OnSplitStagingClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrDownload}" Icon="{DynamicResource VelaIconDownload}" Click="OnSplitDownloadClick" />
                 <vela:VelaMenuItem IsSeparator="True" />
-                <vela:VelaMenuItem Header="Rollback" Icon="{DynamicResource VelaIconTrash}" IsDestructive="True" Click="OnSplitRollbackClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrRollback}" Icon="{DynamicResource VelaIconTrash}" IsDestructive="True" Click="OnSplitRollbackClick" />
               </vela:VelaSplitButton>
 
               <vela:VelaSplitButton Variant="Secondary"
                                     LeadingIcon="{DynamicResource VelaIconShare}"
-                                    Content="Share"
+                                    Content="{DynamicResource StrShare}"
                                     Command="{Binding SplitShareCommand}">
-                <vela:VelaMenuItem Header="Copy Link" Icon="{DynamicResource VelaIconCopy}" Click="OnSplitCopyLinkClick" />
-                <vela:VelaMenuItem Header="Export Markdown" Icon="{DynamicResource VelaIconEdit}" Click="OnSplitExportMdClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrCopyLink}" Icon="{DynamicResource VelaIconCopy}" Click="OnSplitCopyLinkClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrExportMd}" Icon="{DynamicResource VelaIconEdit}" Click="OnSplitExportMdClick" />
               </vela:VelaSplitButton>
             </WrapPanel>
 
@@ -81,8 +81,8 @@
             </Border>
 
             <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-              <vela:VelaCopyButton CopyText="vela_live_9f8a2c4b71e0" Label="Copy API key" Copied="OnCopied" />
-              <vela:VelaCopyButton CopyText="Vela.Avalonia 12.2" Label="Copy" Variant="Plain" Copied="OnCopied" />
+              <vela:VelaCopyButton CopyText="vela_live_9f8a2c4b71e0" Label="{DynamicResource StrCopyApiKey}" Copied="OnCopied" />
+              <vela:VelaCopyButton CopyText="Vela.Avalonia 12.2" Label="{DynamicResource StrCopy}" Variant="Plain" Copied="OnCopied" />
             </WrapPanel>
           </StackPanel>
         </Border>
@@ -95,23 +95,24 @@
             <TextBlock Classes="cardTitle" Text="VelaConfirmMorph" />
 
             <StackPanel Spacing="10">
-              <vela:VelaConfirmMorph IdleText="Delete branch"
+              <vela:VelaConfirmMorph IdleText="{DynamicResource StrDeleteBranch}"
                                      Icon="{DynamicResource VelaIconTrash}"
-                                     PromptText="Delete main-v2?"
-                                     ConfirmText="Delete"
-                                     CancelText="Cancel"
-                                     BusyText="Deleting..."
-                                     DoneText="Deleted"
-                                     UndoText="Undo"
+                                     PromptText="{DynamicResource StrDeleteBranchPrompt}"
+                                     ConfirmText="{DynamicResource StrDelete}"
+                                     CancelText="{DynamicResource StrCancel}"
+                                     BusyText="{DynamicResource StrDeleting}"
+                                     DoneText="{DynamicResource StrDeleted}"
+                                     UndoText="{DynamicResource StrUndo}"
                                      Confirmed="OnBranchDeleted"
                                      Undone="OnBranchRestored" />
 
-              <vela:VelaConfirmMorph IdleText="Purge cache"
-                                     PromptText="Clear cached pages?"
-                                     ConfirmText="Purge"
-                                     BusyText="Purging..."
-                                     DoneText="Purged"
-                                     UndoText="Restore" />
+              <vela:VelaConfirmMorph IdleText="{DynamicResource StrPurgeCache}"
+                                     PromptText="{DynamicResource StrPurgePrompt}"
+                                     ConfirmText="{DynamicResource StrPurge}"
+                                     CancelText="{DynamicResource StrCancel}"
+                                     BusyText="{DynamicResource StrPurging}"
+                                     DoneText="{DynamicResource StrPurged}"
+                                     UndoText="{DynamicResource StrRestore}" />
             </StackPanel>
           </StackPanel>
         </Border>
@@ -123,31 +124,31 @@
               <vela:VelaButton Grid.Column="1"
                                Variant="Ghost"
                                Size="Small"
-                               Content="Reset"
+                               Content="{DynamicResource StrReset}"
                                Command="{Binding ResetAllHoldCommand}" />
             </Grid>
 
             <StackPanel Spacing="8">
               <vela:VelaHoldToConfirm x:Name="HoldDangerBtn"
                                       Tone="Danger"
-                                      Label="Hold to purge cache"
-                                      ConfirmedLabel="Purged"
+                                      Label="{DynamicResource StrHoldPurge}"
+                                      ConfirmedLabel="{DynamicResource StrPurged}"
                                       DurationMs="1000"
                                       HoldChanged="OnHoldChanged"
                                       Confirmed="OnHoldPurgeConfirmed" />
               <vela:VelaHoldToConfirm x:Name="HoldAccentBtn"
                                       Tone="Accent"
                                       Icon="{DynamicResource VelaIconRocket}"
-                                      Label="Hold to publish v1.0"
-                                      ConfirmedLabel="Published"
+                                      Label="{DynamicResource StrHoldPublish}"
+                                      ConfirmedLabel="{DynamicResource StrPublished}"
                                       DurationMs="1100"
                                       HoldChanged="OnHoldChanged"
                                       Confirmed="OnHoldPublishConfirmed" />
               <vela:VelaHoldToConfirm x:Name="HoldNeutralBtn"
                                       Tone="Neutral"
                                       Icon="{DynamicResource VelaIconShield}"
-                                      Label="Hold to seal archive"
-                                      ConfirmedLabel="Sealed"
+                                      Label="{DynamicResource StrHoldSeal}"
+                                      ConfirmedLabel="{DynamicResource StrSealed}"
                                       DurationMs="900"
                                       HoldChanged="OnHoldChanged"
                                       Confirmed="OnHoldSealConfirmed" />
@@ -175,7 +176,8 @@
                 </Border.Background>
               </Border>
 
-              <vela:VelaFloatingBar HorizontalAlignment="Center"
+              <vela:VelaFloatingBar x:Name="ShowcaseFloatingBar"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
                                     UseLiquidGlass="True">
                 <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconEdit}" Label="Edit" Click="OnFloatingEditClick" />

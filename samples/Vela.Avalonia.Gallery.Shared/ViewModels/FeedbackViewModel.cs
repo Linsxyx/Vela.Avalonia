@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 using Vela.Avalonia.Tokens;
 
@@ -45,33 +46,35 @@ public partial class FeedbackViewModel : ViewModelBase
     [RelayCommand]
     private async Task ShowConfirmDialogAsync()
     {
+        var loc = Loc.Instance;
         var mat = SelectedMaterial;
         var ok = await _shell.ShowConfirmDialogAsync(new VelaConfirmDialogOptions
         {
-            Title = $"Publish v0.1.0? ({mat})",
-            Description = "Tag commit and push Vela.Avalonia packages.",
-            ConfirmText = "Publish",
-            CancelText = "Cancel",
+            Title = loc.Pick($"Publish v0.1.0? ({mat})", $"发布 v0.1.0？（{mat}）"),
+            Description = loc.Pick("Tag commit and push Vela.Avalonia packages.", "将打标签并推送 Vela.Avalonia 软件包。"),
+            ConfirmText = loc.Pick("Publish", "发布"),
+            CancelText = loc.Get("StrCancel"),
             Material = mat,
             Style = mat == VelaSurfaceMaterial.GlassCard ? VelaDialogStyle.Centered : VelaDialogStyle.Standard,
             Tone = mat == VelaSurfaceMaterial.GlassCard ? VelaDialogTone.Accent : VelaDialogTone.Neutral,
         });
 
         _shell.ShowToast(
-            ok ? "Published" : "Cancelled",
-            ok ? $"Confirmed with {mat} material." : null,
+            ok ? loc.Pick("Published", "已发布") : loc.Pick("Cancelled", "已取消"),
+            ok ? loc.Pick($"Confirmed ({mat})", $"已确认（{mat}）") : null,
             ok ? VelaToastTone.Success : VelaToastTone.Neutral);
     }
 
     [RelayCommand]
     private async Task ShowDestructiveDialogAsync()
     {
+        var loc = Loc.Instance;
         var ok = await _shell.ShowConfirmDialogAsync(new VelaConfirmDialogOptions
         {
-            Title = "Delete workspace cache?",
-            Description = "Cached page snapshots will be cleared.",
-            ConfirmText = "Delete",
-            CancelText = "Keep",
+            Title = loc.Pick("Delete workspace cache?", "确认清空工作区缓存？"),
+            Description = loc.Pick("Cached page snapshots will be cleared.", "所有已缓存的页面快照将被立即清除。"),
+            ConfirmText = loc.Get("StrDelete"),
+            CancelText = loc.Pick("Keep", "保留"),
             IsDestructive = true,
             Material = SelectedMaterial,
         });
@@ -79,7 +82,7 @@ public partial class FeedbackViewModel : ViewModelBase
         if (ok)
         {
             _shell.ClearInactivePageCache();
-            _shell.ShowToast("Cache deleted", null, VelaToastTone.Danger);
+            _shell.ShowToast(loc.Pick("Cache deleted", "缓存已删除"), null, VelaToastTone.Danger);
         }
     }
 
@@ -88,18 +91,19 @@ public partial class FeedbackViewModel : ViewModelBase
     {
         var created = await _shell.ShowCreateProjectDialogAsync();
         if (!string.IsNullOrEmpty(created))
-            _shell.ShowToast("Project created", created, VelaToastTone.Success);
+            _shell.ShowToast(Loc.Instance.Pick("Project created", "项目已创建"), created, VelaToastTone.Success);
     }
 
     [RelayCommand]
     private async Task ShowPinnedGlassDialogAsync()
     {
+        var loc = Loc.Instance;
         var ok = await _shell.ShowConfirmDialogAsync(new VelaConfirmDialogOptions
         {
-            Title = "Revoke API Key?",
-            Description = "Click backdrop to test pinned bounce physics.",
-            ConfirmText = "Revoke",
-            CancelText = "Keep",
+            Title = loc.Pick("Revoke API Key?", "吊销生产 API 密钥？"),
+            Description = loc.Pick("Click backdrop to test pinned bounce physics.", "点击遮罩测试锁定弹窗的弹簧回弹效果。"),
+            ConfirmText = loc.Pick("Revoke", "吊销"),
+            CancelText = loc.Pick("Keep", "保留"),
             IsDestructive = true,
             CloseOnBackdropClick = false,
             ShowCloseButton = false,
@@ -109,25 +113,26 @@ public partial class FeedbackViewModel : ViewModelBase
         });
 
         if (ok)
-            _shell.ShowToast("API key revoked", null, VelaToastTone.Danger);
+            _shell.ShowToast(loc.Pick("API key revoked", "API 密钥已吊销"), null, VelaToastTone.Danger);
     }
 
     [RelayCommand]
     private async Task OpenDrawerAsync(string side)
     {
+        var loc = Loc.Instance;
         var isLeft = string.Equals(side, "left", StringComparison.OrdinalIgnoreCase);
         var mat = SelectedMaterial;
         var closeBtn = new VelaButton
         {
             Variant = VelaButtonVariant.Primary,
             Size = VelaControlSize.Small,
-            Content = isLeft ? "Close" : "Apply & Close",
+            Content = isLeft ? loc.Pick("Close", "关闭") : loc.Pick("Apply & Close", "应用并关闭"),
         };
         closeBtn.Click += (_, _) =>
         {
             _shell.CloseDrawer();
             if (!isLeft)
-                _shell.ShowToast("Inspector updated", null, VelaToastTone.Success);
+                _shell.ShowToast(loc.Pick("Inspector updated", "检查器已更新"), null, VelaToastTone.Success);
         };
 
         var body = new StackPanel
@@ -135,8 +140,8 @@ public partial class FeedbackViewModel : ViewModelBase
             Spacing = 14,
             Children =
             {
-                new VelaInput { Label = "Title", Text = "VelaDrawerHost", IsClearable = true },
-                new VelaCheckBox { Content = "Close on backdrop click", IsChecked = true },
+                new VelaInput { Label = loc.Pick("Title", "标题"), Text = "VelaDrawerHost", IsClearable = true },
+                new VelaCheckBox { Content = loc.Pick("Close on backdrop click", "点击遮罩关闭"), IsChecked = true },
                 new VelaBadge { Tone = VelaBadgeTone.Accent, IsPill = true, Content = mat.ToString() },
                 closeBtn,
             },
@@ -144,8 +149,8 @@ public partial class FeedbackViewModel : ViewModelBase
 
         await _shell.ShowDrawerAsync(body, new VelaDrawerOptions
         {
-            Title = isLeft ? "Quick Filters" : "Inspector",
-            Description = $"{mat} material",
+            Title = isLeft ? loc.Pick("Quick Filters", "快捷筛选") : loc.Get("StrInspector"),
+            Description = mat.ToString(),
             Side = isLeft ? VelaDrawerSide.Left : VelaDrawerSide.Right,
             Width = isLeft ? 340 : 380,
             Material = mat,
@@ -155,20 +160,21 @@ public partial class FeedbackViewModel : ViewModelBase
     [RelayCommand]
     private void ShowToast(string tone)
     {
+        var loc = Loc.Instance;
         switch (tone)
         {
             case "success":
-                _shell.ShowToast("Saved", "Configuration synced.", VelaToastTone.Success);
+                _shell.ShowToast(loc.Pick("Saved", "已保存"), loc.Pick("Configuration synced.", "配置已同步。"), VelaToastTone.Success);
                 break;
             case "undo":
-                _shell.ShowToast("Archived 3 items", "Hover to pause timer.", VelaToastTone.Info, "Undo",
-                    () => _shell.ShowToast("Restored", "3 items restored.", VelaToastTone.Success));
+                _shell.ShowToast(loc.Pick("Archived 3 items", "已归档 3 项"), loc.Pick("Hover to pause timer.", "悬停可暂停自动消失。"), VelaToastTone.Info, loc.Get("StrUndo"),
+                    () => _shell.ShowToast(loc.Pick("Restored", "已恢复"), loc.Pick("3 items restored.", "已恢复 3 个条目。"), VelaToastTone.Success));
                 break;
             case "warning":
-                _shell.ShowToast("High memory", "Try LRU page cache.", VelaToastTone.Warning);
+                _shell.ShowToast(loc.Pick("High memory", "内存占用较高"), loc.Pick("Try LRU page cache.", "建议切换为 LRU 页面缓存。"), VelaToastTone.Warning);
                 break;
             case "danger":
-                _shell.ShowToast("Connection lost", "Retrying in 5s...", VelaToastTone.Danger);
+                _shell.ShowToast(loc.Pick("Connection lost", "连接已断开"), loc.Pick("Retrying in 5s...", "5 秒后尝试重连..."), VelaToastTone.Danger);
                 break;
         }
     }
@@ -190,7 +196,7 @@ public partial class FeedbackViewModel : ViewModelBase
         IsBusy = true;
         await Task.Delay(2000);
         IsBusy = false;
-        _shell.ShowToast("Task complete", "Indexed in 2.0s.", VelaToastTone.Success);
+        _shell.ShowToast(Loc.Instance.Pick("Task complete", "任务完成"), Loc.Instance.Pick("Indexed in 2.0s.", "耗时 2.0 秒完成索引。"), VelaToastTone.Success);
     }
 
     [RelayCommand]

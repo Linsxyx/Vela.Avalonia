@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Vela.Avalonia.Gallery.Localization;
 
 namespace Vela.Avalonia.Gallery.ViewModels;
 
@@ -13,9 +14,9 @@ public partial class InputsViewModel : ViewModelBase
 
     public string PlanSummary => SelectedPlanIndex switch
     {
-        0 => "Monthly · $12/mo",
-        1 => "Quarterly · $30/qtr",
-        2 => "Yearly · $96/yr (20% off)",
+        0 => Loc.Instance.Get("StrPlanMonthly"),
+        1 => Loc.Instance.Get("StrPlanQuarterly"),
+        2 => Loc.Instance.Get("StrPlanYearly"),
         _ => string.Empty,
     };
 
@@ -42,4 +43,9 @@ public partial class InputsViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial double RulerZoom { get; set; } = 100;
+
+    public InputsViewModel()
+    {
+        Loc.Instance.LanguageChanged += _ => OnPropertyChanged(nameof(PlanSummary));
+    }
 }

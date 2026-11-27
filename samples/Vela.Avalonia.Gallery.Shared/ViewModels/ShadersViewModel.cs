@@ -2,6 +2,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 
 namespace Vela.Avalonia.Gallery.ViewModels;
@@ -65,6 +66,9 @@ public partial class ShadersViewModel : ViewModelBase
     private void SyncShaderToTheme()
     {
         ShaderPrimaryColor = null;
-        _shell.ShowToast("Synced", "Shader tracks VelaTheme accent.", VelaToastTone.Info);
+        _shell.ShowToast(
+            Loc.Instance.Get("StrSynced"),
+            Loc.Instance.Pick("Shader tracks VelaTheme accent.", "着色器已同步主题强调色。"),
+            VelaToastTone.Info);
     }
 }

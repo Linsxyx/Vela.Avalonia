@@ -2,6 +2,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
 
 namespace Vela.Avalonia.Gallery.ViewModels;
@@ -70,29 +71,30 @@ public partial class PickersViewModel : ViewModelBase
     [RelayCommand]
     private void MenuAction(string action)
     {
+        var loc = Loc.Instance;
         switch (action)
         {
             case "rename":
-                _shell.ShowToast("Rename", "Document rename triggered.", VelaToastTone.Info);
+                _shell.ShowToast(loc.Get("StrRename"), loc.Pick("Document rename triggered.", "已触发文档重命名。"), VelaToastTone.Info);
                 break;
             case "duplicate":
-                _shell.ShowToast("Duplicated", "Copy created.", VelaToastTone.Success);
+                _shell.ShowToast(loc.Pick("Duplicated", "已创建副本"), loc.Pick("Copy created.", "副本已生成。"), VelaToastTone.Success);
                 break;
             case "share":
-                _shell.ShowToast("Link copied", "Share URL copied.", VelaToastTone.Info);
+                _shell.ShowToast(loc.Pick("Link copied", "已复制链接"), loc.Pick("Share URL copied.", "分享链接已复制。"), VelaToastTone.Info);
                 break;
             case "delete":
-                _shell.ShowToast("Deleted", "Moved to Trash.", VelaToastTone.Danger, "Undo",
-                    () => _shell.ShowToast("Restored", "Document restored.", VelaToastTone.Success));
+                _shell.ShowToast(loc.Get("StrDeleted"), loc.Pick("Moved to Trash.", "已移至废纸篓。"), VelaToastTone.Danger, loc.Get("StrUndo"),
+                    () => _shell.ShowToast(loc.Pick("Restored", "已恢复"), loc.Pick("Document restored.", "文档已恢复。"), VelaToastTone.Success));
                 break;
             case "ctx-edit":
-                _shell.ShowToast("Edit", "Context menu edit.", VelaToastTone.Info);
+                _shell.ShowToast(loc.Get("StrEdit"), loc.Pick("Context menu edit.", "右键菜单编辑。"), VelaToastTone.Info);
                 break;
             case "ctx-copy":
-                _shell.ShowToast("Copied", "Path copied.", VelaToastTone.Success);
+                _shell.ShowToast(loc.Pick("Copied", "已复制"), loc.Pick("Path copied.", "路径已复制。"), VelaToastTone.Success);
                 break;
             case "ctx-delete":
-                _shell.ShowToast("Deleted", "Removed permanently.", VelaToastTone.Danger);
+                _shell.ShowToast(loc.Get("StrDeleted"), loc.Pick("Removed permanently.", "已永久删除。"), VelaToastTone.Danger);
                 break;
         }
     }

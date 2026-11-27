@@ -6,7 +6,7 @@
              x:DataType="vm:FeedbackViewModel">
   <ScrollViewer Classes="pageScroll">
     <StackPanel Classes="pageRoot">
-      <TextBlock Classes="pageTitle" Text="Overlays &amp; Feedback" />
+      <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavFeedback}" />
 
       <!-- Row 1: Unified Dialog & Drawer Material Card -->
       <Border Classes="card">
@@ -14,20 +14,20 @@
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <TextBlock Classes="cardTitle" Text="VelaDialogHost &amp; VelaDrawerHost" VerticalAlignment="Center" />
             <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding OverlayMaterialIndex, Mode=TwoWay}">
-              <x:String>Solid</x:String>
-              <x:String>Frosted</x:String>
-              <x:String>GlassCard</x:String>
-              <x:String>LiquidGlass</x:String>
+              <vela:VelaSegmentedItem Content="{DynamicResource StrSolid}" />
+              <vela:VelaSegmentedItem Content="{DynamicResource StrFrosted}" />
+              <vela:VelaSegmentedItem Content="GlassCard" />
+              <vela:VelaSegmentedItem Content="{DynamicResource StrLiquidGlass}" />
             </vela:VelaSegmentedControl>
           </Grid>
 
           <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-            <vela:VelaButton Variant="Primary" Size="Small" Content="Confirm Dialog" Command="{Binding ShowConfirmDialogCommand}" />
-            <vela:VelaButton Variant="Danger" Size="Small" Content="Destructive" Command="{Binding ShowDestructiveDialogCommand}" />
-            <vela:VelaButton Variant="Secondary" Size="Small" Content="Form Dialog" Command="{Binding ShowCustomDialogCommand}" />
-            <vela:VelaButton Variant="Secondary" Size="Small" Content="Pinned Bounce" Command="{Binding ShowPinnedGlassDialogCommand}" />
-            <vela:VelaButton Variant="Secondary" Size="Small" Content="Right Drawer" Command="{Binding OpenDrawerCommand}" CommandParameter="right" />
-            <vela:VelaButton Variant="Ghost" Size="Small" Content="Left Drawer" Command="{Binding OpenDrawerCommand}" CommandParameter="left" />
+            <vela:VelaButton Variant="Primary" Size="Small" Content="{DynamicResource StrConfirmDialog}" Command="{Binding ShowConfirmDialogCommand}" />
+            <vela:VelaButton Variant="Danger" Size="Small" Content="{DynamicResource StrDestructive}" Command="{Binding ShowDestructiveDialogCommand}" />
+            <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrFormDialog}" Command="{Binding ShowCustomDialogCommand}" />
+            <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrPinnedBounce}" Command="{Binding ShowPinnedGlassDialogCommand}" />
+            <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrRightDrawer}" Command="{Binding OpenDrawerCommand}" CommandParameter="right" />
+            <vela:VelaButton Variant="Ghost" Size="Small" Content="{DynamicResource StrLeftDrawer}" Command="{Binding OpenDrawerCommand}" CommandParameter="left" />
           </WrapPanel>
         </StackPanel>
       </Border>
@@ -38,10 +38,10 @@
           <StackPanel Spacing="14">
             <TextBlock Classes="cardTitle" Text="VelaToastHost" />
             <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-              <vela:VelaButton Variant="Secondary" Size="Small" Content="Success" Command="{Binding ShowToastCommand}" CommandParameter="success" />
-              <vela:VelaButton Variant="Secondary" Size="Small" Content="Info + Undo" Command="{Binding ShowToastCommand}" CommandParameter="undo" />
-              <vela:VelaButton Variant="Secondary" Size="Small" Content="Warning" Command="{Binding ShowToastCommand}" CommandParameter="warning" />
-              <vela:VelaButton Variant="Danger" Size="Small" Content="Error" Command="{Binding ShowToastCommand}" CommandParameter="danger" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrSuccess}" Command="{Binding ShowToastCommand}" CommandParameter="success" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrInfoUndo}" Command="{Binding ShowToastCommand}" CommandParameter="undo" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="{DynamicResource StrWarning}" Command="{Binding ShowToastCommand}" CommandParameter="warning" />
+              <vela:VelaButton Variant="Danger" Size="Small" Content="{DynamicResource StrError}" Command="{Binding ShowToastCommand}" CommandParameter="danger" />
             </WrapPanel>
           </StackPanel>
         </Border>
@@ -54,7 +54,7 @@
             </Grid>
 
             <vela:VelaBusyOverlay IsBusy="{Binding IsBusy}"
-                                  Message="Indexing shaders..."
+                                  Message="{DynamicResource StrIndexingShaders}"
                                   BlurRadius="10"
                                   CornerRadius="10">
               <Border Background="{DynamicResource VelaSurfaceMutedBrush}"
@@ -64,13 +64,13 @@
                       Padding="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                   <StackPanel Spacing="2" VerticalAlignment="Center">
-                    <TextBlock Text="Build Pipeline #402" FontSize="13" FontWeight="SemiBold" />
-                    <vela:VelaBadge Tone="Success" IsPill="True" Content="Active" HorizontalAlignment="Left" />
+                    <TextBlock Text="{DynamicResource StrBuildPipeline}" FontSize="13" FontWeight="SemiBold" />
+                    <vela:VelaBadge Tone="Success" IsPill="True" Content="{DynamicResource StrActive}" HorizontalAlignment="Left" />
                   </StackPanel>
                   <vela:VelaButton Grid.Column="1"
                                    Variant="Secondary"
                                    Size="Small"
-                                   Content="Run 2s Task"
+                                   Content="{DynamicResource StrRunTask}"
                                    VerticalAlignment="Center"
                                    Command="{Binding SimulateBusyCommand}" />
                 </Grid>
@@ -86,10 +86,10 @@
           <StackPanel Spacing="14">
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Classes="cardTitle" Text="VelaProgress" VerticalAlignment="Center" />
-              <vela:VelaSwitch Grid.Column="1" Content="Indeterminate" IsChecked="{Binding IsProgressIndeterminate, Mode=TwoWay}" />
+              <vela:VelaSwitch Grid.Column="1" Content="{DynamicResource StrIndeterminate}" IsChecked="{Binding IsProgressIndeterminate, Mode=TwoWay}" />
             </Grid>
 
-            <vela:VelaProgress Label="Uploading artifact"
+            <vela:VelaProgress Label="{DynamicResource StrUploadingArtifact}"
                                Value="{Binding ProgressValue}"
                                IsIndeterminate="{Binding IsProgressIndeterminate}" />
 
@@ -106,7 +106,7 @@
           <StackPanel Spacing="14">
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Classes="cardTitle" Text="VelaSkeleton" VerticalAlignment="Center" />
-              <vela:VelaSwitch Grid.Column="1" Content="Loading" IsChecked="{Binding IsSkeletonLoading, Mode=TwoWay}" />
+              <vela:VelaSwitch Grid.Column="1" Content="{DynamicResource StrLoading}" IsChecked="{Binding IsSkeletonLoading, Mode=TwoWay}" />
             </Grid>
 
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
@@ -119,10 +119,10 @@
 
               <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
                 <vela:VelaSkeleton Height="15" Width="140" HorizontalAlignment="Left" IsLoading="{Binding IsSkeletonLoading}">
-                  <TextBlock Text="Vela Studio" FontSize="13.5" FontWeight="SemiBold" />
+                  <TextBlock Text="{DynamicResource StrBrandTitle}" FontSize="13.5" FontWeight="SemiBold" />
                 </vela:VelaSkeleton>
                 <vela:VelaSkeleton Height="12" IsLoading="{Binding IsSkeletonLoading}">
-                  <TextBlock Text="Avalonia 12.2 · Motion primitives" FontSize="12" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  <TextBlock Text="Avalonia 12.2 · OKLCH" FontSize="12" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                 </vela:VelaSkeleton>
               </StackPanel>
             </Grid>
@@ -135,12 +135,12 @@
         <StackPanel Spacing="10">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Classes="cardTitle" Text="VelaAlert" VerticalAlignment="Center" />
-            <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="Restore" Command="{Binding RestoreAlertsCommand}" />
+            <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="{DynamicResource StrRestore}" Command="{Binding RestoreAlertsCommand}" />
           </Grid>
 
-          <vela:VelaAlert x:Name="AlertInfo" Tone="Info" Title="Composition Ready" Description="KeepAlive caching active." IsDismissible="True" />
-          <vela:VelaAlert x:Name="AlertSuccess" Tone="Success" Title="Tokens Synced" Description="8 OKLCH palettes compiled." IsDismissible="True" />
-          <vela:VelaAlert x:Name="AlertWarning" Tone="Warning" Title="High DPI Scaling" Description="Instant transition recommended." IsDismissible="True" />
+          <vela:VelaAlert x:Name="AlertInfo" Tone="Info" Title="{DynamicResource StrAlertInfoTitle}" Description="{DynamicResource StrAlertInfoDesc}" IsDismissible="True" />
+          <vela:VelaAlert x:Name="AlertSuccess" Tone="Success" Title="{DynamicResource StrAlertSuccessTitle}" Description="{DynamicResource StrAlertSuccessDesc}" IsDismissible="True" />
+          <vela:VelaAlert x:Name="AlertWarning" Tone="Warning" Title="{DynamicResource StrAlertWarnTitle}" Description="{DynamicResource StrAlertWarnDesc}" IsDismissible="True" />
         </StackPanel>
       </Border>
     </StackPanel>

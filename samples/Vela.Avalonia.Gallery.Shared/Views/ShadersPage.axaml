@@ -6,7 +6,7 @@
              x:DataType="vm:ShadersViewModel">
   <ScrollViewer Classes="pageScroll">
     <StackPanel Classes="pageRoot" ClipToBounds="False">
-      <TextBlock Classes="pageTitle" Text="Shaders &amp; Glass" />
+      <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavShaders}" />
 
       <!-- 1. VelaLiquidGlass Interactive Optical Stage + Tuning -->
       <Border Classes="card" ClipToBounds="False">
@@ -14,7 +14,7 @@
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Classes="cardTitle" Text="VelaLiquidGlass" VerticalAlignment="Center" />
             <vela:VelaSwitch Grid.Column="1"
-                             Content="SDF Refraction"
+                             Content="{DynamicResource StrSdfRefraction}"
                              IsChecked="{Binding EnableRefraction, Mode=TwoWay}" />
           </Grid>
 
@@ -68,7 +68,7 @@
                                       PointerMoved="OnGlassDragMove"
                                       PointerReleased="OnGlassDragEnd">
                   <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
-                    <TextBlock Text="Drag Me" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                    <TextBlock Text="{DynamicResource StrDragMe}" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" />
                     <TextBlock Text="SkSL SDF Lens" FontSize="11.5" Opacity="0.75" HorizontalAlignment="Center" />
                   </StackPanel>
                 </vela:VelaLiquidGlass>
@@ -85,7 +85,7 @@
                                       Specular="0.9">
                   <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <vela:VelaBadge Tone="Success" ShowDot="True" IsPill="True" Content="Skia GPU" />
-                    <TextBlock Text="Glass Pill" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" />
+                    <TextBlock Text="{DynamicResource StrGlassPill}" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" />
                   </StackPanel>
                 </vela:VelaLiquidGlass>
               </Canvas>
@@ -93,21 +93,21 @@
           </Border>
 
           <Grid ColumnDefinitions="*,*" ColumnSpacing="24" RowDefinitions="Auto,Auto" RowSpacing="20" ClipToBounds="False">
-            <vela:VelaElasticSlider Label="Blur"
+            <vela:VelaElasticSlider Label="{DynamicResource StrBlur}"
                                     Minimum="0"
                                     Maximum="20"
                                     Value="{Binding BlurRadius, Mode=TwoWay}"
                                     Step="1"
                                     ValueSuffix=" px" />
             <vela:VelaElasticSlider Grid.Column="1"
-                                    Label="Bevel"
+                                    Label="{DynamicResource StrBevel}"
                                     Minimum="4"
                                     Maximum="36"
                                     Value="{Binding BevelWidth, Mode=TwoWay}"
                                     Step="1"
                                     ValueSuffix=" px" />
             <vela:VelaElasticSlider Grid.Row="1"
-                                    Label="Refraction"
+                                    Label="{DynamicResource StrRefraction}"
                                     Minimum="0"
                                     Maximum="140"
                                     Value="{Binding RefractionPercent, Mode=TwoWay}"
@@ -115,7 +115,7 @@
                                     ValueSuffix="%" />
             <vela:VelaElasticSlider Grid.Row="1"
                                     Grid.Column="1"
-                                    Label="Dispersion"
+                                    Label="{DynamicResource StrDispersion}"
                                     Minimum="0"
                                     Maximum="140"
                                     Value="{Binding DispersionPercent, Mode=TwoWay}"
@@ -131,9 +131,9 @@
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <TextBlock Classes="cardTitle" Text="VelaShaderBackground" VerticalAlignment="Center" />
             <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding ShaderPresetIndex, Mode=TwoWay}">
-              <x:String>Mesh</x:String>
-              <x:String>Aurora</x:String>
-              <x:String>Silk</x:String>
+              <vela:VelaSegmentedItem Content="Mesh" />
+              <vela:VelaSegmentedItem Content="Aurora" />
+              <vela:VelaSegmentedItem Content="Silk" />
             </vela:VelaSegmentedControl>
           </Grid>
 
@@ -166,13 +166,13 @@
           </Border>
 
           <WrapPanel Orientation="Horizontal" ItemSpacing="16" LineSpacing="10">
-            <vela:VelaSwitch Content="Animate" IsChecked="{Binding AnimateShader, Mode=TwoWay}" />
-            <vela:VelaColorPicker Label="Tint"
+            <vela:VelaSwitch Content="{DynamicResource StrAnimate}" IsChecked="{Binding AnimateShader, Mode=TwoWay}" />
+            <vela:VelaColorPicker Label="{DynamicResource StrTint}"
                                   SelectedColor="{Binding PickerTintColor, Mode=TwoWay}"
                                   ShowAlpha="False" />
             <vela:VelaButton Variant="Ghost"
                              Size="Small"
-                             Content="Sync Theme Accent"
+                             Content="{DynamicResource StrSyncThemeAccent}"
                              Command="{Binding SyncShaderToThemeCommand}" />
           </WrapPanel>
         </StackPanel>

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.ViewModels;
 
 namespace Vela.Avalonia.Gallery.Views;
@@ -13,6 +14,42 @@ public partial class LayoutPage : UserControl
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+        SyncLocalizedItems();
+        Loc.Instance.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(AppLanguage _) => SyncLocalizedItems();
+
+    private void SyncLocalizedItems()
+    {
+        var loc = Loc.Instance;
+
+        if (ShowcaseDockBar.Items.Count >= 4)
+        {
+            ShowcaseDockBar.Items[0].Header = loc.Get("StrDockHome");
+            ShowcaseDockBar.Items[1].Header = loc.Get("StrDockExplore");
+            ShowcaseDockBar.Items[2].Header = loc.Get("StrDockSaved");
+            ShowcaseDockBar.Items[3].Header = loc.Get("StrDockProfile");
+        }
+
+        if (DemoStepper.Steps.Count >= 4)
+        {
+            DemoStepper.Steps[0].Title = loc.Get("StrStepAccount");
+            DemoStepper.Steps[0].Description = loc.Get("StrStepAccountDesc");
+            DemoStepper.Steps[1].Title = loc.Get("StrStepRuntime");
+            DemoStepper.Steps[1].Description = loc.Get("StrStepRuntimeDesc");
+            DemoStepper.Steps[2].Title = loc.Get("StrStepSecurity");
+            DemoStepper.Steps[2].Description = loc.Get("StrStepSecurityDesc");
+            DemoStepper.Steps[3].Title = loc.Get("StrStepDeploy");
+            DemoStepper.Steps[3].Description = loc.Get("StrStepDeployDesc");
+        }
+
+        if (DemoSplitPanels.Panes.Count >= 3)
+        {
+            DemoSplitPanels.Panes[0].Header = loc.Get("StrExplorer");
+            DemoSplitPanels.Panes[1].Header = loc.Get("StrEditor");
+            DemoSplitPanels.Panes[2].Header = loc.Get("StrInspector");
+        }
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)
@@ -57,7 +94,9 @@ public partial class LayoutPage : UserControl
     {
         var idx = Math.Clamp(DemoStepper.CurrentStep, 0, DemoStepper.Steps.Count - 1);
         var step = DemoStepper.Steps[idx];
-        step.ErrorText = string.IsNullOrEmpty(step.ErrorText) ? "Certificate expired" : null;
+        step.ErrorText = string.IsNullOrEmpty(step.ErrorText)
+            ? Loc.Instance.Pick("Certificate expired", "签名证书已过期")
+            : null;
     }
 
     private void OnCompleteAllSteps()
