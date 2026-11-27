@@ -52,6 +52,34 @@ public partial class ShadersViewModel : ViewModelBase
     [ObservableProperty]
     public partial Color? ShaderPrimaryColor { get; set; }
 
+    // ─── VelaGlassCard ───────────────────────────────────────────────────
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GlassCardTintLevel))]
+    public partial int GlassCardTintIndex { get; set; } = 1;
+
+    public VelaGlassTintLevel GlassCardTintLevel => GlassCardTintIndex switch
+    {
+        0 => VelaGlassTintLevel.None,
+        2 => VelaGlassTintLevel.HighContrast,
+        _ => VelaGlassTintLevel.Standard,
+    };
+
+    [ObservableProperty]
+    public partial bool GlassCardBlurEnabled { get; set; } = true;
+
+    [ObservableProperty]
+    public partial double GlassCardBlurRadius { get; set; } = 60;
+
+    // ─── VelaBackgroundLayer ─────────────────────────────────────────────
+    [ObservableProperty]
+    public partial double BgLayerBlurRadius { get; set; } = 12;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BgLayerOverlayOpacity))]
+    public partial double BgLayerOverlayPercent { get; set; } = 45;
+
+    public double BgLayerOverlayOpacity => BgLayerOverlayPercent / 100.0;
+
     public ShadersViewModel(IGalleryShellService shell)
     {
         _shell = shell;

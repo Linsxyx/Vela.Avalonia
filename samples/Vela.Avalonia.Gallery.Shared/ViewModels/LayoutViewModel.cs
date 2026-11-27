@@ -1,3 +1,4 @@
+using Avalonia.Layout;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
@@ -16,16 +17,31 @@ public partial class LayoutViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DockMaterial))]
     [NotifyPropertyChangedFor(nameof(ShowDockShader))]
-    public partial int DockMaterialIndex { get; set; }
+    public partial int DockMaterialIndex { get; set; } = 3;
 
     public VelaSurfaceMaterial DockMaterial => DockMaterialIndex switch
     {
         1 => VelaSurfaceMaterial.Frosted,
-        2 => VelaSurfaceMaterial.LiquidGlass,
+        2 => VelaSurfaceMaterial.GlassCard,
+        3 => VelaSurfaceMaterial.LiquidGlass,
         _ => VelaSurfaceMaterial.Solid,
     };
 
     public bool ShowDockShader => DockMaterial != VelaSurfaceMaterial.Solid;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DockOrientation))]
+    [NotifyPropertyChangedFor(nameof(DockStageHeight))]
+    public partial int DockOrientationIndex { get; set; }
+
+    public Orientation DockOrientation =>
+        DockOrientationIndex == 1 ? Orientation.Vertical : Orientation.Horizontal;
+
+    public double DockStageHeight =>
+        DockOrientationIndex == 1 ? 268.0 : 132.0;
+
+    [ObservableProperty]
+    public partial bool DockShowShadow { get; set; } = true;
 
     [ObservableProperty]
     public partial int DockSelectedIndex { get; set; } = 2;

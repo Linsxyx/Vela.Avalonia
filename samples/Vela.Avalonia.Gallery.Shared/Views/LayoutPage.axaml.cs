@@ -26,10 +26,10 @@ public partial class LayoutPage : UserControl
 
         if (ShowcaseDockBar.Items.Count >= 4)
         {
-            ShowcaseDockBar.Items[0].Header = loc.Get("StrDockHome");
-            ShowcaseDockBar.Items[1].Header = loc.Get("StrDockExplore");
-            ShowcaseDockBar.Items[2].Header = loc.Get("StrDockSaved");
-            ShowcaseDockBar.Items[3].Header = loc.Get("StrDockProfile");
+            ShowcaseDockBar.Items[0].Header = ShowcaseDockBar.Items[0].ToolTip = loc.Get("StrDockHome");
+            ShowcaseDockBar.Items[1].Header = ShowcaseDockBar.Items[1].ToolTip = loc.Get("StrDockExplore");
+            ShowcaseDockBar.Items[2].Header = ShowcaseDockBar.Items[2].ToolTip = loc.Get("StrDockSaved");
+            ShowcaseDockBar.Items[3].Header = ShowcaseDockBar.Items[3].ToolTip = loc.Get("StrDockProfile");
         }
 
         if (DemoStepper.Steps.Count >= 4)

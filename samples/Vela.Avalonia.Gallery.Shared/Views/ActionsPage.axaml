@@ -190,6 +190,52 @@
           </Border>
         </StackPanel>
       </Border>
+      <!-- Row 4: VelaToolBar -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaToolBar" VerticalAlignment="Center" />
+            <WrapPanel Grid.Column="1" Orientation="Horizontal" ItemSpacing="10" LineSpacing="8" VerticalAlignment="Center">
+              <vela:VelaSwitch Content="{DynamicResource StrCompact}" IsChecked="{Binding ToolBarCompact, Mode=TwoWay}" VerticalAlignment="Center" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding ToolBarVariantIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="{DynamicResource StrStandard}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrFloating}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrBorderless}" />
+              </vela:VelaSegmentedControl>
+            </WrapPanel>
+          </Grid>
+
+          <vela:VelaToolBar Variant="{Binding ToolBarVariant}"
+                            IsCompact="{Binding ToolBarCompact}">
+            <vela:VelaToolBarButton Icon="{DynamicResource VelaIconPlus}"
+                                    Label="{DynamicResource StrNewFile}"
+                                    Command="{Binding ToolBarActionCommand}"
+                                    CommandParameter="new" />
+            <vela:VelaToolBarButton Icon="{DynamicResource VelaIconCopy}"
+                                    Label="{DynamicResource StrCopy}"
+                                    Command="{Binding ToolBarActionCommand}"
+                                    CommandParameter="copy" />
+            <vela:VelaToolBarSeparator />
+            <vela:VelaToolBarToggleButton Icon="{DynamicResource VelaIconTable}"
+                                          Label="{DynamicResource StrToggleGrid}"
+                                          IsChecked="{Binding ToolBarGridActive, Mode=TwoWay}" />
+            <vela:VelaToolBarToggleButton Icon="{DynamicResource VelaIconSidebar}"
+                                          Label="{DynamicResource StrInspector}"
+                                          IsChecked="{Binding ToolBarInspectorActive, Mode=TwoWay}" />
+            <vela:VelaToolBar.TrailingItems>
+              <vela:VelaToolBarButton Icon="{DynamicResource VelaIconDownload}"
+                                      Label="{DynamicResource StrExport}"
+                                      Command="{Binding ToolBarActionCommand}"
+                                      CommandParameter="export" />
+              <vela:VelaToolBarButton Icon="{DynamicResource VelaIconSettings}"
+                                      Command="{Binding ToolBarActionCommand}"
+                                      CommandParameter="settings" />
+            </vela:VelaToolBar.TrailingItems>
+          </vela:VelaToolBar>
+
+          <TextBlock Classes="statusText" Text="{Binding ToolBarStatus}" />
+        </StackPanel>
+      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

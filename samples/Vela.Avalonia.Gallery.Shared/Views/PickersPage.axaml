@@ -105,41 +105,83 @@
               </vela:VelaPopover>
             </WrapPanel>
 
-            <Border Grid.Column="1"
+            <Border x:Name="ContextMenuArea"
+                    Grid.Column="1"
                     CornerRadius="10"
-                    Padding="14,12"
+                    Padding="14,10"
                     Background="{DynamicResource VelaSurfaceMutedBrush}"
                     BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
                     BorderThickness="1"
                     Cursor="Hand">
-              <Border.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="{DynamicResource StrEdit}" InputGesture="Ctrl+E" Command="{Binding MenuActionCommand}" CommandParameter="ctx-edit">
-                    <MenuItem.Icon>
-                      <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconEdit}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
-                    </MenuItem.Icon>
-                  </MenuItem>
-                  <MenuItem Header="{DynamicResource StrCopyPath}" InputGesture="Ctrl+C" Command="{Binding MenuActionCommand}" CommandParameter="ctx-copy">
-                    <MenuItem.Icon>
-                      <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconCopy}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
-                    </MenuItem.Icon>
-                  </MenuItem>
-                  <Separator />
-                  <MenuItem Classes="danger" Header="{DynamicResource StrDelete}" InputGesture="Delete" Command="{Binding MenuActionCommand}" CommandParameter="ctx-delete">
-                    <MenuItem.Icon>
-                      <PathIcon Width="14" Height="14" Data="{DynamicResource VelaIconTrash}" Foreground="{DynamicResource VelaDangerBrush}" />
-                    </MenuItem.Icon>
-                  </MenuItem>
-                </ContextMenu>
-              </Border.ContextMenu>
-              <TextBlock Text="{DynamicResource StrRightClickHint}"
-                         FontSize="12.5"
-                         FontWeight="Medium"
-                         Foreground="{DynamicResource VelaTextSecondaryBrush}"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center" />
+              <vela:VelaContextMenu.Menu>
+                <vela:VelaContextMenu x:Name="DemoContextMenu">
+                  <vela:VelaMenuItem Header="{DynamicResource StrEdit}" Icon="{DynamicResource VelaIconEdit}" Shortcut="⌘E" Click="OnCtxEditClick" />
+                  <vela:VelaMenuItem Header="{DynamicResource StrCopyPath}" Icon="{DynamicResource VelaIconCopy}" Shortcut="⌘C" Click="OnCtxCopyClick" />
+                  <vela:VelaMenuItem Header="{DynamicResource StrShareSubmenu}" Icon="{DynamicResource VelaIconShare}">
+                    <vela:VelaMenuItem Header="{DynamicResource StrShareLink}" Icon="{DynamicResource VelaIconGlobe}" Shortcut="⇧⌘C" Click="OnShareClick" />
+                    <vela:VelaMenuItem Header="{DynamicResource StrDuplicate}" Icon="{DynamicResource VelaIconCopy}" Shortcut="⌘D" Click="OnDuplicateClick" />
+                  </vela:VelaMenuItem>
+                  <vela:VelaMenuItem IsSeparator="True" />
+                  <vela:VelaMenuItem Header="{DynamicResource StrDelete}" Icon="{DynamicResource VelaIconTrash}" Shortcut="⌫" IsDestructive="True" Click="OnCtxDeleteClick" />
+                </vela:VelaContextMenu>
+              </vela:VelaContextMenu.Menu>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <TextBlock Text="{DynamicResource StrRightClickHint}"
+                           FontSize="12.5"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                           VerticalAlignment="Center" />
+                <vela:VelaButton Grid.Column="1"
+                                 Variant="Ghost"
+                                 Size="Small"
+                                 Content="{DynamicResource StrOpenContextMenu}"
+                                 Click="OnOpenContextMenuClick" />
+              </Grid>
             </Border>
           </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Row 4: VelaMenuBar -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaMenuBar" VerticalAlignment="Center" />
+            <WrapPanel Grid.Column="1" Orientation="Horizontal" ItemSpacing="10" LineSpacing="8" VerticalAlignment="Center">
+              <vela:VelaSwitch Content="{DynamicResource StrCompact}" IsChecked="{Binding MenuBarCompact, Mode=TwoWay}" VerticalAlignment="Center" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding MenuBarMaterialIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="{DynamicResource StrSolid}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrFrosted}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrGlassCard}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrLiquidGlass}" />
+              </vela:VelaSegmentedControl>
+            </WrapPanel>
+          </Grid>
+
+          <Border CornerRadius="10"
+                  Padding="8,6"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                  BorderThickness="1">
+            <vela:VelaMenuBar IsCompact="{Binding MenuBarCompact}"
+                              SurfaceMaterial="{Binding MenuBarMaterial}">
+              <vela:VelaMenuBarItem Header="{DynamicResource StrMenuFile}">
+                <vela:VelaMenuItem Header="{DynamicResource StrNewFile}" Icon="{DynamicResource VelaIconFile}" Shortcut="⌘N" Click="OnMenuBarNewClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrExport}" Icon="{DynamicResource VelaIconDownload}" Shortcut="⇧⌘E" Click="OnMenuBarExportClick" />
+                <vela:VelaMenuItem IsSeparator="True" />
+                <vela:VelaMenuItem Header="{DynamicResource StrDelete}" Icon="{DynamicResource VelaIconTrash}" IsDestructive="True" Click="OnDeleteClick" />
+              </vela:VelaMenuBarItem>
+              <vela:VelaMenuBarItem Header="{DynamicResource StrMenuEdit}">
+                <vela:VelaMenuItem Header="{DynamicResource StrRename}" Icon="{DynamicResource VelaIconEdit}" Shortcut="⌘R" Click="OnRenameClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrDuplicate}" Icon="{DynamicResource VelaIconCopy}" Shortcut="⌘D" Click="OnDuplicateClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrShareLink}" Icon="{DynamicResource VelaIconShare}" Shortcut="⇧⌘C" Click="OnShareClick" />
+              </vela:VelaMenuBarItem>
+              <vela:VelaMenuBarItem Header="{DynamicResource StrMenuView}">
+                <vela:VelaMenuItem Header="{DynamicResource StrToggleGrid}" Icon="{DynamicResource VelaIconTable}" Shortcut="⌘'" Click="OnMenuBarGridClick" />
+                <vela:VelaMenuItem Header="{DynamicResource StrZoomReset}" Icon="{DynamicResource VelaIconSearch}" Shortcut="⌘0" Click="OnMenuBarZoomClick" />
+              </vela:VelaMenuBarItem>
+            </vela:VelaMenuBar>
+          </Border>
         </StackPanel>
       </Border>
 

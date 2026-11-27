@@ -192,7 +192,7 @@
                                 IsExpanded="True">
                 <vela:VelaNavItem Tag="actions"
                                   Header="{DynamicResource StrNavActions}"
-                                  Category="Button Split Copy ConfirmMorph HoldToConfirm FloatingBar 按钮 操作"
+                                  Category="Button Split Copy ConfirmMorph HoldToConfirm FloatingBar ToolBar 按钮 操作 工具栏"
                                   Icon="{DynamicResource VelaIconComponents}" />
                 <vela:VelaNavItem Tag="inputs"
                                   Header="{DynamicResource StrNavInputs}"
@@ -200,11 +200,11 @@
                                   Icon="{DynamicResource VelaIconSliders}" />
                 <vela:VelaNavItem Tag="pickers"
                                   Header="{DynamicResource StrNavPickers}"
-                                  Category="RadioCards Select ComboBox DatePicker Calendar Dropdown Popover ContextMenu ColorPicker 选择 菜单 日历 颜色"
+                                  Category="RadioCards Select ComboBox DatePicker Calendar Dropdown Popover ContextMenu VelaContextMenu MenuBar ColorPicker 选择 菜单 菜单栏 右键 日历 颜色"
                                   Icon="{DynamicResource VelaIconCalendar}" />
                 <vela:VelaNavItem Tag="layout"
                                   Header="{DynamicResource StrNavLayout}"
-                                  Category="DockBar Tabs Stepper Breadcrumb Pagination Accordion ResizablePanels 导航 布局 分页 步骤"
+                                  Category="DockBar GlassTabBar TabBar Glass Tabs Stepper Breadcrumb Pagination Accordion ResizablePanels 导航 布局 分页 步骤 玻璃标签栏 停靠栏"
                                   Icon="{DynamicResource VelaIconLayers}" />
                 <vela:VelaNavItem Tag="feedback"
                                   Header="{DynamicResource StrNavFeedback}"
@@ -226,7 +226,7 @@
 
               <vela:VelaNavItem Tag="shaders"
                                 Header="{DynamicResource StrNavShaders}"
-                                Category="LiquidGlass ShaderBackground Blur Refraction Skia 着色器 液态玻璃"
+                                Category="LiquidGlass GlassCard ShaderBackground BackgroundLayer Blur Refraction Skia 着色器 液态玻璃 玻璃卡片 背景层"
                                 Icon="{DynamicResource VelaIconSparkles}"
                                 Badge="GPU" />
               <vela:VelaNavItem Tag="charts"

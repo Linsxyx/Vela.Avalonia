@@ -27,6 +27,29 @@ public partial class ActionsViewModel : ViewModelBase
     [ObservableProperty]
     public partial string HoldStatus { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ToolBarVariant))]
+    public partial int ToolBarVariantIndex { get; set; }
+
+    public VelaToolBarVariant ToolBarVariant => ToolBarVariantIndex switch
+    {
+        1 => VelaToolBarVariant.Floating,
+        2 => VelaToolBarVariant.Borderless,
+        _ => VelaToolBarVariant.Standard,
+    };
+
+    [ObservableProperty]
+    public partial bool ToolBarCompact { get; set; }
+
+    [ObservableProperty]
+    public partial bool ToolBarGridActive { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool ToolBarInspectorActive { get; set; }
+
+    [ObservableProperty]
+    public partial string ToolBarStatus { get; set; } = string.Empty;
+
     public event Action? ResetHoldRequested;
 
     public ActionsViewModel(IGalleryShellService shell)
@@ -43,6 +66,7 @@ public partial class ActionsViewModel : ViewModelBase
         SplitButtonLabel = loc.Get(_splitModeKey);
         SplitStatus = loc.Get("StrReady");
         HoldStatus = loc.Get("StrHoldStatusIdle");
+        ToolBarStatus = loc.Get("StrReady");
     }
 
     [RelayCommand]
@@ -117,6 +141,21 @@ public partial class ActionsViewModel : ViewModelBase
     [RelayCommand]
     private void FloatingDelete() =>
         _shell.ShowToast(Loc.Instance.Get("StrDeleted"), Loc.Instance.Pick("Moved to trash.", "已移至废纸篓。"), VelaToastTone.Danger);
+
+    [RelayCommand]
+    private void ToolBarAction(string action)
+    {
+        var loc = Loc.Instance;
+        ToolBarStatus = action switch
+        {
+            "new" => loc.Pick("Created new item", "已新建项目"),
+            "copy" => loc.Pick("Copied selection", "已复制选中内容"),
+            "export" => loc.Pick("Export started", "已开始导出"),
+            "settings" => loc.Pick("Toolbar settings opened", "已打开工具栏设置"),
+            _ => loc.Get("StrReady"),
+        };
+        _shell.ShowToast("VelaToolBar", ToolBarStatus, VelaToastTone.Info);
+    }
 
     public void UpdateHoldState(bool holding) =>
         HoldStatus = Loc.Instance.Get(holding ? "StrHoldStatusActive" : "StrHoldStatusIdle");

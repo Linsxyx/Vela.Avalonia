@@ -396,4 +396,26 @@
   <x:String x:Key="StrProjectName">Project name</x:String>
   <x:String x:Key="StrProjectRequired">Project name is required.</x:String>
   <x:String x:Key="StrCreate">Create</x:String>
+
+  <!-- DockBar, ToolBar, MenuBar, GlassCard & BackgroundLayer -->
+  <x:String x:Key="StrGlassCard">Glass Card</x:String>
+  <x:String x:Key="StrShadow">Shadow</x:String>
+  <x:String x:Key="StrBorderless">Borderless</x:String>
+  <x:String x:Key="StrMenuFile">File</x:String>
+  <x:String x:Key="StrMenuEdit">Edit</x:String>
+  <x:String x:Key="StrMenuView">View</x:String>
+  <x:String x:Key="StrNewFile">New File</x:String>
+  <x:String x:Key="StrExport">Export</x:String>
+  <x:String x:Key="StrToggleGrid">Toggle Grid</x:String>
+  <x:String x:Key="StrZoomReset">Reset Zoom</x:String>
+  <x:String x:Key="StrOpenContextMenu">Open Menu</x:String>
+  <x:String x:Key="StrShareSubmenu">Share To</x:String>
+  <x:String x:Key="StrTintLevel">Tint</x:String>
+  <x:String x:Key="StrHighContrast">High Contrast</x:String>
+  <x:String x:Key="StrBackdropBlur">Backdrop Blur</x:String>
+  <x:String x:Key="StrOverlayOpacity">Scrim Opacity</x:String>
+  <x:String x:Key="StrGlassCardDemoTitle">Retained GPU Glass Surface</x:String>
+  <x:String x:Key="StrGlassCardDemoDesc">Deep frosted backdrop blur with a theme-adaptive contrast veil and diagonal luminous rim.</x:String>
+  <x:String x:Key="StrBgLayerDemoTitle">Adaptive Scrim &amp; Blur Layer</x:String>
+  <x:String x:Key="StrBgLayerDemoDesc">Keep foreground typography crisp over animated shaders or custom wallpaper images.</x:String>
 </ResourceDictionary>

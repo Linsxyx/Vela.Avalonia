@@ -8,20 +8,27 @@
     <StackPanel Classes="pageRoot">
       <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavLayout}" />
 
-      <!-- Row 1: VelaDockBar -->
+      <!-- Row 1: VelaDockBar (Glass Tab Bar) -->
       <Border Classes="card">
         <StackPanel Spacing="14">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-            <TextBlock Classes="cardTitle" Text="VelaDockBar" VerticalAlignment="Center" />
-            <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding DockMaterialIndex, Mode=TwoWay}">
-              <vela:VelaSegmentedItem Content="{DynamicResource StrSolid}" />
-              <vela:VelaSegmentedItem Content="{DynamicResource StrFrosted}" />
-              <vela:VelaSegmentedItem Content="{DynamicResource StrLiquidGlass}" />
-            </vela:VelaSegmentedControl>
+            <TextBlock Classes="cardTitle" Text="VelaDockBar · Glass Tab Bar" VerticalAlignment="Center" />
+            <WrapPanel Grid.Column="1" Orientation="Horizontal" ItemSpacing="8" LineSpacing="8" VerticalAlignment="Center">
+              <vela:VelaSegmentedControl SelectedIndex="{Binding DockOrientationIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="{DynamicResource StrHorizontal}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrVertical}" />
+              </vela:VelaSegmentedControl>
+              <vela:VelaSegmentedControl SelectedIndex="{Binding DockMaterialIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="{DynamicResource StrSolid}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrFrosted}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrGlassCard}" />
+                <vela:VelaSegmentedItem Content="{DynamicResource StrLiquidGlass}" />
+              </vela:VelaSegmentedControl>
+            </WrapPanel>
           </Grid>
 
           <Border CornerRadius="14"
-                  Height="132"
+                  Height="{Binding DockStageHeight}"
                   Background="{DynamicResource VelaSurfaceMutedBrush}"
                   BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
                   BorderThickness="1"
@@ -34,21 +41,24 @@
               <vela:VelaDockBar x:Name="ShowcaseDockBar"
                                 SelectedIndex="{Binding DockSelectedIndex, Mode=TwoWay}"
                                 Material="{Binding DockMaterial}"
+                                Orientation="{Binding DockOrientation}"
+                                ShowShadow="{Binding DockShowShadow}"
                                 ShowSearch="True"
                                 SearchPlaceholder="{DynamicResource StrSearch}"
                                 SearchSubmitted="OnDockSearchSubmitted">
-                <vela:VelaDockItem Header="Home" Icon="{DynamicResource VelaIconHome}" />
-                <vela:VelaDockItem Header="Explore" Icon="{DynamicResource VelaIconCompass}" />
-                <vela:VelaDockItem Header="Saved" Icon="{DynamicResource VelaIconBookmark}" Badge="3" />
-                <vela:VelaDockItem Header="Profile" Icon="{DynamicResource VelaIconUser}" />
+                <vela:VelaDockItem Header="Home" ToolTip="Home" Icon="{DynamicResource VelaIconHome}" />
+                <vela:VelaDockItem Header="Explore" ToolTip="Explore" Icon="{DynamicResource VelaIconCompass}" />
+                <vela:VelaDockItem Header="Saved" ToolTip="Saved" Icon="{DynamicResource VelaIconBookmark}" Badge="3" />
+                <vela:VelaDockItem Header="Profile" ToolTip="Profile" Icon="{DynamicResource VelaIconUser}" />
               </vela:VelaDockBar>
             </Grid>
           </Border>
 
-          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
             <TextBlock Classes="statusText" Text="{Binding DockStatus}" VerticalAlignment="Center" />
-            <vela:VelaButton Grid.Column="1" Variant="Secondary" Size="Small" Content="{DynamicResource StrAddBadge}" Command="{Binding IncrementDockBadgeCommand}" />
-            <vela:VelaButton Grid.Column="2" Variant="Ghost" Size="Small" Content="{DynamicResource StrClear}" Command="{Binding ClearDockBadgeCommand}" />
+            <vela:VelaSwitch Grid.Column="1" Content="{DynamicResource StrShadow}" IsChecked="{Binding DockShowShadow, Mode=TwoWay}" VerticalAlignment="Center" />
+            <vela:VelaButton Grid.Column="2" Variant="Secondary" Size="Small" Content="{DynamicResource StrAddBadge}" Command="{Binding IncrementDockBadgeCommand}" />
+            <vela:VelaButton Grid.Column="3" Variant="Ghost" Size="Small" Content="{DynamicResource StrClear}" Command="{Binding ClearDockBadgeCommand}" />
           </Grid>
         </StackPanel>
       </Border>

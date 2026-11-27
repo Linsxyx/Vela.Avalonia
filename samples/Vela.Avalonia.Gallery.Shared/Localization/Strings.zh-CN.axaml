@@ -396,4 +396,26 @@
   <x:String x:Key="StrProjectName">项目名称</x:String>
   <x:String x:Key="StrProjectRequired">请输入项目名称。</x:String>
   <x:String x:Key="StrCreate">创建</x:String>
+
+  <!-- DockBar, ToolBar, MenuBar, GlassCard & BackgroundLayer -->
+  <x:String x:Key="StrGlassCard">磨砂玻璃</x:String>
+  <x:String x:Key="StrShadow">阴影</x:String>
+  <x:String x:Key="StrBorderless">无边框</x:String>
+  <x:String x:Key="StrMenuFile">文件</x:String>
+  <x:String x:Key="StrMenuEdit">编辑</x:String>
+  <x:String x:Key="StrMenuView">视图</x:String>
+  <x:String x:Key="StrNewFile">新建文件</x:String>
+  <x:String x:Key="StrExport">导出</x:String>
+  <x:String x:Key="StrToggleGrid">切换网格</x:String>
+  <x:String x:Key="StrZoomReset">重置缩放</x:String>
+  <x:String x:Key="StrOpenContextMenu">弹出菜单</x:String>
+  <x:String x:Key="StrShareSubmenu">分享到</x:String>
+  <x:String x:Key="StrTintLevel">遮罩强度</x:String>
+  <x:String x:Key="StrHighContrast">高对比</x:String>
+  <x:String x:Key="StrBackdropBlur">背景模糊</x:String>
+  <x:String x:Key="StrOverlayOpacity">遮罩透明度</x:String>
+  <x:String x:Key="StrGlassCardDemoTitle">GPU 驻留磨砂玻璃卡片</x:String>
+  <x:String x:Key="StrGlassCardDemoDesc">高半径背景模糊搭配主题自适应对比遮罩与对角线高光边框。</x:String>
+  <x:String x:Key="StrBgLayerDemoTitle">自适应遮罩与模糊背景层</x:String>
+  <x:String x:Key="StrBgLayerDemoDesc">在动态着色器或自定义壁纸之上，保持前景文字始终清晰可读。</x:String>
 </ResourceDictionary>

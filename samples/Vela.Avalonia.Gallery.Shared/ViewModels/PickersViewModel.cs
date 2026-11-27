@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
+using Vela.Avalonia.Tokens;
 
 namespace Vela.Avalonia.Gallery.ViewModels;
 
@@ -45,6 +46,21 @@ public partial class PickersViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial bool IsPopoverOpen { get; set; }
+
+    [ObservableProperty]
+    public partial bool MenuBarCompact { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MenuBarMaterial))]
+    public partial int MenuBarMaterialIndex { get; set; }
+
+    public VelaSurfaceMaterial MenuBarMaterial => MenuBarMaterialIndex switch
+    {
+        1 => VelaSurfaceMaterial.Frosted,
+        2 => VelaSurfaceMaterial.GlassCard,
+        3 => VelaSurfaceMaterial.LiquidGlass,
+        _ => VelaSurfaceMaterial.Solid,
+    };
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PreviewBrush))]
@@ -95,6 +111,18 @@ public partial class PickersViewModel : ViewModelBase
                 break;
             case "ctx-delete":
                 _shell.ShowToast(loc.Get("StrDeleted"), loc.Pick("Removed permanently.", "已永久删除。"), VelaToastTone.Danger);
+                break;
+            case "mb-new":
+                _shell.ShowToast(loc.Get("StrNewFile"), loc.Pick("Created untitled document.", "已创建未命名文档。"), VelaToastTone.Info);
+                break;
+            case "mb-export":
+                _shell.ShowToast(loc.Get("StrExport"), loc.Pick("Exported workspace bundle.", "已导出工作区文件。"), VelaToastTone.Success);
+                break;
+            case "mb-grid":
+                _shell.ShowToast(loc.Get("StrToggleGrid"), loc.Pick("Canvas grid visibility toggled.", "已切换画布网格显示。"), VelaToastTone.Neutral);
+                break;
+            case "mb-zoom":
+                _shell.ShowToast(loc.Get("StrZoomReset"), loc.Pick("Viewport zoom reset to 100%.", "视口缩放已重置为 100%。"), VelaToastTone.Info);
                 break;
         }
     }
