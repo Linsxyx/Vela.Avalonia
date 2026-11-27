@@ -4,7 +4,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Vela.Avalonia.Charts;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.Motion;
@@ -180,6 +182,7 @@ public partial class MainView : UserControl
         PopulateCommandPalette();
         InitPhase6Samples();
         InitPhase7Charts();
+        InitTrayShowcase();
         ApplyDataset(0);
     }
 
@@ -1333,5 +1336,308 @@ public partial class MainView : UserControl
         _dockBadgeCount = 0;
         if (ShowcaseDockBar.Items.Count > 2)
             ShowcaseDockBar.Items[2].Badge = null;
+    }
+
+    // ─── System Tray Showcase Handlers ───────────────────────────────────
+
+    private static readonly string[] TrayGlyphKeys =
+    [
+        "VelaIconSparkles",
+        "VelaIconBell",
+        "VelaIconRocket",
+        "VelaIconShield",
+        "VelaIconCompass",
+    ];
+
+    private VelaTrayIcon? _trayIcon;
+    private Bitmap? _previewLightBmp;
+    private Bitmap? _previewDarkBmp;
+
+    private void InitTrayShowcase()
+    {
+        // Standalone preview instance for Browser (WASM); replaced by MainWindow's live VelaTrayIcon on Desktop.
+        if (_trayIcon is null)
+        {
+            var previewTray = new VelaTrayIcon
+            {
+                ToolTipText = "Vela.Avalonia Studio",
+                BadgeVariant = VelaTrayBadgeVariant.Dot,
+                BadgeTone = VelaTrayBadgeTone.Accent,
+                BadgeCount = 3,
+                Presentation = VelaTrayPresentation.VelaMenu,
+            };
+            if (this.TryFindResource("VelaIconSparkles", ActualThemeVariant, out var res) && res is Geometry g)
+                previewTray.IconGeometry = g;
+
+            BindTrayIcon(previewTray);
+        }
+    }
+
+    public void BindTrayIcon(VelaTrayIcon trayIcon)
+    {
+        if (_trayIcon is not null)
+        {
+            _trayIcon.RenderedIconChanged -= OnTrayRenderedIconChanged;
+            _trayIcon.Clicked -= OnTrayIconClicked;
+            _trayIcon.FlyoutOpened -= OnTrayFlyoutOpened;
+            _trayIcon.FlyoutClosed -= OnTrayFlyoutClosed;
+        }
+
+        _trayIcon = trayIcon;
+        _trayIcon.BadgeCount = 3;
+        _trayIcon.RenderedIconChanged += OnTrayRenderedIconChanged;
+        _trayIcon.Clicked += OnTrayIconClicked;
+        _trayIcon.FlyoutOpened += OnTrayFlyoutOpened;
+        _trayIcon.FlyoutClosed += OnTrayFlyoutClosed;
+
+        if (TrayPlatformBadge is not null)
+        {
+            var supported = VelaTrayIcon.IsPlatformSupported && _trayIcon.IsAttached;
+            TrayPlatformBadge.Content = supported ? "Desktop Tray Active" : "Browser Preview Mode";
+            TrayPlatformBadge.Tone = supported ? VelaBadgeTone.Success : VelaBadgeTone.Info;
+        }
+
+        RefreshTrayPreviews();
+    }
+
+    public void LogTrayEvent(string message)
+    {
+        if (TrayStatusText is not null)
+            TrayStatusText.Text = $"Status: {message}";
+    }
+
+    public void ShowTrayDemoToast()
+    {
+        ToastHost.Show("System Tray Action", "Triggered directly from VelaTrayIcon menu.", VelaToastTone.Success);
+        LogTrayEvent("Displayed toast notification from tray menu.");
+    }
+
+    private void OnTrayRenderedIconChanged(object? sender, EventArgs e) => RefreshTrayPreviews();
+
+    private void OnTrayIconClicked(object? sender, EventArgs e) =>
+        LogTrayEvent($"Tray icon clicked ({_trayIcon?.Presentation} mode).");
+
+    private void OnTrayFlyoutOpened(object? sender, EventArgs e) =>
+        LogTrayEvent($"Opened {_trayIcon?.Presentation} flyout ({_trayIcon?.SurfaceMaterial} material).");
+
+    private void OnTrayFlyoutClosed(object? sender, EventArgs e) =>
+        LogTrayEvent("Flyout dismissed.");
+
+    private void RefreshTrayPreviews()
+    {
+        if (_trayIcon is null)
+            return;
+
+        var nextLight = _trayIcon.RenderPreviewBitmap(64, isDarkOverride: false);
+        var nextDark = _trayIcon.RenderPreviewBitmap(64, isDarkOverride: true);
+
+        if (TrayPreviewLightSmall is not null) TrayPreviewLightSmall.Source = nextLight;
+        if (TrayPreviewLightLarge is not null) TrayPreviewLightLarge.Source = nextLight;
+        if (TrayPreviewDarkSmall is not null) TrayPreviewDarkSmall.Source = nextDark;
+        if (TrayPreviewDarkLarge is not null) TrayPreviewDarkLarge.Source = nextDark;
+
+        _previewLightBmp?.Dispose();
+        _previewDarkBmp?.Dispose();
+        _previewLightBmp = nextLight;
+        _previewDarkBmp = nextDark;
+    }
+
+    private void OnTrayOpenFlyoutClick(object? sender, RoutedEventArgs e)
+    {
+        if (_trayIcon is null)
+            return;
+
+        if (!VelaTrayIcon.IsPlatformSupported)
+        {
+            ToastHost.Show("Desktop Feature", "Floating tray windows run on macOS, Windows & Linux desktop targets.", VelaToastTone.Info);
+            LogTrayEvent("Floating tray flyout preview requires desktop runtime.");
+            return;
+        }
+
+        if (_trayIcon.Presentation is VelaTrayPresentation.Native or VelaTrayPresentation.CommandOnly)
+        {
+            ToastHost.Show("Presentation Mode", $"Current mode is {_trayIcon.Presentation}. Switch to VelaMenu or VelaPopover to open a Vela flyout.", VelaToastTone.Info);
+            return;
+        }
+
+        _trayIcon.ShowFlyout();
+    }
+
+    private void OnTrayHideWindowBrieflyClick(object? sender, RoutedEventArgs e)
+    {
+        if (_trayIcon is null || !VelaTrayIcon.IsPlatformSupported)
+        {
+            ToastHost.Show("Desktop Feature", "Hiding to system tray is available on desktop platforms.", VelaToastTone.Info);
+            return;
+        }
+
+        LogTrayEvent("Window hidden to tray — restoring automatically in 3s (or click the tray icon).");
+        _trayIcon.HideWindowToTray();
+
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            _trayIcon?.RestoreWindow();
+            LogTrayEvent("Main window restored from tray.");
+        };
+        timer.Start();
+    }
+
+    private void OnTrayToggleVisibleClick(object? sender, RoutedEventArgs e)
+    {
+        if (_trayIcon is null) return;
+        _trayIcon.IsVisible = !_trayIcon.IsVisible;
+        LogTrayEvent($"Tray icon visibility set to {_trayIcon.IsVisible}.");
+    }
+
+    private void OnTrayGlyphChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayGlyphSegmented is null) return;
+        var idx = Math.Clamp(TrayGlyphSegmented.SelectedIndex, 0, TrayGlyphKeys.Length - 1);
+        if (this.TryFindResource(TrayGlyphKeys[idx], ActualThemeVariant, out var res) && res is Geometry g)
+        {
+            _trayIcon.IconGeometry = g;
+            RefreshTrayPreviews();
+        }
+    }
+
+    private void OnTrayThemeModeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayThemeModeSegmented is null) return;
+        _trayIcon.IconThemeMode = TrayThemeModeSegmented.SelectedIndex switch
+        {
+            1 => VelaTrayIconThemeMode.MonochromeDark,
+            2 => VelaTrayIconThemeMode.MonochromeLight,
+            3 => VelaTrayIconThemeMode.Template,
+            _ => VelaTrayIconThemeMode.Auto,
+        };
+        RefreshTrayPreviews();
+    }
+
+    private void OnTrayBadgeVariantChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayBadgeVariantSegmented is null) return;
+        _trayIcon.BadgeVariant = TrayBadgeVariantSegmented.SelectedIndex switch
+        {
+            1 => VelaTrayBadgeVariant.Dot,
+            2 => VelaTrayBadgeVariant.Count,
+            _ => VelaTrayBadgeVariant.None,
+        };
+        RefreshTrayPreviews();
+    }
+
+    private void OnTrayBadgeToneChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayBadgeToneSegmented is null) return;
+        _trayIcon.BadgeTone = TrayBadgeToneSegmented.SelectedIndex switch
+        {
+            1 => VelaTrayBadgeTone.Success,
+            2 => VelaTrayBadgeTone.Warning,
+            3 => VelaTrayBadgeTone.Danger,
+            4 => VelaTrayBadgeTone.Info,
+            _ => VelaTrayBadgeTone.Accent,
+        };
+        RefreshTrayPreviews();
+    }
+
+    private void OnTrayBadgeCountSliderChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property != VelaElasticSlider.ValueProperty || _trayIcon is null || TrayBadgeCountSlider is null)
+            return;
+
+        var count = (int)Math.Round(TrayBadgeCountSlider.Value);
+        _trayIcon.BadgeCount = count;
+        if (TrayBadgeCountLabel is not null)
+            TrayBadgeCountLabel.Text = count > 99 ? $"{count} (99+)" : count.ToString();
+        RefreshTrayPreviews();
+    }
+
+    private void OnTrayProgressChanged(object? sender, RoutedEventArgs e) => SyncTrayProgress();
+
+    private void OnTrayProgressSliderChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == VelaElasticSlider.ValueProperty)
+            SyncTrayProgress();
+    }
+
+    private void SyncTrayProgress()
+    {
+        if (_trayIcon is null || TrayProgressSwitch is null || TrayProgressSlider is null)
+            return;
+
+        var pct = Math.Clamp(TrayProgressSlider.Value, 0.0, 100.0);
+        if (TrayProgressLabel is not null)
+            TrayProgressLabel.Text = $"{Math.Round(pct):0}%";
+
+        _trayIcon.Progress = TrayProgressSwitch.IsChecked == true ? pct / 100.0 : null;
+        RefreshTrayPreviews();
+    }
+
+    private void OnTrayPresentationChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayPresentationSegmented is null) return;
+        _trayIcon.Presentation = TrayPresentationSegmented.SelectedIndex switch
+        {
+            1 => VelaTrayPresentation.VelaPopover,
+            2 => VelaTrayPresentation.Native,
+            3 => VelaTrayPresentation.CommandOnly,
+            _ => VelaTrayPresentation.VelaMenu,
+        };
+        LogTrayEvent($"Presentation switched to {_trayIcon.Presentation}.");
+    }
+
+    private void OnTrayMaterialChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayMaterialSegmented is null) return;
+        _trayIcon.SurfaceMaterial = TrayMaterialSegmented.SelectedIndex switch
+        {
+            1 => VelaSurfaceMaterial.Frosted,
+            2 => VelaSurfaceMaterial.GlassCard,
+            3 => VelaSurfaceMaterial.LiquidGlass,
+            _ => VelaSurfaceMaterial.Solid,
+        };
+        LogTrayEvent($"Flyout material switched to {_trayIcon.SurfaceMaterial}.");
+    }
+
+    private void OnTrayPlacementChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_trayIcon is null || TrayPlacementSegmented is null) return;
+        _trayIcon.FlyoutPlacement = TrayPlacementSegmented.SelectedIndex switch
+        {
+            1 => VelaTrayFlyoutPlacement.TopRight,
+            2 => VelaTrayFlyoutPlacement.BottomRight,
+            3 => VelaTrayFlyoutPlacement.TopLeft,
+            4 => VelaTrayFlyoutPlacement.BottomLeft,
+            _ => VelaTrayFlyoutPlacement.Auto,
+        };
+        LogTrayEvent($"Flyout placement switched to {_trayIcon.FlyoutPlacement}.");
+    }
+
+    private void OnTrayWindowHooksChanged(object? sender, RoutedEventArgs e)
+    {
+        if (_trayIcon is null) return;
+        if (TrayCloseToTraySwitch is not null)
+            _trayIcon.CloseToTray = TrayCloseToTraySwitch.IsChecked == true;
+        if (TrayMinimizeToTraySwitch is not null)
+            _trayIcon.MinimizeToTray = TrayMinimizeToTraySwitch.IsChecked == true;
+
+        LogTrayEvent($"Window hooks — CloseToTray: {_trayIcon.CloseToTray}, MinimizeToTray: {_trayIcon.MinimizeToTray}.");
+    }
+
+    private void OnTrayPlateChanged(object? sender, RoutedEventArgs e)
+    {
+        if (_trayIcon is null || TrayPlateSwitch is null) return;
+        if (TrayPlateSwitch.IsChecked == true
+            && this.TryFindResource("VelaAccentSubtleBrush", ActualThemeVariant, out var res)
+            && res is IBrush brush)
+        {
+            _trayIcon.IconBackground = brush;
+        }
+        else
+        {
+            _trayIcon.IconBackground = null;
+        }
+        RefreshTrayPreviews();
     }
 }

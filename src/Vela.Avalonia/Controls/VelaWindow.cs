@@ -42,6 +42,9 @@ public class VelaWindow : Window
     public static readonly StyledProperty<object?> TitleBarRightContentProperty =
         AvaloniaProperty.Register<VelaWindow, object?>(nameof(TitleBarRightContent));
 
+    public static readonly StyledProperty<VelaTrayIcon?> TrayIconProperty =
+        AvaloniaProperty.Register<VelaWindow, VelaTrayIcon?>(nameof(TrayIcon));
+
     public static readonly DirectProperty<VelaWindow, Thickness> TitleBarPaddingProperty =
         AvaloniaProperty.RegisterDirect<VelaWindow, Thickness>(nameof(TitleBarPadding), o => o.TitleBarPadding);
 
@@ -56,6 +59,7 @@ public class VelaWindow : Window
     public object? TitleBarLeftContent { get => GetValue(TitleBarLeftContentProperty); set => SetValue(TitleBarLeftContentProperty, value); }
     public object? TitleBarCenterContent { get => GetValue(TitleBarCenterContentProperty); set => SetValue(TitleBarCenterContentProperty, value); }
     public object? TitleBarRightContent { get => GetValue(TitleBarRightContentProperty); set => SetValue(TitleBarRightContentProperty, value); }
+    public VelaTrayIcon? TrayIcon { get => GetValue(TrayIconProperty); set => SetValue(TrayIconProperty, value); }
 
     private Thickness _titleBarPadding;
     public Thickness TitleBarPadding
@@ -84,6 +88,7 @@ public class VelaWindow : Window
         UseCustomTitleBarProperty.Changed.AddClassHandler<VelaWindow>((w, _) => w.SyncChrome());
         TitleBarHeightProperty.Changed.AddClassHandler<VelaWindow>((w, _) => w.SyncChrome());
         WindowStateProperty.Changed.AddClassHandler<VelaWindow>((w, _) => w.SyncWindowState());
+        TrayIconProperty.Changed.AddClassHandler<VelaWindow>((w, e) => w.OnTrayIconChanged(e.OldValue as VelaTrayIcon, e.NewValue as VelaTrayIcon));
     }
 
     public VelaWindow()
@@ -193,5 +198,44 @@ public class VelaWindow : Window
         WindowState = WindowState == WindowState.Maximized
             ? WindowState.Normal
             : WindowState.Maximized;
+    }
+
+    /// <summary>
+    /// Closes this window even when the attached <see cref="TrayIcon"/> has <see cref="VelaTrayIcon.CloseToTray"/> enabled.
+    /// </summary>
+    public void CloseBypassingTray()
+    {
+        if (TrayIcon is not null)
+            TrayIcon.RequestRealClose();
+        else
+            Close();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (TrayIcon is not null)
+        {
+            TrayIcon.DetachFromWindow();
+            TrayIcon.Detach();
+        }
+        base.OnClosed(e);
+    }
+
+    private void OnTrayIconChanged(VelaTrayIcon? oldTray, VelaTrayIcon? newTray)
+    {
+        if (oldTray is not null)
+        {
+            LogicalChildren.Remove(oldTray);
+            if (oldTray.TargetWindow == this)
+                oldTray.DetachFromWindow();
+            oldTray.Detach();
+        }
+
+        if (newTray is not null)
+        {
+            if (!LogicalChildren.Contains(newTray))
+                LogicalChildren.Add(newTray);
+            newTray.AttachToWindow(this);
+        }
     }
 }

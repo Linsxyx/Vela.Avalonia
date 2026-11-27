@@ -10,5 +10,117 @@
                  MinWidth="860"
                  MinHeight="620"
                  FontFamily="Inter, sans-serif">
-  <local:MainView />
+  <vela:VelaWindow.TrayIcon>
+    <vela:VelaTrayIcon x:Name="AppTrayIcon"
+                       ToolTipText="Vela.Avalonia Studio"
+                       IconGeometry="{DynamicResource VelaIconSparkles}"
+                       BadgeVariant="Dot"
+                       BadgeTone="Accent"
+                       Presentation="VelaMenu"
+                       SurfaceMaterial="Solid"
+                       FlyoutMinWidth="248">
+      <vela:VelaTrayIcon.FlyoutHeader>
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="4,2">
+          <Border Width="28"
+                  Height="28"
+                  CornerRadius="8"
+                  Background="{DynamicResource VelaAccentSubtleBrush}">
+            <PathIcon Width="14"
+                      Height="14"
+                      Data="{DynamicResource VelaIconSparkles}"
+                      Foreground="{DynamicResource VelaAccentBrush}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="Vela Studio"
+                       FontSize="13"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource VelaForegroundBrush}" />
+            <TextBlock Text="Avalonia 12.2 · Live Tray"
+                       FontSize="11"
+                       Foreground="{DynamicResource VelaTextMutedBrush}" />
+          </StackPanel>
+          <vela:VelaBadge Grid.Column="2"
+                          Tone="Success"
+                          IsPill="True"
+                          Content="Online"
+                          VerticalAlignment="Center" />
+        </Grid>
+      </vela:VelaTrayIcon.FlyoutHeader>
+
+      <vela:VelaMenuItem Header="Show Vela Studio"
+                         Icon="{DynamicResource VelaIconHome}"
+                         Shortcut="⌘O"
+                         Click="OnTrayShowWindowClick" />
+      <vela:VelaMenuItem Header="Toggle Light / Dark"
+                         Icon="{DynamicResource VelaIconPalette}"
+                         Shortcut="⌘T"
+                         Click="OnTrayToggleThemeClick" />
+      <vela:VelaMenuItem x:Name="TraySyncMenuItem"
+                         Header="Background Sync"
+                         IsChecked="True"
+                         Click="OnTrayToggleSyncClick" />
+      <vela:VelaMenuItem Header="Send Test Toast"
+                         Icon="{DynamicResource VelaIconBell}"
+                         Click="OnTraySendToastClick" />
+      <vela:VelaMenuItem IsSeparator="True" />
+      <vela:VelaMenuItem Header="Quit Vela Studio"
+                         Icon="{DynamicResource VelaIconClose}"
+                         Shortcut="⌘Q"
+                         IsDestructive="True"
+                         Click="OnTrayQuitClick" />
+
+      <vela:VelaTrayIcon.PopoverContent>
+        <StackPanel Spacing="12" Width="264" Margin="6,4">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Quick Controls"
+                         FontSize="13.5"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource VelaForegroundBrush}" />
+              <TextBlock Text="Custom VelaPopover card inside tray flyout."
+                         FontSize="11.5"
+                         Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+            </StackPanel>
+            <vela:VelaBadge Grid.Column="1"
+                            Tone="Info"
+                            IsPill="True"
+                            Content="Popover"
+                            VerticalAlignment="Top" />
+          </Grid>
+
+          <Border CornerRadius="10"
+                  Padding="10,8"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                  BorderThickness="1">
+            <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+              <StackPanel Spacing="1">
+                <TextBlock Text="Live Sync Engine" FontSize="12.5" FontWeight="Medium" />
+                <TextBlock Text="Idle · 0% CPU springs" FontSize="11" Foreground="{DynamicResource VelaTextMutedBrush}" />
+              </StackPanel>
+              <vela:VelaSwitch Grid.Column="1" IsChecked="True" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+            <vela:VelaButton Variant="Primary"
+                             Size="Small"
+                             Content="Open Studio"
+                             HorizontalAlignment="Stretch"
+                             Click="OnTrayPopoverOpenClick" />
+            <vela:VelaButton Grid.Column="1"
+                             Variant="Secondary"
+                             Size="Small"
+                             Content="Quit"
+                             HorizontalAlignment="Stretch"
+                             Click="OnTrayPopoverQuitClick" />
+          </Grid>
+        </StackPanel>
+      </vela:VelaTrayIcon.PopoverContent>
+    </vela:VelaTrayIcon>
+  </vela:VelaWindow.TrayIcon>
+
+  <local:MainView x:Name="MainViewHost" />
 </vela:VelaWindow>

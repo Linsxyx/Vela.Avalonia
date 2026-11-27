@@ -2184,6 +2184,303 @@
           </ScrollViewer>
         </vela:VelaNavItem.PageContent>
       </vela:VelaNavItem>
+
+      <!-- System Tray Configurator & Styling Lab -->
+      <vela:VelaNavItem Header="System Tray"
+                        Category="TrayIcon NativeMenu Flyout Popover Badge Progress VelaWindow"
+                        Icon="{DynamicResource VelaIconBell}">
+        <vela:VelaNavItem.PageContent>
+          <ScrollViewer Padding="32,28">
+            <StackPanel Spacing="20" MaxWidth="860">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="pageTitle" Text="System Tray Icon &amp; Flyout Styling" />
+                <TextBlock Classes="pageSubtitle"
+                           Text="Declarative VelaTrayIcon with Skia HiDPI vector + badge/progress synthesis, live Light/Dark &amp; Accent adaptation, Native vs VelaMenu vs VelaPopover dual presentation, and VelaWindow CloseToTray / MinimizeToTray integration." />
+              </StackPanel>
+
+              <!-- Live Preview Stage (Light & Dark OS menu bar simulations) -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="cardTitle" Text="Live Skia Tray Preview" />
+                      <TextBlock Classes="cardDesc"
+                                 Text="Exact real-time Skia offscreen output synced to your OS tray icon (1× bar scale + 2× magnified)." />
+                    </StackPanel>
+                    <vela:VelaBadge x:Name="TrayPlatformBadge"
+                                    Grid.Column="1"
+                                    Tone="Success"
+                                    IsPill="True"
+                                    Content="Desktop Tray Active"
+                                    VerticalAlignment="Top" />
+                  </Grid>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                    <!-- Simulated Light Menu Bar -->
+                    <Border CornerRadius="12"
+                            Background="#FFF4F4F6"
+                            BorderBrush="#FFE0E0E4"
+                            BorderThickness="1"
+                            Padding="14,12">
+                      <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Text="Light Bar (macOS / Win11)"
+                                     FontSize="11.5"
+                                     FontWeight="Medium"
+                                     Foreground="#FF585858"
+                                     VerticalAlignment="Center" />
+                          <Border Grid.Column="1"
+                                  CornerRadius="7"
+                                  Background="#FFFFFFFF"
+                                  BorderBrush="#FFDCDCE0"
+                                  BorderThickness="1"
+                                  Padding="8,4">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                              <Image x:Name="TrayPreviewLightSmall" Width="20" Height="20" />
+                              <TextBlock Text="9:41" FontSize="11.5" FontWeight="SemiBold" Foreground="#FF141414" VerticalAlignment="Center" />
+                            </StackPanel>
+                          </Border>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                          <Border Width="56" Height="56" CornerRadius="12" Background="#FFFFFFFF" BorderBrush="#FFE2E2E6" BorderThickness="1">
+                            <Image x:Name="TrayPreviewLightLarge" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          </Border>
+                          <TextBlock Text="Auto-adapts monochrome ink, crisp clear-cutout badges, and circular progress arcs."
+                                     FontSize="12"
+                                     Foreground="#FF585858"
+                                     TextWrapping="Wrap"
+                                     MaxWidth="260"
+                                     VerticalAlignment="Center" />
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+
+                    <!-- Simulated Dark Menu Bar -->
+                    <Border Grid.Column="1"
+                            CornerRadius="12"
+                            Background="#FF161618"
+                            BorderBrush="#FF2C2C30"
+                            BorderThickness="1"
+                            Padding="14,12">
+                      <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Text="Dark Bar (macOS / Win11)"
+                                     FontSize="11.5"
+                                     FontWeight="Medium"
+                                     Foreground="#FFA0A0A8"
+                                     VerticalAlignment="Center" />
+                          <Border Grid.Column="1"
+                                  CornerRadius="7"
+                                  Background="#FF242428"
+                                  BorderBrush="#FF36363C"
+                                  BorderThickness="1"
+                                  Padding="8,4">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                              <Image x:Name="TrayPreviewDarkSmall" Width="20" Height="20" />
+                              <TextBlock Text="9:41" FontSize="11.5" FontWeight="SemiBold" Foreground="#FFF2F2F2" VerticalAlignment="Center" />
+                            </StackPanel>
+                          </Border>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                          <Border Width="56" Height="56" CornerRadius="12" Background="#FF242428" BorderBrush="#FF36363C" BorderThickness="1">
+                            <Image x:Name="TrayPreviewDarkLarge" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          </Border>
+                          <TextBlock Text="Switches off macOS template mode automatically when colored badges or progress rings are active."
+                                     FontSize="12"
+                                     Foreground="#FFA8A8B0"
+                                     TextWrapping="Wrap"
+                                     MaxWidth="260"
+                                     VerticalAlignment="Center" />
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </Grid>
+
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <vela:VelaButton Variant="Primary"
+                                     Size="Small"
+                                     Content="Open Tray Flyout"
+                                     Click="OnTrayOpenFlyoutClick" />
+                    <vela:VelaButton Variant="Secondary"
+                                     Size="Small"
+                                     Content="Hide Window to Tray (3s)"
+                                     Click="OnTrayHideWindowBrieflyClick" />
+                    <vela:VelaButton Variant="Ghost"
+                                     Size="Small"
+                                     Content="Toggle Tray Icon Visible"
+                                     Click="OnTrayToggleVisibleClick" />
+                  </StackPanel>
+
+                  <TextBlock x:Name="TrayStatusText"
+                             FontSize="12.5"
+                             Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                             Text="Status: Tray icon active — click the system tray icon or press 'Open Tray Flyout'." />
+                </StackPanel>
+              </Border>
+
+              <!-- Dynamic Icon & Badge Configurator -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="cardTitle" Text="Icon &amp; Dynamic Badge Studio" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Synthesize HiDPI tray icons from VelaIcons vector geometry with status dots, numeric pills, and progress rings." />
+                  </StackPanel>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="20" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Vector Glyph" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayGlyphSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTrayGlyphChanged">
+                        <x:String>Sparkles</x:String>
+                        <x:String>Bell</x:String>
+                        <x:String>Rocket</x:String>
+                        <x:String>Shield</x:String>
+                        <x:String>Compass</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="6">
+                      <TextBlock Text="Icon Theme Mode" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayThemeModeSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTrayThemeModeChanged">
+                        <x:String>Auto</x:String>
+                        <x:String>Dark</x:String>
+                        <x:String>Light</x:String>
+                        <x:String>Template</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Spacing="6">
+                      <TextBlock Text="Badge Variant" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayBadgeVariantSegmented"
+                                                 SelectedIndex="1"
+                                                 SelectionChanged="OnTrayBadgeVariantChanged">
+                        <x:String>None</x:String>
+                        <x:String>Dot</x:String>
+                        <x:String>Count</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                      <TextBlock Text="Badge Tone" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayBadgeToneSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTrayBadgeToneChanged">
+                        <x:String>Accent</x:String>
+                        <x:String>Success</x:String>
+                        <x:String>Warning</x:String>
+                        <x:String>Danger</x:String>
+                        <x:String>Info</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Spacing="6">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Badge Count (clamps at 99+)" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                        <TextBlock x:Name="TrayBadgeCountLabel" Grid.Column="1" Text="3" FontSize="12" FontWeight="SemiBold" />
+                      </Grid>
+                      <vela:VelaElasticSlider x:Name="TrayBadgeCountSlider"
+                                              Minimum="0"
+                                              Maximum="120"
+                                              Value="3"
+                                              PropertyChanged="OnTrayBadgeCountSliderChanged" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="1" Spacing="6">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <vela:VelaSwitch x:Name="TrayProgressSwitch"
+                                         IsChecked="False"
+                                         IsCheckedChanged="OnTrayProgressChanged" />
+                        <TextBlock Grid.Column="1" Text="Circular Progress Ring" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TrayProgressLabel" Grid.Column="2" Text="68%" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      </Grid>
+                      <vela:VelaElasticSlider x:Name="TrayProgressSlider"
+                                              Minimum="0"
+                                              Maximum="100"
+                                              Value="68"
+                                              PropertyChanged="OnTrayProgressSliderChanged" />
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <!-- Presentation Mode, Flyout Surface Material & VelaWindow Lifecycle -->
+              <Border Classes="card">
+                <StackPanel Spacing="16">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="cardTitle" Text="Presentation Mode &amp; VelaWindow Linkage" />
+                    <TextBlock Classes="cardDesc"
+                               Text="Switch between Vela floating menus, rich custom popovers, and OS NativeMenu — plus window CloseToTray / MinimizeToTray hooks." />
+                  </StackPanel>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="20" RowDefinitions="Auto,Auto" RowSpacing="14">
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Presentation Mode" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayPresentationSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTrayPresentationChanged">
+                        <x:String>VelaMenu</x:String>
+                        <x:String>VelaPopover</x:String>
+                        <x:String>Native</x:String>
+                        <x:String>CommandOnly</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="6">
+                      <TextBlock Text="Flyout Surface Material" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayMaterialSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTrayMaterialChanged">
+                        <x:String>Solid</x:String>
+                        <x:String>Frosted</x:String>
+                        <x:String>GlassCard</x:String>
+                        <x:String>LiquidGlass</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
+                      <TextBlock Text="Flyout Placement" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                      <vela:VelaSegmentedControl x:Name="TrayPlacementSegmented"
+                                                 SelectedIndex="0"
+                                                 SelectionChanged="OnTrayPlacementChanged">
+                        <x:String>Auto (Cursor)</x:String>
+                        <x:String>TopRight</x:String>
+                        <x:String>BottomRight</x:String>
+                        <x:String>TopLeft</x:String>
+                        <x:String>BottomLeft</x:String>
+                      </vela:VelaSegmentedControl>
+                    </StackPanel>
+                  </Grid>
+
+                  <vela:VelaSettingsGroup Header="VelaWindow Lifecycle Hooks">
+                    <vela:VelaSettingsRow Title="Close window to tray"
+                                          Description="Intercepts the window close button and hides to the system tray (use 'Quit Vela Studio' in tray menu to exit).">
+                      <vela:VelaSwitch x:Name="TrayCloseToTraySwitch"
+                                       IsChecked="False"
+                                       IsCheckedChanged="OnTrayWindowHooksChanged" />
+                    </vela:VelaSettingsRow>
+                    <vela:VelaSettingsRow Title="Minimize window to tray"
+                                          Description="Automatically hides the window from the taskbar when minimized.">
+                      <vela:VelaSwitch x:Name="TrayMinimizeToTraySwitch"
+                                       IsChecked="False"
+                                       IsCheckedChanged="OnTrayWindowHooksChanged" />
+                    </vela:VelaSettingsRow>
+                    <vela:VelaSettingsRow Title="Rounded icon plate"
+                                          Description="Draws a subtle Accent-tinted squircle backdrop behind the vector tray glyph.">
+                      <vela:VelaSwitch x:Name="TrayPlateSwitch"
+                                       IsChecked="False"
+                                       IsCheckedChanged="OnTrayPlateChanged" />
+                    </vela:VelaSettingsRow>
+                  </vela:VelaSettingsGroup>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </vela:VelaNavItem.PageContent>
+      </vela:VelaNavItem>
         </vela:VelaNavigationView>
           </DockPanel>
         </vela:VelaDialogHost>

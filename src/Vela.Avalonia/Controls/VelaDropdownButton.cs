@@ -18,7 +18,7 @@ namespace Vela.Avalonia.Controls;
 /// Declarative action item inside <see cref="VelaDropdownButton"/>.
 /// Supports icons, trailing keyboard shortcut hints, destructive danger styling, and Command/Click.
 /// </summary>
-public class VelaMenuItem : AvaloniaObject
+public class VelaMenuItem : StyledElement
 {
     public static readonly StyledProperty<string?> HeaderProperty =
         AvaloniaProperty.Register<VelaMenuItem, string?>(nameof(Header));
@@ -38,6 +38,12 @@ public class VelaMenuItem : AvaloniaObject
     public static readonly StyledProperty<bool> IsSeparatorProperty =
         AvaloniaProperty.Register<VelaMenuItem, bool>(nameof(IsSeparator));
 
+    public static readonly StyledProperty<bool> IsCheckedProperty =
+        AvaloniaProperty.Register<VelaMenuItem, bool>(nameof(IsChecked));
+
+    public static readonly StyledProperty<bool> IsVisibleProperty =
+        AvaloniaProperty.Register<VelaMenuItem, bool>(nameof(IsVisible), true);
+
     public static readonly StyledProperty<ICommand?> CommandProperty =
         AvaloniaProperty.Register<VelaMenuItem, ICommand?>(nameof(Command));
 
@@ -50,6 +56,8 @@ public class VelaMenuItem : AvaloniaObject
     public bool IsDestructive { get => GetValue(IsDestructiveProperty); set => SetValue(IsDestructiveProperty, value); }
     public bool IsEnabled { get => GetValue(IsEnabledProperty); set => SetValue(IsEnabledProperty, value); }
     public bool IsSeparator { get => GetValue(IsSeparatorProperty); set => SetValue(IsSeparatorProperty, value); }
+    public bool IsChecked { get => GetValue(IsCheckedProperty); set => SetValue(IsCheckedProperty, value); }
+    public bool IsVisible { get => GetValue(IsVisibleProperty); set => SetValue(IsVisibleProperty, value); }
     public ICommand? Command { get => GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
     public object? CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
 
@@ -205,6 +213,9 @@ public class VelaDropdownButton : TemplatedControl
         _itemsHost.Children.Clear();
         foreach (var item in MenuItems)
         {
+            if (!item.IsVisible)
+                continue;
+
             if (item.IsSeparator)
             {
                 _itemsHost.Children.Add(new Border

@@ -86,11 +86,11 @@ if (theme is not null)
 
 ---
 
-## Component Catalog (57 Controls & Primitives)
+## Component Catalog (58 Controls & Primitives)
 
 | Category | Controls |
 | --- | --- |
-| **Window & Navigation Shell** | `VelaWindow`, `VelaNavigationView`, `VelaNavItem`, `VelaNavSectionHeader`, `VelaPageDeck`, `VelaTabs`, `VelaTabItem`, `VelaDockBar`, `VelaDockItem`, `VelaFloatingBar`, `VelaCommandPalette` (`⌘K` / `Ctrl+K`), `VelaBreadcrumb`, `VelaPagination`, `VelaStepper` |
+| **Window & Navigation Shell** | `VelaWindow`, `VelaTrayIcon`, `VelaNavigationView`, `VelaNavItem`, `VelaNavSectionHeader`, `VelaPageDeck`, `VelaTabs`, `VelaTabItem`, `VelaDockBar`, `VelaDockItem`, `VelaFloatingBar`, `VelaCommandPalette` (`⌘K` / `Ctrl+K`), `VelaBreadcrumb`, `VelaPagination`, `VelaStepper` |
 | **Actions & Inputs** | `VelaButton`, `VelaCopyButton`, `VelaSplitButton`, `VelaConfirmMorph`, `VelaHoldToConfirm`, `VelaSwitch`, `VelaCheckBox`, `VelaSegmentedControl`, `VelaElasticSlider`, `VelaRulerSlider`, `VelaInput`, `VelaScrubInput`, `VelaTagInput`, `VelaColorPicker`, `VelaBadge` |
 | **Selection & Pickers** | `VelaSelect`, `VelaComboBox`, `VelaDropdownButton`, `VelaMenuItem`, `VelaPopover`, `VelaRadioCards`, `VelaRadioCardItem`, `VelaCalendar`, `VelaDatePicker`, Native `ContextMenu` / `MenuItem` |
 | **Layout, Settings & Overlays** | `VelaSettingsGroup`, `VelaSettingsRow`, `VelaResizablePanels`, `VelaResizablePane`, `VelaDialogHost`, `VelaDrawerHost`, `VelaToastHost`, `VelaBusyOverlay`, `VelaSpinnerRing`, `VelaAccordion`, `VelaAccordionItem`, `VelaCollapsePanel` |
