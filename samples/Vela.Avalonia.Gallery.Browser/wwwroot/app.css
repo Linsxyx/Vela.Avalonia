@@ -66,10 +66,10 @@ html, body {
 }
 
 .splash-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--accent);
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
 }
 
 .splash-title {

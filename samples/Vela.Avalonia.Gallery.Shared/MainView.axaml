@@ -57,17 +57,8 @@
               <!-- Brand Header (Expanded) -->
               <vela:VelaNavigationView.Header>
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                  <Border Width="28"
-                          Height="28"
-                          CornerRadius="8"
-                          Background="{DynamicResource VelaForegroundBrush}">
-                    <TextBlock Text="V"
-                               FontSize="13.5"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource VelaBackgroundBrush}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
-                  </Border>
+                  <Image Source="avares://Vela.Avalonia.Gallery.Shared/Assets/vela-icon.png"
+                         Width="28" Height="28" />
                   <StackPanel Spacing="1" VerticalAlignment="Center">
                     <TextBlock Text="{DynamicResource StrBrandTitle}"
                                FontSize="13"
@@ -82,17 +73,8 @@
 
               <!-- Compact Emblem -->
               <vela:VelaNavigationView.CompactHeader>
-                <Border Width="28"
-                        Height="28"
-                        CornerRadius="8"
-                        Background="{DynamicResource VelaForegroundBrush}">
-                  <TextBlock Text="V"
-                             FontSize="13.5"
-                             FontWeight="Bold"
-                             Foreground="{DynamicResource VelaBackgroundBrush}"
-                             HorizontalAlignment="Center"
-                             VerticalAlignment="Center" />
-                </Border>
+                <Image Source="avares://Vela.Avalonia.Gallery.Shared/Assets/vela-icon.png"
+                       Width="28" Height="28" />
               </vela:VelaNavigationView.CompactHeader>
 
               <!-- Top Bar Trailing Slot: Language Toggle + Search Pill + Avatars -->

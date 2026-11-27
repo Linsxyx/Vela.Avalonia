@@ -6,6 +6,7 @@
                  x:Class="Vela.Avalonia.Gallery.MainWindow"
                  x:DataType="vm:MainViewModel"
                  Title="{DynamicResource StrAppTitle}"
+                 Icon="avares://Vela.Avalonia.Gallery.Shared/Assets/vela-icon.png"
                  TitleBarHeight="36"
                  Width="1180"
                  Height="780"

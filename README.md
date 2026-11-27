@@ -1,25 +1,64 @@
-# Vela.Avalonia
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Linsxyx/Vela.Avalonia/master/assets/branding/vela-icon.png" width="112" height="112" alt="Vela icon" />
+</p>
 
-A motion-first, performance-engineered **Avalonia 12** (`net10.0`) desktop UI component library featuring exact analytical spring physics, OKLCH-derived color tokens, zero-flicker live theming, MIT clean-room **SkSL GPU ambient shaders**, optical **Liquid Glass** surfaces (`SkSL` + Avalonia 12 `BackdropEffect`), an **App Rail** hierarchical sidebar shell, an optional frameless **`VelaWindow`**, and interactive Skia vector charts.
+<h1 align="center">Vela.Avalonia</h1>
 
-- **Targets**: .NET 10 (`net10.0`), Avalonia `12.2.0`, Native AOT compatible (`IsAotCompatible=true`)
-- **License**: MIT (100% clean-room implementation)
-- **Packages**:
-  - **`Vela.Avalonia`** — Core theme, OKLCH tokens, analytical spring physics engine, SkSL ambient shaders, optical Liquid Glass, optional `VelaWindow`, and **50+ controls & primitives**
-  - **`Vela.Avalonia.Charts`** — 6 interactive, theme-aware Skia vector data visualization controls
+<p align="center"><strong>Expressive controls. Thoughtful motion.</strong><br />A UI component library for Avalonia desktop applications.</p>
 
----
+<p align="center">
+  <a href="https://linsxyx.github.io/Vela.Avalonia/">Live gallery</a> ·
+  <a href="https://www.nuget.org/packages/Vela.Avalonia">NuGet</a> ·
+  <a href="https://github.com/Linsxyx/Vela.Avalonia/blob/master/docs/components.md">Components</a> ·
+  <a href="https://github.com/Linsxyx/Vela.Avalonia/blob/master/README.zh-CN.md">简体中文</a>
+</p>
 
-## Quick Start
+<p align="center">
+  <a href="https://www.nuget.org/packages/Vela.Avalonia"><img src="https://img.shields.io/nuget/v/Vela.Avalonia?color=7762d9" alt="NuGet version" /></a>
+  <img src="https://img.shields.io/badge/Avalonia-12.2-7056bf" alt="Avalonia 12.2" />
+  <img src="https://img.shields.io/badge/.NET-10-512bd4" alt=".NET 10" />
+  <a href="https://github.com/Linsxyx/Vela.Avalonia/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-3d8b73" alt="MIT license" /></a>
+</p>
 
-### 1. Install Packages
+Vela brings spring-driven interactions, coordinated light and dark themes, and desktop navigation into one component library. Use it for an application shell, a settings screen, a data workspace, or a few controls inside an existing Avalonia app.
+
+## Explore it first
+
+**[Open the interactive gallery →](https://linsxyx.github.io/Vela.Avalonia/)**
+
+Try the controls, switch accents and themes, and explore the navigation and material options. The gallery supports English and Simplified Chinese. For native window and system-tray behavior, run the desktop gallery:
+
+```bash
+git clone https://github.com/Linsxyx/Vela.Avalonia.git
+cd Vela.Avalonia
+dotnet run --project samples/Vela.Avalonia.Gallery
+```
+
+## What makes Vela useful
+
+- **Motion that responds to input.** Shared analytical springs preserve velocity when their target changes. A global reduced-motion option is available.
+- **A coordinated theme.** Semantic design tokens, light and dark palettes, and eight accents keep controls, surfaces, and charts in sync.
+- **An application shell.** Hierarchical navigation, tabs, a command palette, and configurable page caching help organize a desktop workspace.
+- **Surfaces with depth.** Solid, frosted, glass-card, and liquid-glass treatments are available on supported controls, alongside animated shader backgrounds.
+- **Data and visualization.** Lists, tables, trees, and six optional chart controls follow the same visual language.
+
+## Quick start
+
+Use an Avalonia **12.2** application targeting **.NET 10**. Keep the Avalonia packages in your app on the same version.
+
+### 1. Install
 
 ```bash
 dotnet add package Vela.Avalonia
-dotnet add package Vela.Avalonia.Charts # Optional charts package
+dotnet add package Avalonia.Themes.Fluent --version 12.2.0
+
+# Optional: charts
+dotnet add package Vela.Avalonia.Charts
 ```
 
-### 2. Register `VelaTheme` in `App.axaml`
+### 2. Add the theme
+
+In `App.axaml`, place `VelaTheme` after `FluentTheme`. Replace `MyApp` with your application's namespace.
 
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
@@ -29,120 +68,85 @@ dotnet add package Vela.Avalonia.Charts # Optional charts package
              RequestedThemeVariant="Default">
   <Application.Styles>
     <FluentTheme />
-    <vela:VelaTheme Accent="Neutral" />
+    <vela:VelaTheme Accent="Violet" />
   </Application.Styles>
 </Application>
 ```
 
-Switch accents at runtime with zero visual-tree flicker:
+### 3. Use the controls
 
-```csharp
-var theme = Styles.OfType<VelaTheme>().FirstOrDefault();
-if (theme is not null)
-    theme.Accent = VelaAccent.Violet; // Neutral, Violet, Blue, Green, Amber, Orange, Coral, Rose
-```
-
-### 3. Optional Modern Frameless Window (`VelaWindow`)
-
-`VelaWindow` is 100% opt-in (standard `Window` works everywhere). It seamlessly integrates native macOS traffic lights and provides restrained monochrome caption buttons on Windows & Linux:
+A regular Avalonia `Window` works. For example, use this as `MainWindow.axaml`, keeping your app's existing `x:Class`:
 
 ```xml
-<vela:VelaWindow xmlns="https://github.com/avaloniaui"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:vela="using:Vela.Avalonia.Controls"
-                 x:Class="MyApp.MainWindow"
-                 Title="Vela Studio"
-                 Width="1180" Height="790">
-  <vela:VelaNavigationView BrandTitle="Vela Studio"
-                           ShowTopBar="True"
-                           PaneVariant="Standard">
-    <vela:VelaNavItem Header="Home" Icon="{DynamicResource VelaIconHome}" />
-    <vela:VelaNavSectionHeader Header="Workspace" />
-    <vela:VelaNavItem Header="Projects" Icon="{DynamicResource VelaIconFolder}" IsExpanded="True">
-      <vela:VelaNavItem Header="Design System" />
-      <vela:VelaNavItem Header="Desktop Shell" />
-    </vela:VelaNavItem>
-  </vela:VelaNavigationView>
-</vela:VelaWindow>
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vela="using:Vela.Avalonia.Controls"
+        x:Class="MyApp.MainWindow"
+        Title="My Vela app" Width="480" Height="360"
+        Background="{DynamicResource VelaBackgroundBrush}">
+  <StackPanel Margin="32" Spacing="20">
+    <TextBlock Text="Make yourself at home."
+               FontSize="24" FontWeight="SemiBold"
+               Foreground="{DynamicResource VelaForegroundBrush}" />
+    <vela:VelaInput Label="Workspace name" PlaceholderText="My workspace" />
+    <vela:VelaSwitch Content="Enable notifications" IsChecked="True" />
+    <vela:VelaButton Content="Create workspace" Variant="Primary" />
+  </StackPanel>
+</Window>
 ```
 
----
+The example demonstrates appearance and interaction; connect the button's `Command` to your application logic. `VelaWindow` is an optional window shell, not a prerequisite for the controls.
 
-## Architecture Highlights
+## Choose your components
 
-### Exact Analytical Spring Physics (`Vela.Avalonia.Motion`)
-- `SpringChannel` solves the exact 2nd-order damped harmonic oscillator ODE (`m·x'' + c·x' + k·(x - target) = 0`) across underdamped, critically damped, and overdamped regimes — unconditionally stable across 60Hz / 120Hz / 144Hz displays.
-- Retargeting mid-flight inherits instantaneous velocity seamlessly with zero jumps.
-- Respects global `VelaMotionOptions.ReducedMotion` and automatically goes 0% CPU idle at rest.
-
-### Zero-Jank App Rail Navigation (`VelaNavigationView` & `VelaPageDeck`)
-- **Hierarchical Tree & Sections**: `VelaNavSectionHeader`, collapsible `VelaNavItem.Children` with 1px vertical guide lines, sticky `FooterItems`, separated profile `Footer`, and automatic `VelaBreadcrumb` TopBar.
-- **3 Pane Styles & Dual Modes**: `Standard` / `Floating` / `Frosted` pane variants + `Left` / `Top` display modes + smooth zero-reflow collapse to a 60px icon rail.
-- **O(1) Page Caching**: `KeepAlive` / `Lru` / `None` policies via `VelaPageDeck`, lazy `PageFactory`, skipped layout on hidden pages, and `IVelaNavigationAware` lifecycle hooks.
-
-### Clean-Room MIT GPU Shaders (`VelaLiquidGlass` & `VelaShaderBackground`)
-- **`VelaLiquidGlass`**: Official Avalonia 12.2 `Visual.BackdropEffect` paired with a clean-room MIT SkSL shader performing rounded-box SDF lens refraction, subtle RGB chromatic dispersion, and Fresnel rim specular highlights — also available as `SurfaceMaterial="LiquidGlass"` on `VelaDialogHost`, `VelaDrawerHost`, `VelaCommandPalette`, and `VelaDockBar`.
-- **`VelaShaderBackground`**: Real-time SkSL ambient fluid shader (`Mesh`, `Aurora`, `Silk`) that automatically tracks `VelaTheme` accent & Light/Dark changes with smooth GPU color interpolation.
-
----
-
-## Component Catalog (61 Controls & Primitives)
-
-| Category | Controls |
+| Area | Examples |
 | --- | --- |
-| **Window & Navigation Shell** | `VelaWindow`, `VelaTrayIcon`, `VelaNavigationView`, `VelaNavItem`, `VelaNavSectionHeader`, `VelaPageDeck`, `VelaTabs`, `VelaTabItem`, `VelaDockBar`, `VelaDockItem`, `VelaFloatingBar`, `VelaCommandPalette` (`⌘K` / `Ctrl+K`), `VelaBreadcrumb`, `VelaPagination`, `VelaStepper` |
-| **Data Views (Tree & Grid)** | `VelaTreeView`, `VelaTreeNode`, `VelaDataGrid`, `VelaTreeTable` (`VelaDataGridTextColumn`, `VelaDataGridBadgeColumn`, `VelaDataGridCheckBoxColumn`, `VelaDataGridTemplateColumn`) |
-| **Actions & Inputs** | `VelaButton`, `VelaCopyButton`, `VelaSplitButton`, `VelaConfirmMorph`, `VelaHoldToConfirm`, `VelaSwitch`, `VelaCheckBox`, `VelaSegmentedControl`, `VelaElasticSlider`, `VelaRulerSlider`, `VelaInput`, `VelaScrubInput`, `VelaTagInput`, `VelaColorPicker`, `VelaBadge` |
-| **Selection & Pickers** | `VelaSelect`, `VelaComboBox`, `VelaDropdownButton`, `VelaMenuItem`, `VelaPopover`, `VelaRadioCards`, `VelaRadioCardItem`, `VelaCalendar`, `VelaDatePicker`, Native `ContextMenu` / `MenuItem` |
-| **Layout, Settings & Overlays** | `VelaSettingsGroup`, `VelaSettingsRow`, `VelaResizablePanels`, `VelaResizablePane`, `VelaDialogHost`, `VelaDrawerHost`, `VelaToastHost`, `VelaBusyOverlay`, `VelaSpinnerRing`, `VelaAccordion`, `VelaAccordionItem`, `VelaCollapsePanel` |
-| **Feedback, Identity & Surfaces** | `VelaLiquidGlass`, `VelaShaderBackground`, `VelaPopupSurface`, `VelaMorphSlotPanel`, `VelaAvatar`, `VelaAvatarGroup`, `VelaEmptyState`, `VelaAnimatedCounter`, `VelaMetricCard`, `VelaProgress`, `VelaSkeleton`, `VelaAlert`, Thin overlay `ScrollBar` & inverted `ToolTip` themes |
-| **Charts (`Vela.Avalonia.Charts`)** | `VelaDonutChart`, `VelaLineChart`, `VelaBarChart`, `VelaSparkline`, `VelaGauge`, `VelaActivityHeatmap` |
+| Window & navigation | `VelaWindow`, `VelaTrayIcon`, `VelaNavigationView`, `VelaTabs`, `VelaCommandPalette` |
+| Actions & forms | `VelaButton`, `VelaSwitch`, `VelaInput`, `VelaSelect`, `VelaDatePicker`, `VelaColorPicker` |
+| Data views | `VelaListBox`, `VelaDataGrid`, `VelaTreeView`, `VelaTreeTable` |
+| Layout & feedback | `VelaSettingsGroup`, `VelaResizablePanels`, `VelaDialogHost`, `VelaDrawerHost`, `VelaToastHost` |
+| Surfaces & display | `VelaGlassCard`, `VelaLiquidGlass`, `VelaShaderBackground`, `VelaAvatar`, `VelaMetricCard` |
+| Charts · optional package | `VelaLineChart`, `VelaBarChart`, `VelaDonutChart`, `VelaSparkline`, `VelaGauge`, `VelaActivityHeatmap` |
 
----
+See the **[component catalog](https://github.com/Linsxyx/Vela.Avalonia/blob/master/docs/components.md)** for the complete list and links to working gallery examples. This README describes the current source; a published NuGet version may contain an earlier set of components.
 
-## Live Browser Preview (GitHub Pages / WebAssembly)
+## Theme and motion
 
-This repository includes a WebAssembly head (`samples/Vela.Avalonia.Gallery.Browser`) sharing 100% of the Gallery UI (`MainView`) with the Desktop app, plus `.github/workflows/pages.yml`:
+The available accents are `Neutral`, `Violet`, `Blue`, `Green`, `Amber`, `Orange`, `Coral`, and `Rose`. `RequestedThemeVariant="Default"` follows the system's light/dark preference.
 
-1. Push this repository to GitHub.
-2. Open **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**.
-3. Push to `main` (or trigger **Deploy Gallery to GitHub Pages** manually in **Actions**).
+```csharp
+using System.Linq;
+using Avalonia;
+using Vela.Avalonia;
+using Vela.Avalonia.Motion;
+using Vela.Avalonia.Tokens;
 
----
+// Update appearance on the UI thread after the app has initialized.
+var theme = Application.Current?.Styles.OfType<VelaTheme>().FirstOrDefault();
+if (theme is not null)
+    theme.Accent = VelaAccent.Blue;
 
-## Automated NuGet Publishing (Trusted Publishing / OIDC)
-
-`.github/workflows/release.yml` uses **NuGet Trusted Publishing (`NuGet/login@v1`)** via GitHub OIDC — no long-lived API keys to store or rotate. It builds, runs all unit tests, packs `Vela.Avalonia` + `Vela.Avalonia.Charts` (with `.snupkg` symbols), publishes to NuGet.org, and creates a GitHub Release automatically:
-
-1. On [nuget.org](https://www.nuget.org/), open **Account settings → Trusted Publishers → Add a new publisher (GitHub)**:
-   - **Owner / Repository**: your GitHub owner and repository name
-   - **Workflow File**: `release.yml` (filename only, without `.github/workflows/`)
-   - **Environment**: leave blank
-2. In your GitHub repo, open **Settings → Secrets and variables → Actions → Variables** and add **`NUGET_USER`** set to your NuGet.org profile username (not your email).
-3. Push a semantic version tag:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
+// Set this from your app's accessibility or motion preference.
+VelaMotionOptions.ReducedMotion = true;
 ```
 
----
+## Platform notes
 
-## Local Development
+- **Desktop:** Windows, macOS, and Linux are the intended targets. Window chrome, tray menus, and popovers have platform-specific behavior.
+- **Browser:** the WebAssembly gallery shares its UI with the desktop sample; desktop-only integrations are not available there.
+- **Graphics:** shader and backdrop effects depend on the renderer and device. Check them on your target hardware; use simpler surfaces where appropriate.
+- **Page caching:** `KeepAlive` preserves visited pages, `Lru` bounds the number retained, and `None` discards outgoing pages. Cached pages retain their state and resources.
+- **Native AOT:** the libraries enable AOT compatibility analysis. Publish and test your host application for each target runtime before shipping.
+
+## Development and contributions
 
 ```bash
-# Build, run tests, and launch Desktop Gallery
-dotnet build
-dotnet test
-dotnet run --project samples/Vela.Avalonia.Gallery
-
-# Pack Release NuGet packages locally
-dotnet pack src/Vela.Avalonia/Vela.Avalonia.csproj -c Release -o ./artifacts
-dotnet pack src/Vela.Avalonia.Charts/Vela.Avalonia.Charts.csproj -c Release -o ./artifacts
+dotnet build Vela.Avalonia.slnx -c Release
+dotnet test tests/Vela.Avalonia.Tests/Vela.Avalonia.Tests.csproj -c Release
 ```
 
----
+Build instructions, browser publishing, and release setup live in **[CONTRIBUTING.md](https://github.com/Linsxyx/Vela.Avalonia/blob/master/CONTRIBUTING.md)**. For bugs, include a small reproduction and your OS, .NET, Avalonia, and Vela versions in an **[issue](https://github.com/Linsxyx/Vela.Avalonia/issues)**.
 
 ## License
 
-MIT © 2026 Vela.Avalonia Contributors. See [LICENSE](LICENSE).
+[MIT](https://github.com/Linsxyx/Vela.Avalonia/blob/master/LICENSE).

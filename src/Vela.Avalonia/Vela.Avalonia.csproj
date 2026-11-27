@@ -5,6 +5,7 @@
     <Description>Motion-first, performance-engineered Avalonia 12 UI component library with analytical spring physics, OKLCH design tokens, SkSL ambient shaders, optical Liquid Glass surfaces, and an App Rail navigation shell.</Description>
     <PackageTags>avalonia;avaloniaui;ui;controls;theme;spring;motion;liquid-glass;shaders;net10</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>vela-icon.png</PackageIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
@@ -16,6 +17,7 @@
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\branding\vela-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\src\Vela.Avalonia\Vela.Avalonia.csproj" />
     <ProjectReference Include="..\..\src\Vela.Avalonia.Charts\Vela.Avalonia.Charts.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="..\..\assets\branding\vela-icon.png" Link="Assets\vela-icon.png" />
+  </ItemGroup>
 </Project>
