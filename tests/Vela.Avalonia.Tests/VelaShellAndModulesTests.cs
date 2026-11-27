@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -192,5 +193,86 @@ public class VelaShellAndModulesTests
         // Disjoint dirty-rect: returns empty
         var disjointClip = new SKRectI(400, 400, 700, 600);
         Assert.True(VelaLiquidGlassLens.ComputeSnapshotRegion(fullDeviceRect, disjointClip).IsEmpty);
+    }
+
+    [Fact]
+    public void VelaShaderEffect_CompilesCachesAndInjectsStandardUniforms()
+    {
+        Assert.NotNull(VelaShaderEffect.BuiltInAmbient);
+
+        const string customSksl = """
+            half4 main(float2 fragCoord) {
+                float2 uv = fragCoord / max(iResolution, float2(1.0));
+                return half4(uv.x, uv.y, 0.5, iAlpha);
+            }
+            """;
+
+        var first = VelaShaderEffect.FromString(customSksl);
+        var second = VelaShaderEffect.FromString(customSksl);
+        Assert.Same(first, second);
+
+        var preparedWithExisting = VelaShaderEffect.PrepareSourceWithStandardUniforms(
+            "uniform float iTime;\nhalf4 main(float2 p) { return half4(1.0); }");
+        Assert.Equal(1, preparedWithExisting.Split("uniform float iTime;").Length - 1);
+
+        Assert.False(VelaShaderEffect.TryFromString("invalid sksl {{{", out var invalidEffect, out var error));
+        Assert.Null(invalidEffect);
+        Assert.False(string.IsNullOrWhiteSpace(error));
+    }
+
+    [Fact]
+    public void VelaShaderBackground_ResolveEffect_PrioritizesCustomCodeAndFallsBack()
+    {
+        var shader = new VelaShaderBackground();
+        Assert.Equal(0.65, shader.TransitionDuration);
+        Assert.False(shader.ForceSoftwareRendering);
+        Assert.Same(VelaShaderEffect.BuiltInAmbient, shader.ResolveEffect());
+
+        const string customCode = "half4 main(float2 p) { return half4(iBase, iAlpha); }";
+        shader.ShaderCode = customCode;
+        var resolvedCustom = shader.ResolveEffect();
+        Assert.NotNull(resolvedCustom);
+        Assert.NotSame(VelaShaderEffect.BuiltInAmbient, resolvedCustom);
+
+        shader.ShaderCode = "not valid sksl";
+        Assert.Same(VelaShaderEffect.BuiltInAmbient, shader.ResolveEffect());
+    }
+
+    [Fact]
+    public void VelaWindow_MaterialBackground_AndChromeStates_ResolveCorrectly()
+    {
+        // Verify registered AvaloniaProperty metadata defaults without requiring a native windowing backend
+        Assert.Equal(VelaWindowMaterial.Solid, VelaWindow.BackgroundMaterialProperty.GetDefaultValue(typeof(VelaWindow)));
+        Assert.Equal(VelaShaderBackgroundPreset.Mesh, VelaWindow.BackgroundPresetProperty.GetDefaultValue(typeof(VelaWindow)));
+        Assert.False(VelaWindow.BackgroundAnimatedProperty.GetDefaultValue(typeof(VelaWindow)));
+        Assert.True(VelaWindow.ShowTitleBarBackgroundProperty.GetDefaultValue(typeof(VelaWindow)));
+        Assert.Equal(VelaWindowChromeMode.Auto, VelaWindow.WindowChromeModeProperty.GetDefaultValue(typeof(VelaWindow)));
+        Assert.Equal(VelaTitleBarVisibilityMode.AutoHidden, VelaWindow.TitleBarVisibilityOnFullScreenProperty.GetDefaultValue(typeof(VelaWindow)));
+
+        // Transparency level fallback chains
+        Assert.Equal([WindowTransparencyLevel.None], VelaWindow.ResolveTransparencyLevels(VelaWindowMaterial.Solid));
+        Assert.Equal([WindowTransparencyLevel.None], VelaWindow.ResolveTransparencyLevels(VelaWindowMaterial.Shader));
+        Assert.Equal(WindowTransparencyLevel.Mica, VelaWindow.ResolveTransparencyLevels(VelaWindowMaterial.Mica)[0]);
+        Assert.Equal(WindowTransparencyLevel.AcrylicBlur, VelaWindow.ResolveTransparencyLevels(VelaWindowMaterial.AcrylicBlur)[0]);
+
+        // Root corner radius collapses to 0 when maximized or fullscreen
+        var radius = new CornerRadius(14);
+        Assert.Equal(radius, VelaWindow.ResolveEffectiveCornerRadius(radius, WindowState.Normal));
+        Assert.Equal(new CornerRadius(0), VelaWindow.ResolveEffectiveCornerRadius(radius, WindowState.Maximized));
+        Assert.Equal(new CornerRadius(0), VelaWindow.ResolveEffectiveCornerRadius(radius, WindowState.FullScreen));
+
+        // Fullscreen title bar visibility modes
+        Assert.True(VelaWindow.ResolveEffectiveTitleBarVisible(true, true, WindowState.Normal, VelaTitleBarVisibilityMode.AutoHidden, false));
+        Assert.False(VelaWindow.ResolveEffectiveTitleBarVisible(false, true, WindowState.Normal, VelaTitleBarVisibilityMode.Visible, true));
+        Assert.False(VelaWindow.ResolveEffectiveTitleBarVisible(true, true, WindowState.FullScreen, VelaTitleBarVisibilityMode.AutoHidden, false));
+        Assert.True(VelaWindow.ResolveEffectiveTitleBarVisible(true, true, WindowState.FullScreen, VelaTitleBarVisibilityMode.AutoHidden, true));
+        Assert.True(VelaWindow.ResolveEffectiveTitleBarVisible(true, false, WindowState.FullScreen, VelaTitleBarVisibilityMode.Visible, false));
+        Assert.False(VelaWindow.ResolveEffectiveTitleBarVisible(true, true, WindowState.FullScreen, VelaTitleBarVisibilityMode.Hidden, true));
+
+        // Cross-platform caption button visibility
+        Assert.False(VelaWindow.ResolveCustomCaptionButtonsVisible(true, VelaWindowChromeMode.Auto, isMacOs: true));
+        Assert.True(VelaWindow.ResolveCustomCaptionButtonsVisible(true, VelaWindowChromeMode.Auto, isMacOs: false));
+        Assert.True(VelaWindow.ResolveCustomCaptionButtonsVisible(true, VelaWindowChromeMode.Windows, isMacOs: true));
+        Assert.False(VelaWindow.ResolveCustomCaptionButtonsVisible(false, VelaWindowChromeMode.Windows, isMacOs: false));
     }
 }
