@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="Vela.Avalonia.VelaInputsModule">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSelect.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaComboBox.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSegmentedControl.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaElasticSlider.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaRulerSlider.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaScrubInput.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaRadioCards.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTagInput.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDatePicker.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaColorPicker.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

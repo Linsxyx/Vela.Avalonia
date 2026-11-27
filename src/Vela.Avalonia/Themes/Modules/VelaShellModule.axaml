@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="Vela.Avalonia.VelaShellModule">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBackgroundLayer.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaWindow.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaStatusBar.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaToolBar.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMenuBar.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaNavigationView.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTabs.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBreadcrumb.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPagination.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaStepper.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDockBar.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaFloatingBar.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSettingsGroup.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAccordion.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaResizablePanels.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMetricCard.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

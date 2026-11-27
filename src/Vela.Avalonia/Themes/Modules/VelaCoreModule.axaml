@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="Vela.Avalonia.VelaCoreModule">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaButton.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSwitch.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaCheckBox.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaInput.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBadge.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMenu.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPopover.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaProgress.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSkeleton.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAlert.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAvatar.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaEmptyState.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaCopyButton.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSplitButton.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBusyOverlay.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaConfirmMorph.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaHoldToConfirm.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

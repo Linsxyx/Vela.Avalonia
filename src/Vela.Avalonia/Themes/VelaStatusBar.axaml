@@ -1,0 +1,143 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaStatusBarSeparator}" TargetType="controls:VelaStatusBarSeparator">
+    <Setter Property="Width" Value="1" />
+    <Setter Property="Height" Value="13" />
+    <Setter Property="Margin" Value="4,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource VelaBorderBrush}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaStatusBarItem}" TargetType="controls:VelaStatusBarItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    <Setter Property="FontSize" Value="11.5" />
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="CornerRadius" Value="5" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Bg"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.12" />
+            </Transitions>
+          </Border.Transitions>
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <Border x:Name="PART_Dot"
+                    Width="6.5"
+                    Height="6.5"
+                    CornerRadius="99"
+                    Background="{DynamicResource VelaTextMutedBrush}"
+                    VerticalAlignment="Center"
+                    IsVisible="{TemplateBinding ShowIndicatorDot}" />
+            <PathIcon x:Name="PART_Icon"
+                      Width="12"
+                      Height="12"
+                      Data="{TemplateBinding Icon}"
+                      Foreground="{TemplateBinding Foreground}"
+                      VerticalAlignment="Center"
+                      IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{TemplateBinding Text}"
+                       FontSize="{TemplateBinding FontSize}"
+                       FontWeight="{TemplateBinding FontWeight}"
+                       Foreground="{TemplateBinding Foreground}"
+                       VerticalAlignment="Center"
+                       IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              VerticalAlignment="Center"
+                              IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:interactive">
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="^:interactive:pointerover /template/ Border#PART_Bg">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="^:interactive:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:interactive:pressed /template/ Border#PART_Bg">
+      <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    </Style>
+
+    <Style Selector="^:accent /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+    <Style Selector="^:success /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource VelaSuccessBrush}" />
+    </Style>
+    <Style Selector="^:warning /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource VelaWarningBrush}" />
+    </Style>
+    <Style Selector="^:danger /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource VelaDangerBrush}" />
+    </Style>
+    <Style Selector="^:info /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource VelaInfoBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaStatusBar}" TargetType="controls:VelaStatusBar">
+    <Setter Property="Height" Value="30" />
+    <Setter Property="Background" Value="{DynamicResource VelaSidebarBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <StackPanel x:Name="PART_LeftHost"
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="2"
+                        VerticalAlignment="Center" />
+
+            <ContentPresenter Grid.Column="1"
+                              Content="{TemplateBinding CenterContent}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              IsVisible="{TemplateBinding CenterContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+            <StackPanel x:Name="PART_RightHost"
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="2"
+                        VerticalAlignment="Center" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:compact">
+      <Setter Property="Height" Value="24" />
+      <Setter Property="Padding" Value="8,0" />
+    </Style>
+    <Style Selector="^:no-border">
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

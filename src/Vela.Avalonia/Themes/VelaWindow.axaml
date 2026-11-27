@@ -46,6 +46,10 @@
     <Setter Property="Background" Value="{DynamicResource VelaBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
     <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource VelaBackgroundBrush}" />
+    <Setter Property="TitleBarBackground" Value="{DynamicResource VelaSidebarBackgroundBrush}" />
+    <Setter Property="TitleBarBorderBrush" Value="{DynamicResource VelaBorderSubtleBrush}" />
+    <Setter Property="BottomBarBackground" Value="{DynamicResource VelaSidebarBackgroundBrush}" />
+    <Setter Property="BottomBarBorderBrush" Value="{DynamicResource VelaBorderSubtleBrush}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
@@ -54,48 +58,78 @@
                   Background="{TemplateBinding TransparencyBackgroundFallback}" />
           <Border Background="{TemplateBinding Background}">
             <VisualLayerManager>
-              <DockPanel LastChildFill="True">
-                <!-- Optional Sleek Cross-Platform TitleBar -->
-                <Border x:Name="PART_TitleBar"
-                        DockPanel.Dock="Top"
-                        Height="{TemplateBinding TitleBarHeight}"
-                        Background="{DynamicResource VelaSidebarBackgroundBrush}"
-                        BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
-                        BorderThickness="0,0,0,1"
-                        Padding="{TemplateBinding TitleBarPadding}"
-                        IsVisible="{TemplateBinding IsTitleBarVisible}">
-                  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                    <!-- Left Slot (automatically inset 78px on macOS for traffic lights) -->
-                    <ContentPresenter Grid.Column="0"
-                                      Content="{TemplateBinding TitleBarLeftContent}"
-                                      VerticalAlignment="Center" />
+              <Panel>
+                <!-- Replaceable Full-Window Background Layer (Shader, Wallpaper, Gradient, Custom) -->
+                <ContentPresenter x:Name="PART_BackgroundHost"
+                                  Content="{TemplateBinding BackgroundContent}"
+                                  Opacity="{TemplateBinding BackgroundContentOpacity}"
+                                  IsHitTestVisible="False"
+                                  IsVisible="{TemplateBinding BackgroundContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
 
-                    <!-- Center Slot / Default Quiet Window Title -->
-                    <Grid Grid.Column="1" VerticalAlignment="Center">
-                      <ContentPresenter Content="{TemplateBinding TitleBarCenterContent}"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        IsVisible="{TemplateBinding TitleBarCenterContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                      <TextBlock Text="{TemplateBinding Title}"
-                                 FontSize="12.5"
-                                 FontWeight="Medium"
-                                 Foreground="{DynamicResource VelaTextSecondaryBrush}"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 TextTrimming="CharacterEllipsis"
-                                 IsHitTestVisible="False"
-                                 IsVisible="{TemplateBinding TitleBarCenterContent, Converter={x:Static ObjectConverters.IsNull}}" />
-                    </Grid>
+                <Grid RowDefinitions="Auto,*,Auto">
+                  <!-- Window Content (spans row 0+1 when ExtendContentIntoTitleBar is true) -->
+                  <ContentPresenter x:Name="PART_ContentPresenter"
+                                    Grid.Row="1"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
 
-                    <!-- Right Slot + Windows/Linux Custom Caption Buttons -->
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal"
-                                Spacing="4"
-                                VerticalAlignment="Center">
-                      <ContentPresenter Content="{TemplateBinding TitleBarRightContent}"
-                                        VerticalAlignment="Center" />
+                  <!-- Optional Sleek Cross-Platform TitleBar -->
+                  <Border x:Name="PART_TitleBar"
+                          Grid.Row="0"
+                          ZIndex="10"
+                          Height="{TemplateBinding TitleBarHeight}"
+                          Background="{TemplateBinding TitleBarBackground}"
+                          BorderBrush="{TemplateBinding TitleBarBorderBrush}"
+                          BorderThickness="0,0,0,1"
+                          Padding="{TemplateBinding TitleBarPadding}"
+                          IsVisible="{TemplateBinding IsTitleBarVisible}">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
+                      <!-- Mode A: Full Custom TitleBarContent -->
+                      <ContentPresenter Grid.Column="0"
+                                        Content="{TemplateBinding TitleBarContent}"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Stretch"
+                                        IsVisible="{TemplateBinding TitleBarContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
 
+                      <!-- Mode B: Built-in 3-Column TitleBar Slots -->
+                      <Grid Grid.Column="0"
+                            ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="10"
+                            IsVisible="{TemplateBinding TitleBarContent, Converter={x:Static ObjectConverters.IsNull}}">
+                        <!-- Left Slot (automatically inset 78px on macOS for traffic lights) -->
+                        <ContentPresenter Grid.Column="0"
+                                          Content="{TemplateBinding TitleBarLeftContent}"
+                                          VerticalAlignment="Center" />
+
+                        <!-- Center Slot / Default Quiet Window Title -->
+                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                          <ContentPresenter Content="{TemplateBinding TitleBarCenterContent}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{TemplateBinding TitleBarCenterContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                          <TextBlock Text="{TemplateBinding Title}"
+                                     FontSize="12.5"
+                                     FontWeight="Medium"
+                                     Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     TextTrimming="CharacterEllipsis"
+                                     IsHitTestVisible="False"
+                                     IsVisible="{TemplateBinding ShowDefaultTitle}" />
+                        </Grid>
+
+                        <!-- Right Slot -->
+                        <ContentPresenter Grid.Column="2"
+                                          Content="{TemplateBinding TitleBarRightContent}"
+                                          VerticalAlignment="Center" />
+                      </Grid>
+
+                      <!-- Windows/Linux Custom Caption Buttons (always preserved even with custom TitleBarContent) -->
                       <StackPanel x:Name="PART_CaptionButtons"
+                                  Grid.Column="1"
                                   Orientation="Horizontal"
                                   Spacing="2"
                                   Margin="4,0,0,0"
@@ -121,18 +155,44 @@
                                     Data="{DynamicResource VelaIconClose}" />
                         </Button>
                       </StackPanel>
-                    </StackPanel>
-                  </Grid>
-                </Border>
+                    </Grid>
+                  </Border>
 
-                <!-- Window Content -->
-                <ContentPresenter x:Name="PART_ContentPresenter"
-                                  Content="{TemplateBinding Content}"
-                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                  Margin="{TemplateBinding Padding}"
-                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-              </DockPanel>
+                  <!-- Optional Custom BottomBar (Status bar, Dock, Media bar, or 3-column slots) -->
+                  <Border x:Name="PART_BottomBar"
+                          Grid.Row="2"
+                          Height="{TemplateBinding BottomBarHeight}"
+                          Background="{TemplateBinding BottomBarBackground}"
+                          BorderBrush="{TemplateBinding BottomBarBorderBrush}"
+                          BorderThickness="0,1,0,0"
+                          Padding="{TemplateBinding BottomBarPadding}"
+                          IsVisible="{TemplateBinding EffectiveBottomBarVisible}">
+                    <Panel>
+                      <!-- Mode A: Full Custom BottomBarContent -->
+                      <ContentPresenter Content="{TemplateBinding BottomBarContent}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        IsVisible="{TemplateBinding BottomBarContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                      <!-- Mode B: Built-in 3-Column BottomBar Slots -->
+                      <Grid ColumnDefinitions="Auto,*,Auto"
+                            ColumnSpacing="10"
+                            IsVisible="{TemplateBinding BottomBarContent, Converter={x:Static ObjectConverters.IsNull}}">
+                        <ContentPresenter Grid.Column="0"
+                                          Content="{TemplateBinding BottomBarLeftContent}"
+                                          VerticalAlignment="Center" />
+                        <ContentPresenter Grid.Column="1"
+                                          Content="{TemplateBinding BottomBarCenterContent}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                        <ContentPresenter Grid.Column="2"
+                                          Content="{TemplateBinding BottomBarRightContent}"
+                                          VerticalAlignment="Center" />
+                      </Grid>
+                    </Panel>
+                  </Border>
+                </Grid>
+              </Panel>
             </VisualLayerManager>
           </Border>
         </Panel>
@@ -141,6 +201,23 @@
 
     <Style Selector="^:not(:custom-chrome) /template/ Border#PART_TitleBar">
       <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="^:no-titlebar-divider /template/ Border#PART_TitleBar">
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="^:no-bottombar-divider /template/ Border#PART_BottomBar">
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="^:extend-content /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Grid.Row" Value="0" />
+      <Setter Property="Grid.RowSpan" Value="2" />
+    </Style>
+    <Style Selector="^:extend-content /template/ Border#PART_TitleBar">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
     </Style>
   </ControlTheme>
 

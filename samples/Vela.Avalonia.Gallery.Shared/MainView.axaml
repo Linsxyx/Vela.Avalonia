@@ -14,46 +14,32 @@
                              UseLiquidGlass="{Binding CommandPaletteGlass}">
       <vela:VelaDrawerHost x:Name="DrawerHost">
         <vela:VelaDialogHost x:Name="DialogHost">
-          <DockPanel>
-            <!-- Compact Telemetry Status Bar -->
-            <Border DockPanel.Dock="Bottom"
-                    Height="30"
-                    Background="{DynamicResource VelaSidebarBackgroundBrush}"
-                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
-                    BorderThickness="0,1,0,0"
-                    Padding="14,0">
-              <Grid ColumnDefinitions="Auto,*,Auto">
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                  <Border x:Name="TelemetryDot"
-                          Width="7"
-                          Height="7"
-                          CornerRadius="99"
-                          Background="{DynamicResource VelaSuccessBrush}" />
-                  <TextBlock Text="{Binding TelemetryText}"
-                             FontSize="11.5"
-                             Foreground="{DynamicResource VelaTextSecondaryBrush}" />
-                </StackPanel>
-
-                <TextBlock Grid.Column="2"
-                           Text="{Binding TelemetrySummary}"
-                           FontSize="11.5"
-                           Foreground="{DynamicResource VelaTextMutedBrush}"
-                           VerticalAlignment="Center" />
-              </Grid>
-            </Border>
-
-            <vela:VelaNavigationView x:Name="RootNav"
-                                     DisplayMode="{Binding DisplayMode}"
-                                     PaneVariant="{Binding PaneVariant}"
-                                     ShowTopBar="{Binding ShowTopBar}"
-                                     BrandTitle="{DynamicResource StrBrandTitle}"
-                                     IsPaneOpen="{Binding IsPaneOpen, Mode=TwoWay}"
-                                     IsSearchVisible="{Binding IsSearchVisible}"
-                                     PageCacheMode="{Binding PageCacheMode}"
-                                     MaxCachedPages="3"
-                                     PageTransitionMode="{Binding PageTransitionMode}"
-                                     SelectedIndex="{Binding SelectedNavIndex, Mode=TwoWay}"
-                                     PageSwitched="OnPageSwitched">
+          <vela:VelaNavigationView x:Name="RootNav"
+                                   DisplayMode="{Binding DisplayMode}"
+                                   PaneVariant="{Binding PaneVariant}"
+                                   ShowTopBar="{Binding ShowTopBar}"
+                                   BrandTitle="{DynamicResource StrBrandTitle}"
+                                   IsPaneOpen="{Binding IsPaneOpen, Mode=TwoWay}"
+                                   IsSearchVisible="{Binding IsSearchVisible}"
+                                   PageCacheMode="{Binding PageCacheMode}"
+                                   MaxCachedPages="3"
+                                   PageTransitionMode="{Binding PageTransitionMode}"
+                                   SelectedIndex="{Binding SelectedNavIndex, Mode=TwoWay}"
+                                   BottomBarPadding="0"
+                                   ShowBottomBarDivider="False"
+                                   PageSwitched="OnPageSwitched">
+            <!-- Custom Bottom Status Bar powered by VelaStatusBar -->
+            <vela:VelaNavigationView.BottomBarContent>
+              <vela:VelaStatusBar>
+                <vela:VelaStatusBarItem x:Name="TelemetryStatusItem"
+                                        ShowIndicatorDot="True"
+                                        Tone="Success"
+                                        Text="{Binding TelemetryText}" />
+                <vela:VelaStatusBar.RightItems>
+                  <vela:VelaStatusBarItem Text="{Binding TelemetrySummary}" />
+                </vela:VelaStatusBar.RightItems>
+              </vela:VelaStatusBar>
+            </vela:VelaNavigationView.BottomBarContent>
               <!-- Brand Header (Expanded) -->
               <vela:VelaNavigationView.Header>
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
@@ -238,7 +224,6 @@
                                 Category="TrayIcon NativeMenu Flyout Popover Badge Progress 托盘"
                                 Icon="{DynamicResource VelaIconBell}" />
             </vela:VelaNavigationView>
-          </DockPanel>
         </vela:VelaDialogHost>
       </vela:VelaDrawerHost>
     </vela:VelaCommandPalette>

@@ -4,57 +4,13 @@
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <!-- Foundation: always loaded (icons, design/color tokens, bare primitives, scrollbar, tooltip) -->
         <ResourceInclude Source="avares://Vela.Avalonia/Icons/VelaIcons.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Tokens/VelaDesignTokens.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Tokens/VelaColorTokens.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPrimitives.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaButton.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSwitch.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaCheckBox.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaInput.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBadge.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSelect.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaComboBox.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMenu.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPopover.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaProgress.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSkeleton.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAlert.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAccordion.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaLiquidGlass.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaGlassCard.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaConfirmMorph.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaScrubInput.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaFloatingBar.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTabs.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaRadioCards.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTagInput.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDatePicker.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMetricCard.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaToolTip.axaml" />
         <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaScrollBar.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSegmentedControl.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaElasticSlider.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaNavigationView.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSettingsGroup.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaStepper.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAvatar.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaEmptyState.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaCopyButton.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaSplitButton.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBreadcrumb.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPagination.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaBusyOverlay.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaHoldToConfirm.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaRulerSlider.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaColorPicker.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaResizablePanels.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDockBar.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaWindow.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaListBox.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeView.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDataGrid.axaml" />
-        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeTable.axaml" />
+        <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaToolTip.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

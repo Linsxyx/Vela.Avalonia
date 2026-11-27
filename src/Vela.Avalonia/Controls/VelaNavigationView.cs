@@ -360,7 +360,7 @@ public class VelaNavItem : TemplatedControl
 /// - Optional sleek TopBar (<see cref="ShowTopBar"/>) with sidebar toggle, auto-generated <see cref="VelaBreadcrumb"/>, and right-side <see cref="TopBarContent"/>
 /// - Dual Left / Top display modes, Standard / Floating / Frosted pane variants, and smooth zero-reflow collapse to 60px icon rail
 /// </summary>
-[PseudoClasses(":left", ":top", ":open", ":compact", ":floating", ":frosted", ":topbar")]
+[PseudoClasses(":left", ":top", ":open", ":compact", ":floating", ":frosted", ":topbar", ":has-background-content", ":no-topbar-divider", ":no-bottombar-divider")]
 public class VelaNavigationView : TemplatedControl
 {
     public static readonly StyledProperty<VelaNavigationDisplayMode> DisplayModeProperty =
@@ -384,11 +384,68 @@ public class VelaNavigationView : TemplatedControl
     public static readonly StyledProperty<bool> ShowTopBarProperty =
         AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(ShowTopBar), true);
 
+    public static readonly StyledProperty<double> TopBarHeightProperty =
+        AvaloniaProperty.Register<VelaNavigationView, double>(nameof(TopBarHeight), 50.0);
+
+    public static readonly StyledProperty<bool> ShowTopBarBreadcrumbProperty =
+        AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(ShowTopBarBreadcrumb), true);
+
+    public static readonly StyledProperty<bool> ShowTopBarDividerProperty =
+        AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(ShowTopBarDivider), true);
+
+    public static readonly StyledProperty<IBrush?> TopBarBackgroundProperty =
+        AvaloniaProperty.Register<VelaNavigationView, IBrush?>(nameof(TopBarBackground));
+
     public static readonly StyledProperty<string?> BrandTitleProperty =
         AvaloniaProperty.Register<VelaNavigationView, string?>(nameof(BrandTitle), "Vela");
 
+    public static readonly StyledProperty<object?> TopBarLeftContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(TopBarLeftContent));
+
+    public static readonly StyledProperty<object?> TopBarCenterContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(TopBarCenterContent));
+
     public static readonly StyledProperty<object?> TopBarContentProperty =
         AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(TopBarContent));
+
+    public static readonly StyledProperty<object?> TopBarCustomContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(TopBarCustomContent));
+
+    public static readonly StyledProperty<bool> IsBottomBarVisibleProperty =
+        AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(IsBottomBarVisible), true);
+
+    public static readonly StyledProperty<double> BottomBarHeightProperty =
+        AvaloniaProperty.Register<VelaNavigationView, double>(nameof(BottomBarHeight), 30.0);
+
+    public static readonly StyledProperty<bool> ShowBottomBarDividerProperty =
+        AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(ShowBottomBarDivider), true);
+
+    public static readonly StyledProperty<IBrush?> BottomBarBackgroundProperty =
+        AvaloniaProperty.Register<VelaNavigationView, IBrush?>(nameof(BottomBarBackground));
+
+    public static readonly StyledProperty<Thickness> BottomBarPaddingProperty =
+        AvaloniaProperty.Register<VelaNavigationView, Thickness>(nameof(BottomBarPadding), new Thickness(14, 0));
+
+    public static readonly StyledProperty<object?> BottomBarContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(BottomBarContent));
+
+    public static readonly StyledProperty<object?> BottomBarLeftContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(BottomBarLeftContent));
+
+    public static readonly StyledProperty<object?> BottomBarCenterContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(BottomBarCenterContent));
+
+    public static readonly StyledProperty<object?> BottomBarRightContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(BottomBarRightContent));
+
+    public static readonly StyledProperty<object?> BackgroundContentProperty =
+        AvaloniaProperty.Register<VelaNavigationView, object?>(nameof(BackgroundContent));
+
+    public static readonly StyledProperty<double> BackgroundContentOpacityProperty =
+        AvaloniaProperty.Register<VelaNavigationView, double>(nameof(BackgroundContentOpacity), 1.0);
+
+    public static readonly DirectProperty<VelaNavigationView, bool> EffectiveBottomBarVisibleProperty =
+        AvaloniaProperty.RegisterDirect<VelaNavigationView, bool>(nameof(EffectiveBottomBarVisible), o => o.EffectiveBottomBarVisible);
 
     public static readonly StyledProperty<bool> IsSearchVisibleProperty =
         AvaloniaProperty.Register<VelaNavigationView, bool>(nameof(IsSearchVisible), false);
@@ -439,8 +496,35 @@ public class VelaNavigationView : TemplatedControl
     public double CompactPaneLength { get => GetValue(CompactPaneLengthProperty); set => SetValue(CompactPaneLengthProperty, value); }
     public bool IsPaneToggleVisible { get => GetValue(IsPaneToggleVisibleProperty); set => SetValue(IsPaneToggleVisibleProperty, value); }
     public bool ShowTopBar { get => GetValue(ShowTopBarProperty); set => SetValue(ShowTopBarProperty, value); }
+    public double TopBarHeight { get => GetValue(TopBarHeightProperty); set => SetValue(TopBarHeightProperty, value); }
+    public bool ShowTopBarBreadcrumb { get => GetValue(ShowTopBarBreadcrumbProperty); set => SetValue(ShowTopBarBreadcrumbProperty, value); }
+    public bool ShowTopBarDivider { get => GetValue(ShowTopBarDividerProperty); set => SetValue(ShowTopBarDividerProperty, value); }
+    public IBrush? TopBarBackground { get => GetValue(TopBarBackgroundProperty); set => SetValue(TopBarBackgroundProperty, value); }
     public string? BrandTitle { get => GetValue(BrandTitleProperty); set => SetValue(BrandTitleProperty, value); }
+    public object? TopBarLeftContent { get => GetValue(TopBarLeftContentProperty); set => SetValue(TopBarLeftContentProperty, value); }
+    public object? TopBarCenterContent { get => GetValue(TopBarCenterContentProperty); set => SetValue(TopBarCenterContentProperty, value); }
     public object? TopBarContent { get => GetValue(TopBarContentProperty); set => SetValue(TopBarContentProperty, value); }
+    public object? TopBarCustomContent { get => GetValue(TopBarCustomContentProperty); set => SetValue(TopBarCustomContentProperty, value); }
+
+    public bool IsBottomBarVisible { get => GetValue(IsBottomBarVisibleProperty); set => SetValue(IsBottomBarVisibleProperty, value); }
+    public double BottomBarHeight { get => GetValue(BottomBarHeightProperty); set => SetValue(BottomBarHeightProperty, value); }
+    public bool ShowBottomBarDivider { get => GetValue(ShowBottomBarDividerProperty); set => SetValue(ShowBottomBarDividerProperty, value); }
+    public IBrush? BottomBarBackground { get => GetValue(BottomBarBackgroundProperty); set => SetValue(BottomBarBackgroundProperty, value); }
+    public Thickness BottomBarPadding { get => GetValue(BottomBarPaddingProperty); set => SetValue(BottomBarPaddingProperty, value); }
+    public object? BottomBarContent { get => GetValue(BottomBarContentProperty); set => SetValue(BottomBarContentProperty, value); }
+    public object? BottomBarLeftContent { get => GetValue(BottomBarLeftContentProperty); set => SetValue(BottomBarLeftContentProperty, value); }
+    public object? BottomBarCenterContent { get => GetValue(BottomBarCenterContentProperty); set => SetValue(BottomBarCenterContentProperty, value); }
+    public object? BottomBarRightContent { get => GetValue(BottomBarRightContentProperty); set => SetValue(BottomBarRightContentProperty, value); }
+
+    public object? BackgroundContent { get => GetValue(BackgroundContentProperty); set => SetValue(BackgroundContentProperty, value); }
+    public double BackgroundContentOpacity { get => GetValue(BackgroundContentOpacityProperty); set => SetValue(BackgroundContentOpacityProperty, value); }
+
+    private bool _effectiveBottomBarVisible;
+    public bool EffectiveBottomBarVisible
+    {
+        get => _effectiveBottomBarVisible;
+        private set => SetAndRaise(EffectiveBottomBarVisibleProperty, ref _effectiveBottomBarVisible, value);
+    }
     public bool IsSearchVisible { get => GetValue(IsSearchVisibleProperty); set => SetValue(IsSearchVisibleProperty, value); }
     public string? SearchText { get => GetValue(SearchTextProperty); set => SetValue(SearchTextProperty, value); }
     public object? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
@@ -506,6 +590,14 @@ public class VelaNavigationView : TemplatedControl
         DisplayModeProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnDisplayModeChanged());
         PaneVariantProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnPaneVariantChanged());
         ShowTopBarProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        ShowTopBarDividerProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        IsBottomBarVisibleProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        ShowBottomBarDividerProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        BottomBarContentProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        BottomBarLeftContentProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        BottomBarCenterContentProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        BottomBarRightContentProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
+        BackgroundContentProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdatePseudoClasses());
         BrandTitleProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.UpdateTopBreadcrumb());
         IsPaneOpenProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnPaneOpenChanged());
         IsSearchVisibleProperty.Changed.AddClassHandler<VelaNavigationView>((v, _) => v.OnSearchVisibleChanged());
@@ -1188,5 +1280,15 @@ public class VelaNavigationView : TemplatedControl
         PseudoClasses.Set(":floating", !isTop && PaneVariant == VelaNavigationPaneVariant.Floating);
         PseudoClasses.Set(":frosted", !isTop && PaneVariant == VelaNavigationPaneVariant.Frosted);
         PseudoClasses.Set(":topbar", !isTop && ShowTopBar);
+        PseudoClasses.Set(":has-background-content", BackgroundContent is not null);
+        PseudoClasses.Set(":no-topbar-divider", !ShowTopBarDivider);
+        PseudoClasses.Set(":no-bottombar-divider", !ShowBottomBarDivider);
+
+        var hasBottomContent = BottomBarContent is not null
+            || BottomBarLeftContent is not null
+            || BottomBarCenterContent is not null
+            || BottomBarRightContent is not null;
+
+        EffectiveBottomBarVisible = IsBottomBarVisible && hasBottomContent;
     }
 }

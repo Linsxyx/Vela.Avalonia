@@ -1,0 +1,10 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="Vela.Avalonia.VelaDataViewsModule">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaListBox.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeView.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDataGrid.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeTable.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

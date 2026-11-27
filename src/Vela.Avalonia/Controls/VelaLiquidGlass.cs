@@ -78,6 +78,9 @@ public sealed class VelaLiquidGlassLens : Control
         private static readonly SKRuntimeEffect? ShaderEffect = CompileShader();
         private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.None);
 
+        [ThreadStatic] private static float[]? t_radii;
+        [ThreadStatic] private static SKPoint[]? t_skRadii;
+
         private readonly Rect _bounds;
         private readonly CornerRadius _corners;
         private readonly float _bevelWidth;
@@ -150,13 +153,11 @@ public sealed class VelaLiquidGlassLens : Control
                 effectiveBevel = MathF.Min(effectiveBevel, 10f);
 
             float ClampR(double r) => Math.Clamp((float)r, 0f, minSide * 0.5f);
-            float[] radii =
-            [
-                ClampR(_corners.TopLeft),
-                ClampR(_corners.TopRight),
-                ClampR(_corners.BottomRight),
-                ClampR(_corners.BottomLeft),
-            ];
+            var radii = t_radii ??= new float[4];
+            radii[0] = ClampR(_corners.TopLeft);
+            radii[1] = ClampR(_corners.TopRight);
+            radii[2] = ClampR(_corners.BottomRight);
+            radii[3] = ClampR(_corners.BottomLeft);
 
             var localRect = SKRect.Create(w, h);
             // Refraction bends inward (-n), so sampling stays cleanly inside the frosted glass bounds.
@@ -193,15 +194,15 @@ public sealed class VelaLiquidGlassLens : Control
                 ["uScene"] = sceneShader,
             };
 
+            var skRadii = t_skRadii ??= new SKPoint[4];
+            skRadii[0] = new SKPoint(radii[0], radii[0]);
+            skRadii[1] = new SKPoint(radii[1], radii[1]);
+            skRadii[2] = new SKPoint(radii[2], radii[2]);
+            skRadii[3] = new SKPoint(radii[3], radii[3]);
+
             using var lensShader = ShaderEffect.ToShader(uniforms, children);
             using var rrect = new SKRoundRect();
-            rrect.SetRectRadii(localRect,
-            [
-                new SKPoint(radii[0], radii[0]),
-                new SKPoint(radii[1], radii[1]),
-                new SKPoint(radii[2], radii[2]),
-                new SKPoint(radii[3], radii[3]),
-            ]);
+            rrect.SetRectRadii(localRect, skRadii);
 
             using var paint = new SKPaint
             {

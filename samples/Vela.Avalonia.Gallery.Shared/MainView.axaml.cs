@@ -105,9 +105,6 @@ public partial class MainView : UserControl
     private void OnPageSwitched(object? sender, VelaPageSwitchMetrics metrics)
     {
         _viewModel?.RecordPageSwitch(metrics);
-
-        var dotKey = metrics.IsCacheHit ? "VelaSuccessBrush" : "VelaWarningBrush";
-        if (this.TryFindResource(dotKey, ActualThemeVariant, out var res) && res is IBrush brush)
-            TelemetryDot.Background = brush;
+        TelemetryStatusItem.Tone = metrics.IsCacheHit ? VelaStatusTone.Success : VelaStatusTone.Warning;
     }
 }

@@ -1,0 +1,103 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaMenuBarItem}" TargetType="controls:VelaMenuBarItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="9,0" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Button x:Name="PART_Trigger"
+                  Background="{TemplateBinding Background}"
+                  Foreground="{TemplateBinding Foreground}"
+                  FontSize="{TemplateBinding FontSize}"
+                  FontWeight="{TemplateBinding FontWeight}"
+                  Height="{TemplateBinding Height}"
+                  Padding="{TemplateBinding Padding}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  BorderThickness="0"
+                  Cursor="Hand"
+                  VerticalContentAlignment="Center"
+                  HorizontalContentAlignment="Center">
+            <Button.Template>
+              <ControlTemplate TargetType="Button">
+                <Border x:Name="PART_TriggerBg"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                  <Border.Transitions>
+                    <Transitions>
+                      <BrushTransition Property="Background" Duration="0:0:0.12" />
+                    </Transitions>
+                  </Border.Transitions>
+                  <ContentPresenter Content="{TemplateBinding Content}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                </Border>
+              </ControlTemplate>
+            </Button.Template>
+            <TextBlock Text="{TemplateBinding Header}"
+                       FontSize="{TemplateBinding FontSize}"
+                       FontWeight="{TemplateBinding FontWeight}"
+                       Foreground="{TemplateBinding Foreground}"
+                       VerticalAlignment="Center" />
+          </Button>
+
+          <Popup x:Name="PART_Popup"
+                 PlacementTarget="{Binding ElementName=PART_Trigger}"
+                 Placement="BottomEdgeAlignedLeft"
+                 VerticalOffset="4"
+                 IsLightDismissEnabled="True">
+            <controls:VelaPopupSurface x:Name="PART_PopupSurface"
+                                       Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                                       BorderBrush="{DynamicResource VelaBorderBrush}"
+                                       BorderThickness="1"
+                                       BoxShadow="{DynamicResource VelaShadowFloating}"
+                                       CornerRadius="10"
+                                       Padding="4"
+                                       MinWidth="{TemplateBinding MinMenuWidth}">
+              <StackPanel x:Name="PART_MenuHost" Spacing="2" />
+            </controls:VelaPopupSurface>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:compact">
+      <Setter Property="Height" Value="24" />
+      <Setter Property="Padding" Value="7,0" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Button#PART_Trigger">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+    <Style Selector="^:open /template/ Button#PART_Trigger">
+      <Setter Property="Background" Value="{DynamicResource VelaSurfaceMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaMenuBar}" TargetType="controls:VelaMenuBar">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="2,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}">
+          <StackPanel x:Name="PART_ItemsHost"
+                      Orientation="Horizontal"
+                      Spacing="2"
+                      VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="Vela.Avalonia.VelaGlassModule">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaLiquidGlass.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaGlassCard.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

@@ -177,10 +177,51 @@
   <ControlTheme x:Key="{x:Type controls:VelaNavigationView}" TargetType="controls:VelaNavigationView">
     <Setter Property="Background" Value="{DynamicResource VelaBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="TopBarBackground" Value="{DynamicResource VelaSurfaceBrush}" />
+    <Setter Property="BottomBarBackground" Value="{DynamicResource VelaSidebarBackgroundBrush}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <DockPanel Background="{TemplateBinding Background}">
-          <!-- Navigation Pane (Sidebar / Top Bar) -->
+        <Panel Background="{TemplateBinding Background}">
+          <!-- Optional Replaceable Background Layer -->
+          <ContentPresenter x:Name="PART_BackgroundHost"
+                            Content="{TemplateBinding BackgroundContent}"
+                            Opacity="{TemplateBinding BackgroundContentOpacity}"
+                            IsHitTestVisible="False"
+                            IsVisible="{TemplateBinding BackgroundContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+          <DockPanel LastChildFill="True">
+            <!-- Optional Custom BottomBar (spans full navigation shell width) -->
+            <Border x:Name="PART_BottomBar"
+                    DockPanel.Dock="Bottom"
+                    Height="{TemplateBinding BottomBarHeight}"
+                    Background="{TemplateBinding BottomBarBackground}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="{TemplateBinding BottomBarPadding}"
+                    IsVisible="{TemplateBinding EffectiveBottomBarVisible}">
+              <Panel>
+                <ContentPresenter Content="{TemplateBinding BottomBarContent}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  IsVisible="{TemplateBinding BottomBarContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <Grid ColumnDefinitions="Auto,*,Auto"
+                      ColumnSpacing="10"
+                      IsVisible="{TemplateBinding BottomBarContent, Converter={x:Static ObjectConverters.IsNull}}">
+                  <ContentPresenter Grid.Column="0"
+                                    Content="{TemplateBinding BottomBarLeftContent}"
+                                    VerticalAlignment="Center" />
+                  <ContentPresenter Grid.Column="1"
+                                    Content="{TemplateBinding BottomBarCenterContent}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                  <ContentPresenter Grid.Column="2"
+                                    Content="{TemplateBinding BottomBarRightContent}"
+                                    VerticalAlignment="Center" />
+                </Grid>
+              </Panel>
+            </Border>
+
+            <!-- Navigation Pane (Sidebar / Top Bar) -->
           <Border x:Name="PART_Pane"
                   DockPanel.Dock="Left"
                   Background="{DynamicResource VelaSidebarBackgroundBrush}"
@@ -304,40 +345,66 @@
           </Border>
 
           <!-- Content Area: Optional Arc TopBar + O(1) Cached VelaPageDeck -->
-          <DockPanel Background="{TemplateBinding Background}">
+          <DockPanel x:Name="PART_ContentDock" Background="Transparent">
             <Border x:Name="PART_TopBar"
                     DockPanel.Dock="Top"
-                    Height="50"
-                    Background="{DynamicResource VelaSurfaceBrush}"
+                    Height="{TemplateBinding TopBarHeight}"
+                    Background="{TemplateBinding TopBarBackground}"
                     BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
                     BorderThickness="0,0,0,1"
                     Padding="14,0,18,0"
                     IsVisible="False">
-              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                <Button x:Name="PART_TopBarToggle"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
-                        Width="30"
-                        Height="30"
-                        CornerRadius="8"
-                        IsVisible="{TemplateBinding IsPaneToggleVisible}"
-                        ToolTip.Tip="Toggle sidebar">
-                  <PathIcon Width="15"
-                            Height="15"
-                            Data="{DynamicResource VelaIconSidebar}"
-                            Foreground="{DynamicResource VelaTextSecondaryBrush}" />
-                </Button>
+              <Panel>
+                <!-- Mode A: Full Custom TopBar -->
+                <ContentPresenter Content="{TemplateBinding TopBarCustomContent}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  IsVisible="{TemplateBinding TopBarCustomContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
 
-                <controls:VelaBreadcrumb x:Name="PART_TopBreadcrumb"
-                                         Grid.Column="1"
-                                         VerticalAlignment="Center" />
+                <!-- Mode B: Built-in TopBar (Toggle + Left/Breadcrumb + Center + Right) -->
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto"
+                      ColumnSpacing="10"
+                      IsVisible="{TemplateBinding TopBarCustomContent, Converter={x:Static ObjectConverters.IsNull}}">
+                  <Button x:Name="PART_TopBarToggle"
+                          Grid.Column="0"
+                          Theme="{DynamicResource VelaIconButtonTheme}"
+                          Width="30"
+                          Height="30"
+                          CornerRadius="8"
+                          IsVisible="{TemplateBinding IsPaneToggleVisible}"
+                          ToolTip.Tip="Toggle sidebar">
+                    <PathIcon Width="15"
+                              Height="15"
+                              Data="{DynamicResource VelaIconSidebar}"
+                              Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  </Button>
 
-                <ContentPresenter Grid.Column="2"
-                                  Content="{TemplateBinding TopBarContent}"
-                                  VerticalAlignment="Center" />
-              </Grid>
+                  <StackPanel Grid.Column="1"
+                              Orientation="Horizontal"
+                              Spacing="10"
+                              VerticalAlignment="Center">
+                    <ContentPresenter Content="{TemplateBinding TopBarLeftContent}"
+                                      VerticalAlignment="Center"
+                                      IsVisible="{TemplateBinding TopBarLeftContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <controls:VelaBreadcrumb x:Name="PART_TopBreadcrumb"
+                                             VerticalAlignment="Center"
+                                             IsVisible="{TemplateBinding ShowTopBarBreadcrumb}" />
+                  </StackPanel>
+
+                  <ContentPresenter Grid.Column="2"
+                                    Content="{TemplateBinding TopBarCenterContent}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{TemplateBinding TopBarCenterContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                  <ContentPresenter Grid.Column="3"
+                                    Content="{TemplateBinding TopBarContent}"
+                                    VerticalAlignment="Center" />
+                </Grid>
+              </Panel>
             </Border>
 
-            <Border Background="{TemplateBinding Background}" ClipToBounds="True">
+            <Border x:Name="PART_PageDeckHost" Background="Transparent" ClipToBounds="True">
               <controls:VelaPageDeck x:Name="PART_PageDeck"
                                      PageCacheMode="{TemplateBinding PageCacheMode}"
                                      MaxCachedPages="{TemplateBinding MaxCachedPages}"
@@ -346,6 +413,7 @@
             </Border>
           </DockPanel>
         </DockPanel>
+        </Panel>
       </ControlTemplate>
     </Setter>
 
@@ -355,6 +423,12 @@
     </Style>
     <Style Selector="^:topbar /template/ Button#PART_PaneToggle">
       <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:no-topbar-divider /template/ Border#PART_TopBar">
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="^:no-bottombar-divider /template/ Border#PART_BottomBar">
+      <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <!-- Floating Sidebar Variant (inset rounded card) -->

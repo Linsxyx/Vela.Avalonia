@@ -40,6 +40,12 @@ public class VelaShaderBackground : Control
     public static readonly StyledProperty<bool> IsAnimatedProperty =
         AvaloniaProperty.Register<VelaShaderBackground, bool>(nameof(IsAnimated), true);
 
+    public static readonly StyledProperty<double> MaxFrameRateProperty =
+        AvaloniaProperty.Register<VelaShaderBackground, double>(nameof(MaxFrameRate), 30.0);
+
+    public static readonly StyledProperty<bool> PauseWhenWindowInactiveProperty =
+        AvaloniaProperty.Register<VelaShaderBackground, bool>(nameof(PauseWhenWindowInactive), true);
+
     public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =
         Border.CornerRadiusProperty.AddOwner<VelaShaderBackground>();
 
@@ -56,14 +62,20 @@ public class VelaShaderBackground : Control
     public double Speed { get => GetValue(SpeedProperty); set => SetValue(SpeedProperty, value); }
     public double Intensity { get => GetValue(IntensityProperty); set => SetValue(IntensityProperty, value); }
     public bool IsAnimated { get => GetValue(IsAnimatedProperty); set => SetValue(IsAnimatedProperty, value); }
+    public double MaxFrameRate { get => GetValue(MaxFrameRateProperty); set => SetValue(MaxFrameRateProperty, value); }
+    public bool PauseWhenWindowInactive { get => GetValue(PauseWhenWindowInactiveProperty); set => SetValue(PauseWhenWindowInactiveProperty, value); }
     public CornerRadius CornerRadius { get => GetValue(CornerRadiusProperty); set => SetValue(CornerRadiusProperty, value); }
     public Color? PrimaryColor { get => GetValue(PrimaryColorProperty); set => SetValue(PrimaryColorProperty, value); }
     public Color? SecondaryColor { get => GetValue(SecondaryColorProperty); set => SetValue(SecondaryColorProperty, value); }
     public Color? TertiaryColor { get => GetValue(TertiaryColorProperty); set => SetValue(TertiaryColorProperty, value); }
 
+    private readonly Action<TimeSpan> _frameCallback;
     private float _time;
     private bool _frameScheduled;
     private TimeSpan? _lastFrame;
+    private TimeSpan? _lastRenderTimestamp;
+    private Window? _hostWindow;
+    private bool _windowActive = true;
 
     // Smoothly interpolated RGBA palette channels
     private SKColor _curBase, _tgtBase;
@@ -83,6 +95,7 @@ public class VelaShaderBackground : Control
             TertiaryColorProperty);
 
         IsAnimatedProperty.Changed.AddClassHandler<VelaShaderBackground>((b, _) => b.UpdateAnimationLoop());
+        PauseWhenWindowInactiveProperty.Changed.AddClassHandler<VelaShaderBackground>((b, _) => b.UpdateAnimationLoop());
         PrimaryColorProperty.Changed.AddClassHandler<VelaShaderBackground>((b, _) => b.RefreshTargetPalette(snap: false));
         SecondaryColorProperty.Changed.AddClassHandler<VelaShaderBackground>((b, _) => b.RefreshTargetPalette(snap: false));
         TertiaryColorProperty.Changed.AddClassHandler<VelaShaderBackground>((b, _) => b.RefreshTargetPalette(snap: false));
@@ -90,6 +103,7 @@ public class VelaShaderBackground : Control
 
     public VelaShaderBackground()
     {
+        _frameCallback = OnFrame;
         IsHitTestVisible = false;
     }
 
@@ -98,6 +112,7 @@ public class VelaShaderBackground : Control
         base.OnAttachedToVisualTree(e);
         VelaTheme.AccentChanged += OnAccentChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
+        AttachHostWindow(TopLevel.GetTopLevel(this) as Window);
         RefreshTargetPalette(snap: !_paletteInitialized);
         UpdateAnimationLoop();
     }
@@ -107,8 +122,56 @@ public class VelaShaderBackground : Control
         base.OnDetachedFromVisualTree(e);
         VelaTheme.AccentChanged -= OnAccentChanged;
         ActualThemeVariantChanged -= OnThemeVariantChanged;
+        DetachHostWindow();
         _frameScheduled = false;
         _lastFrame = null;
+        _lastRenderTimestamp = null;
+    }
+
+    private void AttachHostWindow(Window? window)
+    {
+        DetachHostWindow();
+        if (window is null) return;
+        _hostWindow = window;
+        _windowActive = window.IsActive;
+        window.Activated += OnHostWindowActivated;
+        window.Deactivated += OnHostWindowDeactivated;
+    }
+
+    private void DetachHostWindow()
+    {
+        if (_hostWindow is null) return;
+        _hostWindow.Activated -= OnHostWindowActivated;
+        _hostWindow.Deactivated -= OnHostWindowDeactivated;
+        _hostWindow = null;
+        _windowActive = true;
+    }
+
+    private void OnHostWindowActivated(object? sender, EventArgs e)
+    {
+        _windowActive = true;
+        UpdateAnimationLoop();
+    }
+
+    private void OnHostWindowDeactivated(object? sender, EventArgs e)
+    {
+        _windowActive = false;
+    }
+
+    private bool ShouldAnimateFlow()
+    {
+        if (!IsAnimated || VelaMotionOptions.ReducedMotion || !IsEffectivelyVisible)
+            return false;
+
+        if (_hostWindow is not null)
+        {
+            if (_hostWindow.WindowState == WindowState.Minimized)
+                return false;
+            if (PauseWhenWindowInactive && !_windowActive)
+                return false;
+        }
+
+        return true;
     }
 
     private void OnAccentChanged(object? sender, VelaAccent accent) => RefreshTargetPalette(snap: false);
@@ -143,7 +206,7 @@ public class VelaShaderBackground : Control
 
     private void UpdateAnimationLoop()
     {
-        if (IsAnimated && !VelaMotionOptions.ReducedMotion)
+        if (ShouldAnimateFlow())
             ScheduleFrame();
         else
             InvalidateVisual();
@@ -160,7 +223,8 @@ public class VelaShaderBackground : Control
 
         _frameScheduled = true;
         _lastFrame = null;
-        top.RequestAnimationFrame(OnFrame);
+        _lastRenderTimestamp = null;
+        top.RequestAnimationFrame(_frameCallback);
     }
 
     private void OnFrame(TimeSpan timestamp)
@@ -173,15 +237,39 @@ public class VelaShaderBackground : Control
         {
             _frameScheduled = false;
             _lastFrame = null;
+            _lastRenderTimestamp = null;
             return;
         }
 
-        var dt = _lastFrame.HasValue
-            ? (float)Math.Clamp((timestamp - _lastFrame.Value).TotalSeconds, 0.001, 0.05)
-            : 1f / 60f;
-        _lastFrame = timestamp;
+        var animateFlow = ShouldAnimateFlow();
+        var paletteNeedsLerp = _curBase != _tgtBase || _curC1 != _tgtC1 || _curC2 != _tgtC2 || _curC3 != _tgtC3;
 
-        var animateFlow = IsAnimated && !VelaMotionOptions.ReducedMotion;
+        if (!animateFlow && !paletteNeedsLerp)
+        {
+            _frameScheduled = false;
+            _lastFrame = null;
+            _lastRenderTimestamp = null;
+            return;
+        }
+
+        // Throttle ambient shader frames to MaxFrameRate (default 30fps) while keeping theme-switch palette lerps smooth
+        var maxFps = MaxFrameRate;
+        if (!paletteNeedsLerp && maxFps > 0 && _lastRenderTimestamp.HasValue)
+        {
+            var minInterval = 1.0 / maxFps;
+            if ((timestamp - _lastRenderTimestamp.Value).TotalSeconds < minInterval * 0.92)
+            {
+                top.RequestAnimationFrame(_frameCallback);
+                return;
+            }
+        }
+
+        var dt = _lastFrame.HasValue
+            ? (float)Math.Clamp((timestamp - _lastFrame.Value).TotalSeconds, 0.001, 0.1)
+            : 1f / 30f;
+        _lastFrame = timestamp;
+        _lastRenderTimestamp = timestamp;
+
         if (animateFlow)
             _time += dt * (float)Math.Clamp(Speed, 0.0, 4.0);
 
@@ -196,12 +284,13 @@ public class VelaShaderBackground : Control
 
         if (animateFlow || !paletteSettled)
         {
-            top.RequestAnimationFrame(OnFrame);
+            top.RequestAnimationFrame(_frameCallback);
         }
         else
         {
             _frameScheduled = false;
             _lastFrame = null;
+            _lastRenderTimestamp = null;
         }
     }
 
@@ -254,6 +343,10 @@ public class VelaShaderBackground : Control
     private sealed class AmbientShaderDrawOp : ICustomDrawOperation
     {
         private static readonly SKRuntimeEffect? Effect = CompileShader();
+
+        [ThreadStatic] private static float[]? t_resolution;
+        [ThreadStatic] private static float[]? t_vec3;
+        [ThreadStatic] private static SKPoint[]? t_radii;
 
         private readonly Rect _bounds;
         private readonly CornerRadius _corners;
@@ -335,18 +428,20 @@ public class VelaShaderBackground : Control
                 return;
             }
 
-            var uniforms = new SKRuntimeEffectUniforms(Effect)
-            {
-                ["iResolution"] = new[] { w, h },
-                ["iTime"] = _time,
-                ["iPreset"] = (float)_preset,
-                ["iIntensity"] = _intensity,
-                ["iIsDark"] = _isDark ? 1.0f : 0.0f,
-                ["iBase"] = ToVec3(_baseColor),
-                ["iColor1"] = ToVec3(_c1),
-                ["iColor2"] = ToVec3(_c2),
-                ["iColor3"] = ToVec3(_c3),
-            };
+            var resBuf = t_resolution ??= new float[2];
+            resBuf[0] = w;
+            resBuf[1] = h;
+
+            using var uniforms = new SKRuntimeEffectUniforms(Effect);
+            uniforms["iResolution"] = resBuf;
+            uniforms["iTime"] = _time;
+            uniforms["iPreset"] = (float)_preset;
+            uniforms["iIntensity"] = _intensity;
+            uniforms["iIsDark"] = _isDark ? 1.0f : 0.0f;
+            uniforms["iBase"] = FillVec3(_baseColor);
+            uniforms["iColor1"] = FillVec3(_c1);
+            uniforms["iColor2"] = FillVec3(_c2);
+            uniforms["iColor3"] = FillVec3(_c3);
 
             using var shader = Effect.ToShader(uniforms);
             if (shader is null)
@@ -364,17 +459,25 @@ public class VelaShaderBackground : Control
                 canvas.DrawRect(rect, paint);
         }
 
-        private static float[] ToVec3(SKColor c) => [c.Red / 255f, c.Green / 255f, c.Blue / 255f];
+        private static float[] FillVec3(SKColor c)
+        {
+            var buf = t_vec3 ??= new float[3];
+            buf[0] = c.Red / 255f;
+            buf[1] = c.Green / 255f;
+            buf[2] = c.Blue / 255f;
+            return buf;
+        }
 
         private static SKRoundRect BuildRoundRect(SKRect rect, CornerRadius cr)
         {
+            var radii = t_radii ??= new SKPoint[4];
+            radii[0] = new SKPoint((float)cr.TopLeft, (float)cr.TopLeft);
+            radii[1] = new SKPoint((float)cr.TopRight, (float)cr.TopRight);
+            radii[2] = new SKPoint((float)cr.BottomRight, (float)cr.BottomRight);
+            radii[3] = new SKPoint((float)cr.BottomLeft, (float)cr.BottomLeft);
+
             var rr = new SKRoundRect();
-            rr.SetRectRadii(rect, [
-                new SKPoint((float)cr.TopLeft, (float)cr.TopLeft),
-                new SKPoint((float)cr.TopRight, (float)cr.TopRight),
-                new SKPoint((float)cr.BottomRight, (float)cr.BottomRight),
-                new SKPoint((float)cr.BottomLeft, (float)cr.BottomLeft),
-            ]);
+            rr.SetRectRadii(rect, radii);
             return rr;
         }
 
