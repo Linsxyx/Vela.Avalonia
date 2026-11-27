@@ -175,8 +175,7 @@ public sealed class VelaPageDeck : Panel
             NotifyLifecycle(previous.Visual, entering: false);
             if (mode == VelaPageCacheMode.None)
             {
-                Children.Remove(previous.Visual);
-                _slots.Remove(previous.Key);
+                EvictSlot(previous);
             }
             else
             {
@@ -208,10 +207,7 @@ public sealed class VelaPageDeck : Panel
     {
         var toRemove = _slots.Values.Where(s => !ReferenceEquals(s, _activeSlot)).ToList();
         foreach (var slot in toRemove)
-        {
-            Children.Remove(slot.Visual);
-            _slots.Remove(slot.Key);
-        }
+            EvictSlot(slot);
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -243,8 +239,7 @@ public sealed class VelaPageDeck : Panel
         NotifyLifecycle(_activeSlot.Visual, entering: false);
         if (PageCacheMode == VelaPageCacheMode.None)
         {
-            Children.Remove(_activeSlot.Visual);
-            _slots.Remove(_activeSlot.Key);
+            EvictSlot(_activeSlot);
         }
         else
         {
@@ -274,9 +269,17 @@ public sealed class VelaPageDeck : Panel
             .ToList();
 
         foreach (var victim in victims)
+            EvictSlot(victim);
+    }
+
+    private void EvictSlot(PageSlot slot)
+    {
+        Children.Remove(slot.Visual);
+        _slots.Remove(slot.Key);
+        if (slot.Visual is ContentPresenter cp)
         {
-            Children.Remove(victim.Visual);
-            _slots.Remove(victim.Key);
+            cp.Content = null;
+            cp.ContentTemplate = null;
         }
     }
 

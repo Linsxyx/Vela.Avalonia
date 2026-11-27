@@ -183,7 +183,7 @@ public class VelaPagination : TemplatedControl
                     TextAlignment = TextAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                     Padding = new Thickness(0, 8, 0, 0),
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
                 });
                 continue;
             }
@@ -232,9 +232,8 @@ public class VelaPagination : TemplatedControl
         {
             var isCurrent = page == current;
             btn.FontWeight = isCurrent ? FontWeight.SemiBold : FontWeight.Normal;
-            btn.Bind(
-                TemplatedControl.ForegroundProperty,
-                this.GetResourceObservable(isCurrent ? "VelaAccentForegroundBrush" : "VelaTextSecondaryBrush"));
+            btn[!TemplatedControl.ForegroundProperty] = VelaResourceBinding.Create(
+                isCurrent ? "VelaAccentForegroundBrush" : "VelaTextSecondaryBrush");
         }
     }
 

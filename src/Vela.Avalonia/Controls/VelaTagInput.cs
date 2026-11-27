@@ -167,8 +167,8 @@ public class VelaTagInput : TemplatedControl
             RenderTransformOrigin = RelativePoint.Center;
             RenderTransform = _scaleTransform;
 
-            Bind(BackgroundProperty, this.GetResourceObservable("VelaSurfaceMutedBrush"));
-            Bind(BorderBrushProperty, this.GetResourceObservable("VelaBorderBrush"));
+            this[!BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush");
+            this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush");
 
             var closeBtn = new Button
             {
@@ -180,11 +180,11 @@ public class VelaTagInput : TemplatedControl
                 {
                     Width = 10,
                     Height = 10,
-                    [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconClose").ToBinding(),
-                    [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconClose"),
+                    [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 },
             };
-            closeBtn.Bind(ThemeProperty, this.GetResourceObservable("VelaIconButtonTheme"));
+            closeBtn[!ThemeProperty] = VelaResourceBinding.Create("VelaIconButtonTheme");
             closeBtn.Click += (_, _) => onRemove();
 
             Child = new StackPanel
@@ -200,7 +200,7 @@ public class VelaTagInput : TemplatedControl
                         FontSize = 13,
                         FontWeight = FontWeight.Medium,
                         VerticalAlignment = VerticalAlignment.Center,
-                        [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                        [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
                     },
                     closeBtn,
                 },

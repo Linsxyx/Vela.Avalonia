@@ -778,7 +778,7 @@ public class VelaDataGridTextColumn : VelaDataGridColumn
         else
         {
             var key = IsMuted ? "VelaTextSecondaryBrush" : "VelaForegroundBrush";
-            tb[!TextBlock.ForegroundProperty] = tb.GetResourceObservable(key).ToBinding();
+            tb[!TextBlock.ForegroundProperty] = VelaResourceBinding.Create(key);
         }
 
         if (ValueSelector is not null)

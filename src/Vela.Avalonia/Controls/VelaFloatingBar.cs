@@ -146,7 +146,7 @@ public class VelaFloatingBar : TemplatedControl
                     Height = 18,
                     Margin = new Thickness(3, 0),
                     VerticalAlignment = VerticalAlignment.Center,
-                    [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+                    [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
                 });
                 continue;
             }
@@ -173,7 +173,7 @@ public class VelaFloatingBar : TemplatedControl
                 Height = 15,
                 Data = item.Icon,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
             });
         }
 
@@ -185,7 +185,7 @@ public class VelaFloatingBar : TemplatedControl
                 FontSize = 13,
                 FontWeight = FontWeight.Medium,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
             });
         }
 

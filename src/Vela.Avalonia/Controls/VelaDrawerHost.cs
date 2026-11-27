@@ -54,6 +54,7 @@ public class VelaDrawerHost : ContentControl
     private VelaDrawerSide _currentSide = VelaDrawerSide.Right;
     private double _currentWidth = 390.0;
     private Action? _onClosed;
+    private readonly List<IDisposable> _sheetBindings = new();
 
     public bool IsDrawerOpen => _isOpen;
 
@@ -96,7 +97,7 @@ public class VelaDrawerHost : ContentControl
 
             _scrim = new Border
             {
-                [!Border.BackgroundProperty] = host.GetResourceObservable("VelaOverlayScrimBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaOverlayScrimBrush"),
                 Opacity = 0,
             };
             _scrim.PointerPressed += (_, ev) =>
@@ -119,9 +120,9 @@ public class VelaDrawerHost : ContentControl
                 BorderThickness = new Thickness(1),
                 ClipToBounds = false,
                 RenderTransform = _sheetTranslate,
-                [!Border.BackgroundProperty] = host.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding(),
-                [!Border.BorderBrushProperty] = host.GetResourceObservable("VelaBorderBrush").ToBinding(),
-                [!Border.BoxShadowProperty] = host.GetResourceObservable("VelaShadowFloating").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
+                [!Border.BoxShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating"),
             };
 
             _overlayLayer = new Grid
@@ -158,6 +159,7 @@ public class VelaDrawerHost : ContentControl
 
         _sheet.Width = opts.Width;
         _sheet.HorizontalAlignment = opts.Side == VelaDrawerSide.Left ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        ClearSheetBindings();
         var chrome = BuildDrawerChrome(body, opts);
 
         if (opts.Material == VelaSurfaceMaterial.GlassCard)
@@ -177,7 +179,7 @@ public class VelaDrawerHost : ContentControl
                 TintLevel = VelaGlassTintLevel.HighContrast,
                 RimThickness = new Thickness(1.2),
                 Content = chrome,
-                [!VelaGlassCard.CardShadowProperty] = this.GetResourceObservable("VelaShadowFloating").ToBinding(),
+                [!VelaGlassCard.CardShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating"),
             };
         }
         else if (opts.Material == VelaSurfaceMaterial.LiquidGlass)
@@ -205,8 +207,8 @@ public class VelaDrawerHost : ContentControl
             _sheet.ClipToBounds = false;
             _sheet.BackdropEffect = null;
             _sheet.Background = Brushes.Transparent;
-            _sheet.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaGlassCardOuterHairlineBrush"));
-            _sheet.Bind(Border.BoxShadowProperty, this.GetResourceObservable("VelaShadowFloating"));
+            _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BorderBrushProperty, "VelaGlassCardOuterHairlineBrush"));
+            _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BoxShadowProperty, "VelaShadowFloating"));
             _sheet.BorderThickness = new Thickness(1);
             _sheet.Child = new Border
             {
@@ -214,16 +216,16 @@ public class VelaDrawerHost : ContentControl
                 ClipToBounds = true,
                 BackdropEffect = new BlurEffect { Radius = 14 },
                 Child = chrome,
-                [!Border.BackgroundProperty] = this.GetResourceObservable("VelaLiquidGlassTintBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaLiquidGlassTintBrush"),
             };
         }
         else
         {
             _sheet.ClipToBounds = false;
             _sheet.BackdropEffect = null;
-            _sheet.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaSurfaceRaisedBrush"));
-            _sheet.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaBorderBrush"));
-            _sheet.Bind(Border.BoxShadowProperty, this.GetResourceObservable("VelaShadowFloating"));
+            _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BackgroundProperty, "VelaSurfaceRaisedBrush"));
+            _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BorderBrushProperty, "VelaBorderBrush"));
+            _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BoxShadowProperty, "VelaShadowFloating"));
             _sheet.BorderThickness = new Thickness(1);
             _sheet.Child = new Border
             {
@@ -303,7 +305,7 @@ public class VelaDrawerHost : ContentControl
                     Text = opts.Title,
                     FontSize = 16.5,
                     FontWeight = FontWeight.SemiBold,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
                 });
             }
             if (!string.IsNullOrEmpty(opts.Description))
@@ -313,7 +315,7 @@ public class VelaDrawerHost : ContentControl
                     Text = opts.Description,
                     FontSize = 13,
                     TextWrapping = TextWrapping.Wrap,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 });
             }
             headerGrid.Children.Add(titleStack);
@@ -335,8 +337,8 @@ public class VelaDrawerHost : ContentControl
                 {
                     Width = 13,
                     Height = 13,
-                    [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconClose").ToBinding(),
-                    [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconClose"),
+                    [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 },
             };
             if (this.TryFindResource("VelaIconButtonTheme", ActualThemeVariant, out var themeObj) && themeObj is ControlTheme ct)
@@ -350,7 +352,7 @@ public class VelaDrawerHost : ContentControl
             {
                 Padding = new Thickness(20, 16),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                [!Border.BorderBrushProperty] = this.GetResourceObservable(dividerKey).ToBinding(),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create(dividerKey),
                 Child = headerGrid,
             };
             DockPanel.SetDock(headerBorder, Dock.Top);
@@ -410,7 +412,15 @@ public class VelaDrawerHost : ContentControl
     {
         if (_overlayLayer is not null)
             _overlayLayer.IsVisible = false;
+        ClearSheetBindings();
         if (_sheet is not null)
             _sheet.Child = null;
+    }
+
+    private void ClearSheetBindings()
+    {
+        foreach (var d in _sheetBindings)
+            d.Dispose();
+        _sheetBindings.Clear();
     }
 }

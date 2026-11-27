@@ -1,4 +1,5 @@
 using Avalonia;
+using SkiaSharp;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.Tokens;
 using Xunit;
@@ -244,5 +245,29 @@ public class VelaControlsLogicTests
         list.ItemsSource = Array.Empty<VelaListBoxItem>();
         Assert.Equal(0, list.ItemCount);
         Assert.Contains(":empty", list.Classes);
+    }
+
+    [Fact]
+    public void VelaLiquidGlassLens_IsInsideFlatInterior_SkipsOnlyStrictInteriorClips()
+    {
+        var radii = new[] { 24f, 24f, 24f, 24f };
+        const float w = 800f;
+        const float h = 74f;
+        const float bevel = 16f;
+
+        // Strictly inside flat interior (e.g. scrolling title label centered vertically)
+        Assert.True(VelaLiquidGlassLens.IsInsideFlatInterior(new SKRect(80, 24, 280, 48), w, h, radii, bevel));
+
+        // Touches top bezel (< bevel + margin from top edge)
+        Assert.False(VelaLiquidGlassLens.IsInsideFlatInterior(new SKRect(80, 10, 280, 48), w, h, radii, bevel));
+
+        // Touches left bezel
+        Assert.False(VelaLiquidGlassLens.IsInsideFlatInterior(new SKRect(10, 24, 280, 48), w, h, radii, bevel));
+
+        // Corner clip inside bounding box > bevel from edges, but close to the r=24 rounded arc
+        Assert.False(VelaLiquidGlassLens.IsInsideFlatInterior(new SKRect(18, 18, 100, 40), w, h, radii, bevel));
+
+        // Full glass redraw covers the bezel
+        Assert.False(VelaLiquidGlassLens.IsInsideFlatInterior(new SKRect(0, 0, w, h), w, h, radii, bevel));
     }
 }

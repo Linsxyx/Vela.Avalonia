@@ -59,27 +59,34 @@ public sealed class VelaSpinnerRing : Control
 
     private void UpdateLoop()
     {
-        if (!IsActive)
+        if (!IsActive || !IsEffectivelyVisible || VisualRoot is null)
         {
             _scheduled = false;
             _lastFrame = null;
             return;
         }
 
-        if (_scheduled) return;
+        ScheduleNextFrame();
+    }
+
+    private void ScheduleNextFrame()
+    {
+        if (_scheduled || !IsActive || !IsEffectivelyVisible)
+            return;
+
         var top = TopLevel.GetTopLevel(this);
-        if (top is null) return;
+        if (top is null)
+            return;
 
         _scheduled = true;
-        _lastFrame = null;
         top.RequestAnimationFrame(OnFrame);
     }
 
     private void OnFrame(TimeSpan ts)
     {
-        if (!_scheduled || !IsActive || VisualRoot is null)
+        _scheduled = false;
+        if (!IsActive || !IsEffectivelyVisible || VisualRoot is null)
         {
-            _scheduled = false;
             _lastFrame = null;
             return;
         }
@@ -92,14 +99,15 @@ public sealed class VelaSpinnerRing : Control
         var speed = VelaMotionOptions.ReducedMotion ? 140.0 : 340.0;
         _angleDeg = (_angleDeg + dt * speed) % 360.0;
         InvalidateVisual();
-
-        TopLevel.GetTopLevel(this)?.RequestAnimationFrame(OnFrame);
     }
 
     public override void Render(DrawingContext context)
     {
         var size = Math.Min(Bounds.Width, Bounds.Height);
         if (size <= 2) return;
+
+        // Resume frame pumping only when Avalonia actually renders this visible control
+        ScheduleNextFrame();
 
         var stroke = StrokeThickness;
         var r = (size - stroke) * 0.5;

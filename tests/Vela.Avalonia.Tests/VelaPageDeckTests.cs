@@ -113,4 +113,27 @@ public sealed class VelaPageDeckTests
         deck.ClearInactiveCache();
         Assert.Equal(1, deck.CachedPageCount);
     }
+
+    [Fact]
+    public void LruEviction_ClearsContentPresenterReferences()
+    {
+        var deck = new VelaPageDeck
+        {
+            PageCacheMode = VelaPageCacheMode.Lru,
+            MaxCachedPages = 1,
+            TransitionMode = VelaPageTransitionMode.Instant,
+        };
+
+        var vmA = new object();
+        var vmB = new object();
+
+        deck.Activate(vmA, () => vmA);
+        var presenterA = Assert.IsType<global::Avalonia.Controls.Presenters.ContentPresenter>(deck.Children[0]);
+        Assert.Same(vmA, presenterA.Content);
+
+        deck.Activate(vmB, () => vmB);
+        Assert.Equal(1, deck.CachedPageCount);
+        Assert.Null(presenterA.Content);
+        Assert.Null(presenterA.ContentTemplate);
+    }
 }

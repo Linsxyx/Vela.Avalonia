@@ -1365,7 +1365,7 @@ internal sealed class VelaTreeTableRowControl : Border
         var owner = _row.Owner;
         Height = VelaColumnLayoutEngine.GetRowHeight(owner.Density, isTreeView: false);
         BorderThickness = owner.ShowHorizontalGridLines ? new Thickness(0, 0, 0, 1) : new Thickness(0);
-        this[!BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding();
+        this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
 
         PseudoClasses.Set(":selected", _row.IsSelected);
         PseudoClasses.Set(":alternate", owner.ShowAlternatingRows && (_row.RowIndex % 2 == 1));
@@ -1466,14 +1466,14 @@ internal sealed class VelaTreeTableRowControl : Border
                     IndentSize = owner.IndentSize,
                     ShowGuides = owner.ShowGuideLines,
                     VerticalAlignment = VerticalAlignment.Stretch,
-                    [!VelaTreeIndentGuides.LineBrushProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+                    [!VelaTreeIndentGuides.LineBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
                 };
 
                 _chevron = new VelaTreeChevron
                 {
                     HasChildren = _row.HasChildren,
-                    [!VelaTreeChevron.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
-                    [!VelaTreeChevron.HoverBackgroundProperty] = this.GetResourceObservable("VelaSurfaceMutedBrush").ToBinding(),
+                    [!VelaTreeChevron.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
+                    [!VelaTreeChevron.HoverBackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush"),
                 };
                 _chevron.SetExpanded(_row.IsExpanded, animateChevron);
                 _chevron.Toggled += (_, _) =>
@@ -1500,7 +1500,7 @@ internal sealed class VelaTreeTableRowControl : Border
                         Data = _row.Icon,
                         Margin = new Thickness(2, 0, 7, 0),
                         VerticalAlignment = VerticalAlignment.Center,
-                        [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                        [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                     };
                     Grid.SetColumn(icon, 2);
                     treeGrid.Children.Add(icon);
@@ -1525,7 +1525,7 @@ internal sealed class VelaTreeTableRowControl : Border
                 Child = cellInner,
             };
             if (owner.ShowVerticalGridLines)
-                cellHost[!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding();
+                cellHost[!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
 
             _cellHosts.Add((cellHost, col));
             _cellsPanel.Children.Add(cellHost);

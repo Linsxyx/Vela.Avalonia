@@ -478,12 +478,12 @@ public class VelaContextMenu : StyledElement
             Focusable = true,
             Child = scrollViewer,
         };
-        _surface[!Border.BackgroundProperty] = _surface.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding();
-        _surface[!Border.BorderBrushProperty] = _surface.GetResourceObservable("VelaBorderBrush").ToBinding();
-        _surface[!Border.BoxShadowProperty] = _surface.GetResourceObservable("VelaShadowFloating").ToBinding();
+        _surface[!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush");
+        _surface[!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush");
+        _surface[!Border.BoxShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating");
         _surface.KeyDown += OnSurfaceKeyDown;
 
-        _highlight[!Border.BackgroundProperty] = _surface.GetResourceObservable("VelaSurfaceMutedBrush").ToBinding();
+        _highlight[!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush");
         _runner = new SpringRunner(_surface, OnTick);
 
         _popup = new Popup
@@ -537,7 +537,7 @@ public class VelaContextMenu : StyledElement
                     Height = 1,
                     Margin = new Thickness(6, 4),
                 };
-                sep[!Border.BackgroundProperty] = _surface.GetResourceObservable("VelaBorderSubtleBrush").ToBinding();
+                sep[!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
                 _itemsHost.Children.Add(sep);
                 lastWasSeparator = true;
                 continue;
@@ -584,7 +584,7 @@ public class VelaContextMenu : StyledElement
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            icon[!PathIcon.ForegroundProperty] = surface.GetResourceObservable(iconKey).ToBinding();
+            icon[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(iconKey);
             grid.Children.Add(icon);
         }
         else if (item.IsChecked)
@@ -596,8 +596,8 @@ public class VelaContextMenu : StyledElement
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            checkIcon[!PathIcon.DataProperty] = surface.GetResourceObservable("VelaIconCheck").ToBinding();
-            checkIcon[!PathIcon.ForegroundProperty] = surface.GetResourceObservable(iconKey).ToBinding();
+            checkIcon[!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconCheck");
+            checkIcon[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(iconKey);
             grid.Children.Add(checkIcon);
         }
 
@@ -608,7 +608,7 @@ public class VelaContextMenu : StyledElement
             TextTrimming = TextTrimming.CharacterEllipsis,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        label[!TextBlock.ForegroundProperty] = surface.GetResourceObservable(fgKey).ToBinding();
+        label[!TextBlock.ForegroundProperty] = VelaResourceBinding.Create(fgKey);
         Grid.SetColumn(label, 1);
         grid.Children.Add(label);
 
@@ -621,8 +621,8 @@ public class VelaContextMenu : StyledElement
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(12, 0, 0, 0),
             };
-            chevron[!PathIcon.DataProperty] = surface.GetResourceObservable("VelaIconChevronRight").ToBinding();
-            chevron[!PathIcon.ForegroundProperty] = surface.GetResourceObservable("VelaTextMutedBrush").ToBinding();
+            chevron[!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconChevronRight");
+            chevron[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush");
             Grid.SetColumn(chevron, 2);
             grid.Children.Add(chevron);
         }
@@ -635,7 +635,7 @@ public class VelaContextMenu : StyledElement
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(14, 0, 0, 0),
             };
-            shortcut[!TextBlock.ForegroundProperty] = surface.GetResourceObservable("VelaTextMutedBrush").ToBinding();
+            shortcut[!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush");
             Grid.SetColumn(shortcut, 2);
             grid.Children.Add(shortcut);
         }

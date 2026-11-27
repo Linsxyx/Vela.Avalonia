@@ -68,7 +68,7 @@ public class VelaSettingsGroup : TemplatedControl
                 {
                     Height = 1,
                     Margin = new Thickness(16, 0),
-                    [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+                    [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush"),
                 });
             }
 

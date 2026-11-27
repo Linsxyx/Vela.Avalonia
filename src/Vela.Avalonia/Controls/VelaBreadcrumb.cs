@@ -127,7 +127,7 @@ public class VelaBreadcrumb : TemplatedControl
                     Data = chevronGeom,
                     Margin = new Thickness(2, 0),
                     VerticalAlignment = VerticalAlignment.Center,
-                    [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                    [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
                 });
             }
 
@@ -146,8 +146,8 @@ public class VelaBreadcrumb : TemplatedControl
                     Height = 13,
                     Data = item.Icon,
                     VerticalAlignment = VerticalAlignment.Center,
-                    [!PathIcon.ForegroundProperty] = this.GetResourceObservable(
-                        isCurrent ? "VelaForegroundBrush" : "VelaTextSecondaryBrush").ToBinding(),
+                    [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(
+                        isCurrent ? "VelaForegroundBrush" : "VelaTextSecondaryBrush"),
                 });
             }
 
@@ -157,8 +157,8 @@ public class VelaBreadcrumb : TemplatedControl
                 FontSize = 13.5,
                 FontWeight = isCurrent ? FontWeight.SemiBold : FontWeight.Normal,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable(
-                    isCurrent ? "VelaForegroundBrush" : "VelaTextSecondaryBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create(
+                    isCurrent ? "VelaForegroundBrush" : "VelaTextSecondaryBrush"),
             });
 
             if (isCurrent)

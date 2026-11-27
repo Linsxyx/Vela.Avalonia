@@ -110,7 +110,7 @@ internal sealed class VelaTableHeaderCell : Border
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = column.HorizontalAlignment,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
             };
         }
 
@@ -121,7 +121,7 @@ internal sealed class VelaTableHeaderCell : Border
             Margin = new Thickness(6, 0, 0, 0),
             VerticalAlignment = VerticalAlignment.Center,
             IsVisible = false,
-            [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaAccentBrush").ToBinding(),
+            [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
         };
 
         Grid.SetColumn(headerPresenter, 0);
@@ -136,7 +136,7 @@ internal sealed class VelaTableHeaderCell : Border
             VerticalAlignment = VerticalAlignment.Stretch,
             Margin = new Thickness(0, showVerticalGridLines ? 0 : 9, 0, showVerticalGridLines ? 0 : 9),
             IsHitTestVisible = false,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush"),
         };
 
         _resizeLine = new Border
@@ -146,7 +146,7 @@ internal sealed class VelaTableHeaderCell : Border
             VerticalAlignment = VerticalAlignment.Stretch,
             Opacity = 0,
             IsHitTestVisible = false,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaAccentBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
         };
 
         _resizeGrip = new Border
@@ -1130,7 +1130,7 @@ internal sealed class VelaDataGridRowControl : Border
         var owner = _row.Owner;
         Height = VelaColumnLayoutEngine.GetRowHeight(owner.Density, isTreeView: false);
         BorderThickness = owner.ShowHorizontalGridLines ? new Thickness(0, 0, 0, 1) : new Thickness(0);
-        this[!BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding();
+        this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
 
         PseudoClasses.Set(":selected", _row.IsSelected);
         PseudoClasses.Set(":alternate", owner.ShowAlternatingRows && (_row.RowIndex % 2 == 1));
@@ -1212,7 +1212,7 @@ internal sealed class VelaDataGridRowControl : Border
                 Child = cellContent,
             };
             if (owner.ShowVerticalGridLines)
-                cellHost[!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding();
+                cellHost[!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
 
             _cellHosts.Add((cellHost, col));
             _cellsPanel.Children.Add(cellHost);

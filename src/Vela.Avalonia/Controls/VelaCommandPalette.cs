@@ -200,7 +200,7 @@ public class VelaCommandPalette : ContentControl
 
             _scrim = new Border
             {
-                [!Border.BackgroundProperty] = host.GetResourceObservable("VelaOverlayScrimBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaOverlayScrimBrush"),
                 Opacity = 0,
             };
             _scrim.PointerPressed += (_, ev) =>
@@ -219,9 +219,9 @@ public class VelaCommandPalette : ContentControl
                 CornerRadius = new CornerRadius(20),
                 BorderThickness = new Thickness(1),
                 ClipToBounds = false,
-                [!Border.BackgroundProperty] = host.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding(),
-                [!Border.BorderBrushProperty] = host.GetResourceObservable("VelaBorderBrush").ToBinding(),
-                [!Border.BoxShadowProperty] = host.GetResourceObservable("VelaShadowFloating").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
+                [!Border.BoxShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating"),
             };
 
             _glassSurface = new VelaLiquidGlass
@@ -275,8 +275,8 @@ public class VelaCommandPalette : ContentControl
         {
             Width = 16,
             Height = 16,
-            [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconSearch").ToBinding(),
-            [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+            [!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconSearch"),
+            [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
         };
 
         _searchBox = new TextBox
@@ -300,13 +300,13 @@ public class VelaCommandPalette : ContentControl
             CornerRadius = new CornerRadius(6),
             BorderThickness = new Thickness(1),
             VerticalAlignment = VerticalAlignment.Center,
-            [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+            [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush"),
             Child = new TextBlock
             {
                 Text = "ESC",
                 FontSize = 10.5,
                 FontWeight = FontWeight.Medium,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             },
         };
 
@@ -326,7 +326,7 @@ public class VelaCommandPalette : ContentControl
         {
             Padding = new Thickness(16, 0),
             BorderThickness = new Thickness(0, 0, 0, 1),
-            [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+            [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush"),
             Child = searchGrid,
         };
         DockPanel.SetDock(searchBar, Dock.Top);
@@ -341,7 +341,7 @@ public class VelaCommandPalette : ContentControl
             IsHitTestVisible = false,
             Opacity = 0,
             RenderTransform = _hlTranslate,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaSurfaceMutedBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush"),
         };
 
         var hlCanvas = new Canvas { IsHitTestVisible = false };
@@ -356,7 +356,7 @@ public class VelaCommandPalette : ContentControl
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 28),
             IsVisible = false,
-            [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+            [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
         };
 
         _resultsTrack = new Grid
@@ -418,7 +418,7 @@ public class VelaCommandPalette : ContentControl
                 FontSize = 11.5,
                 FontWeight = FontWeight.Medium,
                 Margin = new Thickness(10, 8, 10, 3),
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             });
 
             foreach (var cmd in group)
@@ -447,7 +447,7 @@ public class VelaCommandPalette : ContentControl
                 Height = 15,
                 Data = cmd.Icon,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
             });
         }
 
@@ -463,7 +463,7 @@ public class VelaCommandPalette : ContentControl
             FontSize = 13.5,
             FontWeight = FontWeight.Medium,
             VerticalAlignment = VerticalAlignment.Center,
-            [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+            [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
         });
         if (!string.IsNullOrEmpty(cmd.Description))
         {
@@ -473,7 +473,7 @@ public class VelaCommandPalette : ContentControl
                 FontSize = 12,
                 VerticalAlignment = VerticalAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             });
         }
         Grid.SetColumn(copyStack, 1);
@@ -487,14 +487,14 @@ public class VelaCommandPalette : ContentControl
                 CornerRadius = new CornerRadius(5),
                 BorderThickness = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
-                [!Border.BackgroundProperty] = this.GetResourceObservable("VelaSurfaceBrush").ToBinding(),
-                [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
                 Child = new TextBlock
                 {
                     Text = cmd.Shortcut,
                     FontSize = 11,
                     FontWeight = FontWeight.Medium,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
                 },
             };
             Grid.SetColumn(kbd, 2);

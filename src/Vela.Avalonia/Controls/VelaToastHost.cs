@@ -148,9 +148,9 @@ public class VelaToastHost : Panel
             RenderTransformOrigin = RelativePoint.Center;
             RenderTransform = new TransformGroup { Children = { _scaleTransform, _translate } };
 
-            Bind(BackgroundProperty, this.GetResourceObservable("VelaSurfaceRaisedBrush"));
-            Bind(BorderBrushProperty, this.GetResourceObservable("VelaBorderBrush"));
-            Bind(BoxShadowProperty, this.GetResourceObservable("VelaShadowRaised"));
+            this[!BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush");
+            this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush");
+            this[!BoxShadowProperty] = VelaResourceBinding.Create("VelaShadowRaised");
 
             Child = BuildContent(options);
 
@@ -276,8 +276,8 @@ public class VelaToastHost : Panel
                 Height = 16,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(0, 2, 0, 0),
-                [!PathIcon.DataProperty] = this.GetResourceObservable(iconKey).ToBinding(),
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable(brushKey).ToBinding(),
+                [!PathIcon.DataProperty] = VelaResourceBinding.Create(iconKey),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(brushKey),
             };
             grid.Children.Add(icon);
 
@@ -289,7 +289,7 @@ public class VelaToastHost : Panel
                 FontSize = 13.5,
                 FontWeight = FontWeight.Medium,
                 TextWrapping = TextWrapping.Wrap,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
             });
 
             if (!string.IsNullOrEmpty(options.Description))
@@ -299,7 +299,7 @@ public class VelaToastHost : Panel
                     Text = options.Description,
                     FontSize = 12.5,
                     TextWrapping = TextWrapping.Wrap,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 });
             }
 
@@ -350,8 +350,8 @@ public class VelaToastHost : Panel
                 {
                     Width = 11,
                     Height = 11,
-                    [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconClose").ToBinding(),
-                    [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                    [!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconClose"),
+                    [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
                 },
             };
             closeBtn.Click += (_, _) => Dismiss();

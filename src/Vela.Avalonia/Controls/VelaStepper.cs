@@ -231,7 +231,7 @@ public class VelaStepper : TemplatedControl
                         Margin = new Thickness(10, 0, 10, 0),
                         VerticalAlignment = VerticalAlignment.Center,
                         ClipToBounds = true,
-                        [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+                        [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
                     };
 
                     var fillScale = new ScaleTransform(0, 1);
@@ -242,7 +242,7 @@ public class VelaStepper : TemplatedControl
                         VerticalAlignment = VerticalAlignment.Stretch,
                         RenderTransformOrigin = new RelativePoint(0, 0.5, RelativeUnit.Relative),
                         RenderTransform = fillScale,
-                        [!Border.BackgroundProperty] = this.GetResourceObservable("VelaAccentBrush").ToBinding(),
+                        [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
                     };
                     track.Child = fill;
                     visual.ConnectorScale = fillScale;
@@ -312,7 +312,7 @@ public class VelaStepper : TemplatedControl
                         Margin = new Thickness(0, 6, 0, 6),
                         HorizontalAlignment = HorizontalAlignment.Center,
                         ClipToBounds = true,
-                        [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+                        [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
                     };
 
                     var fillScale = new ScaleTransform(1, 0);
@@ -323,7 +323,7 @@ public class VelaStepper : TemplatedControl
                         VerticalAlignment = VerticalAlignment.Stretch,
                         RenderTransformOrigin = new RelativePoint(0.5, 0, RelativeUnit.Relative),
                         RenderTransform = fillScale,
-                        [!Border.BackgroundProperty] = this.GetResourceObservable("VelaAccentBrush").ToBinding(),
+                        [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
                     };
                     track.Child = fill;
                     visual.ConnectorScale = fillScale;

@@ -225,7 +225,7 @@ public sealed class VelaResizableLayoutPanel : Panel
             Height = isHoriz ? double.NaN : 1,
             HorizontalAlignment = isHoriz ? HorizontalAlignment.Center : HorizontalAlignment.Stretch,
             VerticalAlignment = isHoriz ? VerticalAlignment.Stretch : VerticalAlignment.Center,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
         };
 
         var grip = new Border
@@ -236,7 +236,7 @@ public sealed class VelaResizableLayoutPanel : Panel
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             Opacity = 0.55,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderStrongBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderStrongBrush"),
         };
 
         var chevron = new PathIcon
@@ -245,7 +245,7 @@ public sealed class VelaResizableLayoutPanel : Panel
             Height = 11,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+            [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
         };
 
         var restoreBadge = new Border
@@ -257,8 +257,8 @@ public sealed class VelaResizableLayoutPanel : Panel
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             IsVisible = false,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding(),
-            [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderStrongBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush"),
+            [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderStrongBrush"),
             Child = chevron,
         };
 

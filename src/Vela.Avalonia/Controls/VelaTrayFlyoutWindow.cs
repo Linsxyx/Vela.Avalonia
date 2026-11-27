@@ -290,8 +290,8 @@ internal sealed class VelaTrayFlyoutWindow : Window
             CornerRadius = new CornerRadius(14),
             BorderThickness = new Thickness(1),
             Child = inner,
-            [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
-            [!Border.BoxShadowProperty] = this.GetResourceObservable("VelaShadowFloating").ToBinding(),
+            [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
+            [!Border.BoxShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating"),
         };
 
         if (material == VelaSurfaceMaterial.Frosted)
@@ -303,7 +303,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
         }
         else
         {
-            surface[!Border.BackgroundProperty] = this.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding();
+            surface[!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush");
         }
 
         return surface;
@@ -318,7 +318,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
             IsHitTestVisible = false,
             Opacity = 0.0,
             RenderTransform = _hlTranslate,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaSurfaceMutedBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush"),
         };
 
         var canvas = new Canvas
@@ -355,7 +355,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
                 Text = "No tray actions configured",
                 FontSize = 12.5,
                 Margin = new Thickness(10, 8),
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             });
         }
 
@@ -386,8 +386,8 @@ internal sealed class VelaTrayFlyoutWindow : Window
                 Width = 14,
                 Height = 14,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconCheck").ToBinding(),
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaAccentBrush").ToBinding(),
+                [!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconCheck"),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
             };
             grid.Children.Add(checkIcon);
         }
@@ -399,7 +399,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
                 Height = 15,
                 Data = item.Icon,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable(iconKey).ToBinding(),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(iconKey),
             };
             grid.Children.Add(icon);
         }
@@ -413,7 +413,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
             Text = item.Header,
             FontSize = 13.5,
             VerticalAlignment = VerticalAlignment.Center,
-            [!TextBlock.ForegroundProperty] = this.GetResourceObservable(fgKey).ToBinding(),
+            [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create(fgKey),
         };
         Grid.SetColumn(label, 1);
         grid.Children.Add(label);
@@ -426,7 +426,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
                 FontSize = 11.5,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(14, 0, 0, 0),
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             };
             Grid.SetColumn(shortcut, 2);
             grid.Children.Add(shortcut);
@@ -463,7 +463,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
     {
         Height = 1,
         Margin = new Thickness(4, 4),
-        [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+        [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush"),
     };
 
     private void OnMenuPointerExited(object? sender, PointerEventArgs e)

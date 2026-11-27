@@ -88,6 +88,45 @@ public sealed class VelaLiquidGlassLens : Control
             : SKRectI.Empty;
     }
 
+    /// <summary>
+    /// Returns <c>true</c> when the dirty clip rectangle lies strictly inside the flat optical interior
+    /// of the rounded box (<c>edgeDist >= bevel + margin</c> at all 4 corners). Because the rounded box
+    /// is convex, <c>-sdRoundBox</c> is concave on its interior, so checking the 4 corners guarantees
+    /// every pixel inside <paramref name="localClip"/> would take the SkSL flat-interior identity branch
+    /// (<c>return uScene.eval(fragCoord)</c>), letting us skip <c>surface.Snapshot</c> and shader dispatch.
+    /// </summary>
+    internal static bool IsInsideFlatInterior(
+        SKRect localClip,
+        float width,
+        float height,
+        float[] radii,
+        float effectiveBevel)
+    {
+        if (localClip.IsEmpty)
+            return true;
+
+        var halfW = width * 0.5f;
+        var halfH = height * 0.5f;
+        var threshold = effectiveBevel + 1.0f;
+
+        return -SdRoundBox(localClip.Left - halfW, localClip.Top - halfH, halfW, halfH, radii) >= threshold &&
+               -SdRoundBox(localClip.Right - halfW, localClip.Top - halfH, halfW, halfH, radii) >= threshold &&
+               -SdRoundBox(localClip.Right - halfW, localClip.Bottom - halfH, halfW, halfH, radii) >= threshold &&
+               -SdRoundBox(localClip.Left - halfW, localClip.Bottom - halfH, halfW, halfH, radii) >= threshold;
+    }
+
+    private static float SdRoundBox(float px, float py, float bx, float by, float[] radii)
+    {
+        var rad = py < 0f
+            ? (px < 0f ? radii[0] : radii[1])
+            : (px < 0f ? radii[3] : radii[2]);
+        var qx = MathF.Abs(px) - bx + rad;
+        var qy = MathF.Abs(py) - by + rad;
+        var outX = MathF.Max(qx, 0f);
+        var outY = MathF.Max(qy, 0f);
+        return MathF.Min(MathF.Max(qx, qy), 0f) + MathF.Sqrt(outX * outX + outY * outY) - rad;
+    }
+
     private sealed class LiquidGlassDrawOp : ICustomDrawOperation
     {
         private static readonly SKRuntimeEffect? ShaderEffect = CompileShader();
@@ -180,6 +219,12 @@ public sealed class VelaLiquidGlassLens : Control
             var deviceRect = totalMatrix.MapRect(localRect);
             var region = ComputeSnapshotRegion(deviceRect, canvas.DeviceClipBounds);
             if (region.IsEmpty)
+                return;
+
+            // Partial dirty-rect updates strictly inside the flat optical interior (e.g. a ticking
+            // progress bar or scrolling label inside a glass toolbar) don't touch the refractive bezel.
+            var localClip = deviceToLocal.MapRect(new SKRect(region.Left, region.Top, region.Right, region.Bottom));
+            if (IsInsideFlatInterior(localClip, w, h, radii, effectiveBevel))
                 return;
 
             using var snapshot = surface.Snapshot(region);

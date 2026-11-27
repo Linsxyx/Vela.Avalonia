@@ -247,7 +247,7 @@ public class VelaDropdownButton : TemplatedControl
                 {
                     Height = 1,
                     Margin = new Thickness(4, 4),
-                    [!Border.BackgroundProperty] = this.GetResourceObservable("VelaBorderSubtleBrush").ToBinding(),
+                    [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush"),
                 });
                 continue;
             }
@@ -277,7 +277,7 @@ public class VelaDropdownButton : TemplatedControl
                 Height = 15,
                 Data = item.Icon,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!PathIcon.ForegroundProperty] = this.GetResourceObservable(iconKey).ToBinding(),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(iconKey),
             };
             grid.Children.Add(icon);
         }
@@ -287,7 +287,7 @@ public class VelaDropdownButton : TemplatedControl
             Text = item.Header,
             FontSize = 13.5,
             VerticalAlignment = VerticalAlignment.Center,
-            [!TextBlock.ForegroundProperty] = this.GetResourceObservable(fgKey).ToBinding(),
+            [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create(fgKey),
         };
         Grid.SetColumn(label, 1);
         grid.Children.Add(label);
@@ -300,7 +300,7 @@ public class VelaDropdownButton : TemplatedControl
                 FontSize = 11.5,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(12, 0, 0, 0),
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             };
             Grid.SetColumn(shortcut, 2);
             grid.Children.Add(shortcut);

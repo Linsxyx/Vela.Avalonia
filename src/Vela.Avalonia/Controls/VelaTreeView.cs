@@ -996,19 +996,19 @@ internal sealed class VelaTreeRowControl : Border
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(-4, 0, 0, 0),
             IsVisible = false,
-            [!Border.BackgroundProperty] = this.GetResourceObservable("VelaAccentBrush").ToBinding(),
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
         };
 
         _guides = new VelaTreeIndentGuides
         {
             VerticalAlignment = VerticalAlignment.Stretch,
-            [!VelaTreeIndentGuides.LineBrushProperty] = this.GetResourceObservable("VelaBorderBrush").ToBinding(),
+            [!VelaTreeIndentGuides.LineBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
         };
 
         _chevron = new VelaTreeChevron
         {
-            [!VelaTreeChevron.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
-            [!VelaTreeChevron.HoverBackgroundProperty] = this.GetResourceObservable("VelaSurfaceMutedBrush").ToBinding(),
+            [!VelaTreeChevron.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
+            [!VelaTreeChevron.HoverBackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush"),
         };
         _chevron.Toggled += (_, _) =>
         {
@@ -1037,7 +1037,7 @@ internal sealed class VelaTreeRowControl : Border
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(2, 0, 6, 0),
             IsVisible = false,
-            [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+            [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
         };
 
         _contentHost = new ContentControl
@@ -1163,7 +1163,7 @@ internal sealed class VelaTreeRowControl : Border
                 FontWeight = _row.IsSelected ? FontWeight.SemiBold : FontWeight.Normal,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
             };
             var desc = new TextBlock
             {
@@ -1171,7 +1171,7 @@ internal sealed class VelaTreeRowControl : Border
                 FontSize = 11.5,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextMutedBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             };
             stack.Children.Add(title);
             stack.Children.Add(desc);
@@ -1186,7 +1186,7 @@ internal sealed class VelaTreeRowControl : Border
                 FontWeight = _row.IsSelected ? FontWeight.SemiBold : FontWeight.Normal,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
             };
         }
 

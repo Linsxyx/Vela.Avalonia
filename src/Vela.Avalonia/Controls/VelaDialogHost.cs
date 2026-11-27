@@ -223,7 +223,7 @@ public class VelaDialogHost : ContentControl
 
             _scrim = new Border
             {
-                [!Border.BackgroundProperty] = host.GetResourceObservable("VelaOverlayScrimBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaOverlayScrimBrush"),
                 Opacity = 0,
             };
             _scrim.PointerPressed += (_, ev) =>
@@ -253,9 +253,9 @@ public class VelaDialogHost : ContentControl
                 CornerRadius = new CornerRadius(24),
                 BorderThickness = new Thickness(1),
                 ClipToBounds = false,
-                [!Border.BackgroundProperty] = host.GetResourceObservable("VelaSurfaceRaisedBrush").ToBinding(),
-                [!Border.BorderBrushProperty] = host.GetResourceObservable("VelaBorderBrush").ToBinding(),
-                [!Border.BoxShadowProperty] = host.GetResourceObservable("VelaShadowFloating").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceRaisedBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
+                [!Border.BoxShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating"),
             };
 
             _floatingEmblemHost = new ContentControl
@@ -527,7 +527,7 @@ public class VelaDialogHost : ContentControl
                     TintLevel = VelaGlassTintLevel.HighContrast,
                     RimThickness = new Thickness(1.2),
                     Content = chrome,
-                    [!VelaGlassCard.CardShadowProperty] = this.GetResourceObservable("VelaShadowFloating").ToBinding(),
+                    [!VelaGlassCard.CardShadowProperty] = VelaResourceBinding.Create("VelaShadowFloating"),
                 };
                 _cardShell.Child = glassCard;
                 break;
@@ -561,8 +561,8 @@ public class VelaDialogHost : ContentControl
                 _cardShell.ClipToBounds = false;
                 _cardShell.BackdropEffect = null;
                 _cardShell.Background = Brushes.Transparent;
-                _shellBindings.Add(_cardShell.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaGlassCardOuterHairlineBrush")));
-                _shellBindings.Add(_cardShell.Bind(Border.BoxShadowProperty, this.GetResourceObservable("VelaShadowFloating")));
+                _shellBindings.Add(VelaResourceBinding.Bind(_cardShell, Border.BorderBrushProperty, "VelaGlassCardOuterHairlineBrush"));
+                _shellBindings.Add(VelaResourceBinding.Bind(_cardShell, Border.BoxShadowProperty, "VelaShadowFloating"));
                 _cardShell.BorderThickness = new Thickness(1);
 
                 var frostedClip = new Border
@@ -571,7 +571,7 @@ public class VelaDialogHost : ContentControl
                     ClipToBounds = true,
                     BackdropEffect = new BlurEffect { Radius = 16 },
                     Child = chrome,
-                    [!Border.BackgroundProperty] = this.GetResourceObservable("VelaLiquidGlassTintBrush").ToBinding(),
+                    [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaLiquidGlassTintBrush"),
                 };
                 _cardShell.Child = frostedClip;
                 break;
@@ -581,9 +581,9 @@ public class VelaDialogHost : ContentControl
             {
                 _cardShell.ClipToBounds = false;
                 _cardShell.BackdropEffect = null;
-                _shellBindings.Add(_cardShell.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaSurfaceRaisedBrush")));
-                _shellBindings.Add(_cardShell.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaBorderBrush")));
-                _shellBindings.Add(_cardShell.Bind(Border.BoxShadowProperty, this.GetResourceObservable("VelaShadowFloating")));
+                _shellBindings.Add(VelaResourceBinding.Bind(_cardShell, Border.BackgroundProperty, "VelaSurfaceRaisedBrush"));
+                _shellBindings.Add(VelaResourceBinding.Bind(_cardShell, Border.BorderBrushProperty, "VelaBorderBrush"));
+                _shellBindings.Add(VelaResourceBinding.Bind(_cardShell, Border.BoxShadowProperty, "VelaShadowFloating"));
                 _cardShell.BorderThickness = new Thickness(1);
                 _cardShell.Child = new Border
                 {
@@ -632,7 +632,7 @@ public class VelaDialogHost : ContentControl
                     FontSize = 17,
                     FontWeight = FontWeight.SemiBold,
                     TextWrapping = TextWrapping.Wrap,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
                 });
             }
 
@@ -643,7 +643,7 @@ public class VelaDialogHost : ContentControl
                     Text = options.Description,
                     FontSize = 13.5,
                     TextWrapping = TextWrapping.Wrap,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 });
             }
 
@@ -662,7 +662,7 @@ public class VelaDialogHost : ContentControl
             {
                 Padding = new Thickness(22, 20),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                [!Border.BorderBrushProperty] = this.GetResourceObservable(dividerKey).ToBinding(),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create(dividerKey),
                 Child = headerGrid,
             });
         }
@@ -708,7 +708,7 @@ public class VelaDialogHost : ContentControl
                     TextAlignment = TextAlignment.Center,
                     TextWrapping = TextWrapping.Wrap,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
                 });
             }
 
@@ -722,7 +722,7 @@ public class VelaDialogHost : ContentControl
                     TextAlignment = TextAlignment.Center,
                     TextWrapping = TextWrapping.Wrap,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 });
             }
 
@@ -750,8 +750,8 @@ public class VelaDialogHost : ContentControl
         {
             Width = 13,
             Height = 13,
-            [!PathIcon.DataProperty] = this.GetResourceObservable("VelaIconClose").ToBinding(),
-            [!PathIcon.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+            [!PathIcon.DataProperty] = VelaResourceBinding.Create("VelaIconClose"),
+            [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
         };
 
         var bgKey = isGlassSurface ? "VelaGlassCloseBackgroundBrush" : "VelaSurfaceMutedBrush";
@@ -769,8 +769,8 @@ public class VelaDialogHost : ContentControl
             VerticalContentAlignment = VerticalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
             Content = closeIcon,
-            [!Button.BackgroundProperty] = this.GetResourceObservable(bgKey).ToBinding(),
-            [!Button.BorderBrushProperty] = this.GetResourceObservable(borderKey).ToBinding(),
+            [!Button.BackgroundProperty] = VelaResourceBinding.Create(bgKey),
+            [!Button.BorderBrushProperty] = VelaResourceBinding.Create(borderKey),
         };
         closeBtn.Click += (_, _) => Close(null);
         return closeBtn;
@@ -810,9 +810,9 @@ public class VelaDialogHost : ContentControl
             };
 
             if (tone == VelaDialogTone.Neutral && customBackground is null)
-                iconVisual.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaForegroundBrush"));
+                iconVisual[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush");
             else if (tone == VelaDialogTone.Accent && customBackground is null)
-                iconVisual.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaAccentForegroundBrush"));
+                iconVisual[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaAccentForegroundBrush");
             else
                 iconVisual.Foreground = Brushes.White;
 
@@ -846,9 +846,9 @@ public class VelaDialogHost : ContentControl
         };
 
         if (tone == VelaDialogTone.Neutral && customBackground is null)
-            iconVisual.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaForegroundBrush"));
+            iconVisual[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush");
         else if (tone == VelaDialogTone.Accent && customBackground is null)
-            iconVisual.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaAccentForegroundBrush"));
+            iconVisual[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaAccentForegroundBrush");
         else
             iconVisual.Foreground = Brushes.White;
 
@@ -873,7 +873,7 @@ public class VelaDialogHost : ContentControl
             VelaDialogTone.Danger => "VelaDangerBrush",
             _ => "VelaSurfaceMutedBrush",
         };
-        target.Bind(Border.BackgroundProperty, this.GetResourceObservable(key));
+        target[!Border.BackgroundProperty] = VelaResourceBinding.Create(key);
     }
 
     private Geometry? ResolveIconGeometry(VelaDialogOptions options)

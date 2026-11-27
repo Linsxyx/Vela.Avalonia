@@ -151,6 +151,18 @@ public class VelaDockBar : TemplatedControl
         public required TextBlock Label;
         public required Border BadgeBorder;
         public required TextBlock BadgeText;
+        public IDisposable? IconFgBinding;
+        public IDisposable? LabelFgBinding;
+        public string? CurrentFgKey;
+
+        public void DisposeBindings()
+        {
+            IconFgBinding?.Dispose();
+            IconFgBinding = null;
+            LabelFgBinding?.Dispose();
+            LabelFgBinding = null;
+            CurrentFgKey = null;
+        }
     }
 
     private readonly List<TabVisual> _tabs = new();
@@ -343,6 +355,8 @@ public class VelaDockBar : TemplatedControl
         _tabsHost.HorizontalAlignment = IsVertical ? HorizontalAlignment.Center : HorizontalAlignment.Left;
         _tabsHost.VerticalAlignment = IsVertical ? VerticalAlignment.Top : VerticalAlignment.Center;
 
+        foreach (var oldTab in _tabs)
+            oldTab.DisposeBindings();
         _tabsHost.Children.Clear();
         _tabs.Clear();
 
@@ -367,7 +381,7 @@ public class VelaDockBar : TemplatedControl
                 FontWeight = FontWeight.SemiBold,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaBackgroundBrush").ToBinding(),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaBackgroundBrush"),
             };
 
             var badgeBorder = new Border
@@ -381,8 +395,8 @@ public class VelaDockBar : TemplatedControl
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(0, -4, -10, 0),
                 IsVisible = !string.IsNullOrEmpty(item.Badge),
-                [!Border.BackgroundProperty] = this.GetResourceObservable("VelaForegroundBrush").ToBinding(),
-                [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaSurfaceBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaSurfaceBrush"),
                 Child = badgeText,
             };
 
@@ -544,11 +558,17 @@ public class VelaDockBar : TemplatedControl
     {
         for (var i = 0; i < _tabs.Count; i++)
         {
+            var tab = _tabs[i];
             var isSel = i == SelectedIndex;
             var fgKey = isSel ? "VelaForegroundBrush" : "VelaTextSecondaryBrush";
-            _tabs[i].Icon.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable(fgKey));
-            _tabs[i].Label.Bind(TextBlock.ForegroundProperty, this.GetResourceObservable(fgKey));
-            _tabs[i].Label.FontWeight = isSel ? FontWeight.SemiBold : FontWeight.Medium;
+            if (!string.Equals(tab.CurrentFgKey, fgKey, StringComparison.Ordinal))
+            {
+                tab.DisposeBindings();
+                tab.CurrentFgKey = fgKey;
+                tab.IconFgBinding = VelaResourceBinding.Bind(tab.Icon, PathIcon.ForegroundProperty, fgKey);
+                tab.LabelFgBinding = VelaResourceBinding.Bind(tab.Label, TextBlock.ForegroundProperty, fgKey);
+            }
+            tab.Label.FontWeight = isSel ? FontWeight.SemiBold : FontWeight.Medium;
         }
     }
 

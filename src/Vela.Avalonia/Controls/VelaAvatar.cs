@@ -389,7 +389,7 @@ public class VelaAvatarGroup : TemplatedControl
                 Padding = new Thickness(0),
                 Margin = i == 0 ? new Thickness(0) : new Thickness(-Overlap, 0, 0, 0),
                 ZIndex = i,
-                [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaSurfaceBrush").ToBinding(),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaSurfaceBrush"),
                 Child = avatar,
             };
 
@@ -422,8 +422,8 @@ public class VelaAvatarGroup : TemplatedControl
                 BorderThickness = new Thickness(2),
                 Margin = new Thickness(-Overlap, 0, 0, 0),
                 ZIndex = visibleCount + 1,
-                [!Border.BackgroundProperty] = this.GetResourceObservable("VelaSurfaceMutedBrush").ToBinding(),
-                [!Border.BorderBrushProperty] = this.GetResourceObservable("VelaSurfaceBrush").ToBinding(),
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceMutedBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaSurfaceBrush"),
                 Child = new TextBlock
                 {
                     Text = $"+{overflow}",
@@ -431,7 +431,7 @@ public class VelaAvatarGroup : TemplatedControl
                     FontWeight = FontWeight.SemiBold,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    [!TextBlock.ForegroundProperty] = this.GetResourceObservable("VelaTextSecondaryBrush").ToBinding(),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
                 },
             };
             _host.Children.Add(badge);
