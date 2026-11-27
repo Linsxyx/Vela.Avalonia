@@ -1,135 +1,447 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:charts="using:Vela.Avalonia.Charts"
              xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
              x:Class="Vela.Avalonia.Gallery.Views.OverviewPage"
              x:DataType="vm:MainViewModel"
              x:Name="PageRoot">
   <ScrollViewer Classes="pageScroll">
-    <StackPanel Classes="pageRoot">
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavOverview}" VerticalAlignment="Center" />
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-          <vela:VelaButton Variant="Secondary"
-                           Size="Small"
-                           Content="{DynamicResource StrCmdPaletteBtn}"
-                           Command="{Binding OpenCommandPaletteCommand}" />
-          <vela:VelaButton Variant="Ghost"
-                           Size="Small"
-                           Content="{DynamicResource StrClearCache}"
-                           Command="{Binding ClearPageCacheCommand}" />
-        </StackPanel>
-      </Grid>
+    <StackPanel Classes="pageRootWide" ClipToBounds="False">
 
-      <!-- Appearance, Accent & Language -->
-      <Border Classes="card">
-        <StackPanel Spacing="16">
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Classes="cardTitle" Text="{DynamicResource StrAppearance}" VerticalAlignment="Center" />
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
-              <vela:VelaSwitch Content="{DynamicResource StrDarkMode}" IsChecked="{Binding IsDarkMode, Mode=TwoWay}" />
-              <vela:VelaSwitch Content="{DynamicResource StrReducedMotion}" IsChecked="{Binding ReducedMotion, Mode=TwoWay}" />
+      <!-- ══ Band 1: Hero Banner with Shader Backdrop + Live Theme Studio ══ -->
+      <Border CornerRadius="18"
+              BorderBrush="{DynamicResource VelaBorderBrush}"
+              BorderThickness="1"
+              ClipToBounds="True">
+        <Grid>
+          <vela:VelaShaderBackground Preset="Mesh"
+                                     IsAnimated="{Binding !ReducedMotion}"
+                                     PrimaryColor="{Binding Overview.HeroShaderColor}"
+                                     Speed="0.55"
+                                     Intensity="0.65" />
+
+          <!-- High-contrast translucent veil for both Light & Dark themes -->
+          <Border Background="{DynamicResource VelaSurfaceBrush}" Opacity="0.80" />
+
+          <Grid ColumnDefinitions="1.35*,0.9*" ColumnSpacing="20" Margin="22,20">
+            <!-- Left: Brand Identity, Tagline & Primary Actions -->
+            <StackPanel Spacing="12" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <vela:VelaLiquidGlass CornerRadius="999"
+                                      Padding="10,4"
+                                      BlurRadius="10"
+                                      BevelWidth="10"
+                                      Refraction="0.45"
+                                      Dispersion="0.3"
+                                      Specular="0.85">
+                  <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                    <vela:VelaBadge Tone="Success" ShowDot="True" IsPill="True" Size="Small" Content="v0.1.0" />
+                    <TextBlock Text="Avalonia 12.2 · .NET 10"
+                               FontSize="11.5"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource VelaForegroundBrush}"
+                               VerticalAlignment="Center" />
+                  </StackPanel>
+                </vela:VelaLiquidGlass>
+              </StackPanel>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="{DynamicResource StrOverviewHeroTitle}"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource VelaForegroundBrush}" />
+                <TextBlock Text="{DynamicResource StrOverviewHeroSubtitle}"
+                           FontSize="13"
+                           LineHeight="20"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+              </StackPanel>
+
+              <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8" Margin="0,2,0,0">
+                <vela:VelaButton Variant="Primary"
+                                 Size="Small"
+                                 Content="{DynamicResource StrCmdPaletteBtn}"
+                                 Command="{Binding OpenCommandPaletteCommand}" />
+                <vela:VelaButton Variant="Secondary"
+                                 Size="Small"
+                                 Content="{DynamicResource StrShellSettings}"
+                                 Command="{Binding OpenShellSettingsCommand}" />
+                <vela:VelaCopyButton CopyText="dotnet add package Vela.Avalonia"
+                                     Label="dotnet add package Vela.Avalonia"
+                                     Copied="OnPackageCopied" />
+              </WrapPanel>
             </StackPanel>
-          </Grid>
 
-          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
-            <StackPanel Spacing="8">
-              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrAccent}" />
-              <ItemsControl ItemsSource="{Binding AccentSwatches}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:AccentSwatchViewModel">
-                    <Button Theme="{DynamicResource VelaIconButtonTheme}"
-                            Width="26"
-                            Height="26"
-                            CornerRadius="999"
-                            ToolTip.Tip="{Binding Name}"
-                            Command="{Binding #PageRoot.((vm:MainViewModel)DataContext).SelectAccentCommand}"
-                            CommandParameter="{Binding Accent}">
-                      <Border Width="22"
-                              Height="22"
+            <!-- Right: Live Theme Studio -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource VelaSurfaceBrush}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    Padding="14,12"
+                    VerticalAlignment="Center">
+              <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="cardTitle"
+                             Text="{DynamicResource StrOverviewThemeStudio}"
+                             VerticalAlignment="Center" />
+                  <vela:VelaButton Grid.Column="1"
+                                   Variant="Secondary"
+                                   Size="Small"
+                                   Content="{DynamicResource StrOverviewSimulate}"
+                                   Command="{Binding Overview.SimulateLivePulseCommand}" />
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding AccentSwatches}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" ItemSpacing="7" LineSpacing="7" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AccentSwatchViewModel">
+                      <Button Theme="{DynamicResource VelaIconButtonTheme}"
+                              Width="26"
+                              Height="26"
                               CornerRadius="999"
-                              Background="{Binding SwatchBrush}"
-                              BorderBrush="{Binding RingBrush}"
-                              BorderThickness="2" />
-                    </Button>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
+                              ToolTip.Tip="{Binding Name}"
+                              Command="{Binding #PageRoot.((vm:MainViewModel)DataContext).SelectAccentCommand}"
+                              CommandParameter="{Binding Accent}">
+                        <Border Width="22"
+                                Height="22"
+                                CornerRadius="999"
+                                Background="{Binding SwatchBrush}"
+                                BorderBrush="{Binding RingBrush}"
+                                BorderThickness="2" />
+                      </Button>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-            <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Top">
-              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrLanguage}" />
-              <vela:VelaSegmentedControl SelectedIndex="{Binding LanguageIndex, Mode=TwoWay}">
-                <vela:VelaSegmentedItem Content="English" />
-                <vela:VelaSegmentedItem Content="中文" />
-              </vela:VelaSegmentedControl>
-            </StackPanel>
+                <Border Height="1" Background="{DynamicResource VelaBorderSubtleBrush}" />
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                  <vela:VelaSwitch Content="{DynamicResource StrDarkMode}"
+                                   IsChecked="{Binding IsDarkMode, Mode=TwoWay}"
+                                   VerticalAlignment="Center" />
+                  <vela:VelaSegmentedControl Grid.Column="1"
+                                             SelectedIndex="{Binding LanguageIndex, Mode=TwoWay}">
+                    <vela:VelaSegmentedItem Content="EN" />
+                    <vela:VelaSegmentedItem Content="中文" />
+                  </vela:VelaSegmentedControl>
+                </Grid>
+              </StackPanel>
+            </Border>
           </Grid>
-        </StackPanel>
+        </Grid>
       </Border>
 
-      <!-- Shell & PageDeck 2-Column Grid -->
-      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+      <!-- ══ Band 2: 4-Column Animated KPI Strip ══ -->
+      <UniformGrid Columns="4" ColumnSpacing="12">
+        <vela:VelaMetricCard Label="{DynamicResource StrOverviewMrr}"
+                             Value="{Binding Overview.MonthlyRevenue}"
+                             Prefix="$"
+                             Delta="+18.4%"
+                             DeltaTone="Success"
+                             Caption="{DynamicResource StrVsLast30d}"
+                             Icon="{DynamicResource VelaIconTrendingUp}" />
+        <vela:VelaMetricCard Label="{DynamicResource StrOverviewDeploys}"
+                             Value="{Binding Overview.ActiveDeployments}"
+                             Delta="+12.6%"
+                             DeltaTone="Info"
+                             Caption="{DynamicResource StrOverviewDeploysCaption}"
+                             Icon="{DynamicResource VelaIconRocket}" />
+        <vela:VelaMetricCard Label="{DynamicResource StrOverviewLatency}"
+                             Value="{Binding Overview.P95Latency}"
+                             Suffix=" ms"
+                             Decimals="1"
+                             Delta="-31%"
+                             DeltaTone="Accent"
+                             Caption="{DynamicResource StrOverviewLatencyCaption}"
+                             Icon="{DynamicResource VelaIconSparkles}" />
+        <vela:VelaMetricCard Label="{DynamicResource StrOverviewUptime}"
+                             Value="{Binding Overview.UptimePercent}"
+                             Suffix="%"
+                             Decimals="2"
+                             Delta="+0.04%"
+                             DeltaTone="Success"
+                             Caption="{DynamicResource StrOverviewUptimeCaption}"
+                             Icon="{DynamicResource VelaIconShield}" />
+      </UniformGrid>
+
+      <!-- ══ Band 3: Revenue Line Chart (Left) + Quick Release Controls (Right) ══ -->
+      <Grid ColumnDefinitions="1.55*,1*" ColumnSpacing="14" ClipToBounds="False">
+        <!-- Left: VelaLineChart + Sparkline Strip -->
         <Border Classes="card">
           <StackPanel Spacing="14">
-            <TextBlock Classes="cardTitle" Text="{DynamicResource StrNavShell}" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Classes="cardTitle"
+                           Text="{DynamicResource StrOverviewChartTitle}"
+                           VerticalAlignment="Center" />
+                <vela:VelaBadge Tone="Success"
+                                ShowDot="True"
+                                IsPill="True"
+                                Size="Small"
+                                Content="{DynamicResource StrOverviewLiveProd}" />
+              </StackPanel>
 
-            <StackPanel Spacing="6">
-              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrDisplayMode}" />
-              <vela:VelaSegmentedControl SelectedIndex="{Binding DisplayModeIndex, Mode=TwoWay}">
-                <vela:VelaSegmentedItem Content="{DynamicResource StrLeftSidebar}" />
-                <vela:VelaSegmentedItem Content="{DynamicResource StrTopNavbar}" />
+              <vela:VelaSegmentedControl Grid.Column="1"
+                                         SelectedIndex="{Binding Overview.ChartRangeIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="7D" />
+                <vela:VelaSegmentedItem Content="30D" />
+                <vela:VelaSegmentedItem Content="90D" />
               </vela:VelaSegmentedControl>
-            </StackPanel>
+            </Grid>
 
-            <StackPanel Spacing="6">
-              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrSidebarStyle}" />
-              <vela:VelaSegmentedControl SelectedIndex="{Binding PaneVariantIndex, Mode=TwoWay}">
-                <vela:VelaSegmentedItem Content="{DynamicResource StrStandard}" />
-                <vela:VelaSegmentedItem Content="{DynamicResource StrFloating}" />
-                <vela:VelaSegmentedItem Content="{DynamicResource StrFrosted}" />
-              </vela:VelaSegmentedControl>
-            </StackPanel>
+            <charts:VelaLineChart Height="232"
+                                  ValuePrefix="$"
+                                  Labels="{Binding Overview.ChartLabels}"
+                                  Series="{Binding Overview.ChartSeries}" />
 
-            <WrapPanel Orientation="Horizontal" ItemSpacing="16" LineSpacing="10">
-              <vela:VelaSwitch Content="{DynamicResource StrExpanded}" IsChecked="{Binding IsPaneOpen, Mode=TwoWay}" />
-              <vela:VelaSwitch Content="{DynamicResource StrTopBar}" IsChecked="{Binding ShowTopBar, Mode=TwoWay}" />
-              <vela:VelaSwitch Content="{DynamicResource StrSidebarFilter}" IsChecked="{Binding IsSearchVisible, Mode=TwoWay}" />
+            <Border Height="1" Background="{DynamicResource VelaBorderSubtleBrush}" />
+
+            <UniformGrid Columns="3" ColumnSpacing="12">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <StackPanel Spacing="1" VerticalAlignment="Center">
+                  <TextBlock Text="RPS" FontSize="11" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                  <TextBlock Text="4,218" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource VelaForegroundBrush}" />
+                </StackPanel>
+                <charts:VelaSparkline Grid.Column="1" Width="64" Height="24" Values="{Binding Overview.SparkRequests}" VerticalAlignment="Center" />
+              </Grid>
+
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <StackPanel Spacing="1" VerticalAlignment="Center">
+                  <TextBlock Text="P95" FontSize="11" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                  <TextBlock Text="18.4 ms" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource VelaForegroundBrush}" />
+                </StackPanel>
+                <charts:VelaSparkline Grid.Column="1" Width="64" Height="24" StrokeColor="#10A870" Values="{Binding Overview.SparkLatency}" VerticalAlignment="Center" />
+              </Grid>
+
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <StackPanel Spacing="1" VerticalAlignment="Center">
+                  <TextBlock Text="Errors" FontSize="11" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                  <TextBlock Text="0.03%" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource VelaForegroundBrush}" />
+                </StackPanel>
+                <charts:VelaSparkline Grid.Column="1" Width="64" Height="24" StrokeColor="#EF4444" Values="{Binding Overview.SparkErrors}" VerticalAlignment="Center" />
+              </Grid>
+            </UniformGrid>
+          </StackPanel>
+        </Border>
+
+        <!-- Right: Quick Release Micro-App -->
+        <Border Grid.Column="1" Classes="card" ClipToBounds="False">
+          <StackPanel Spacing="12" ClipToBounds="False">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle"
+                         Text="{DynamicResource StrOverviewQuickRelease}"
+                         VerticalAlignment="Center" />
+              <vela:VelaBadge Grid.Column="1"
+                              Tone="Accent"
+                              IsPill="True"
+                              Size="Small"
+                              Content="{Binding Overview.CanaryBadgeText}" />
+            </Grid>
+
+            <vela:VelaInput Label="{DynamicResource StrOverviewReleaseTag}"
+                            Text="{Binding Overview.ReleaseTag, Mode=TwoWay}"
+                            Size="Small"
+                            IsClearable="True" />
+
+            <vela:VelaSelect Label="{DynamicResource StrRegion}"
+                             SelectedIndex="{Binding Overview.SelectedRegionIndex, Mode=TwoWay}">
+              <x:String>Tokyo (ap-northeast-1)</x:String>
+              <x:String>Singapore (ap-southeast-1)</x:String>
+              <x:String>Oregon (us-west-2)</x:String>
+              <x:String>Frankfurt (eu-central-1)</x:String>
+            </vela:VelaSelect>
+
+            <vela:VelaElasticSlider Label="{DynamicResource StrOverviewCanary}"
+                                    Minimum="5"
+                                    Maximum="100"
+                                    Step="5"
+                                    Value="{Binding Overview.CanaryPercent, Mode=TwoWay}"
+                                    ValueSuffix="%" />
+
+            <WrapPanel Orientation="Horizontal" ItemSpacing="14" LineSpacing="8">
+              <vela:VelaSwitch Content="{DynamicResource StrOverviewAutoRollback}"
+                               IsChecked="{Binding Overview.AutoRollback, Mode=TwoWay}" />
+              <vela:VelaSwitch Content="{DynamicResource StrOverviewEdgeWarmup}"
+                               IsChecked="{Binding Overview.EdgeWarmup, Mode=TwoWay}" />
             </WrapPanel>
+
+            <vela:VelaHoldToConfirm x:Name="QuickDeployHold"
+                                    Tone="Accent"
+                                    Icon="{DynamicResource VelaIconRocket}"
+                                    Label="{DynamicResource StrOverviewHoldDeploy}"
+                                    ConfirmedLabel="{DynamicResource StrOverviewDeployed}"
+                                    DurationMs="850"
+                                    Confirmed="OnQuickDeployConfirmed" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- ══ Band 4: Live Service DataGrid (Left) + Release Schedule Calendar (Right) ══ -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="14">
+        <Border Classes="card">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Classes="cardTitle"
+                           Text="{DynamicResource StrOverviewActiveServices}"
+                           VerticalAlignment="Center" />
+                <vela:VelaBadge Tone="Neutral"
+                                IsPill="True"
+                                Size="Small"
+                                Content="{Binding Overview.ActiveServicesCountText}" />
+              </StackPanel>
+
+              <vela:VelaInput Grid.Column="1"
+                              Width="210"
+                              Size="Small"
+                              PlaceholderText="{DynamicResource StrFilterServicesPlaceholder}"
+                              LeadingIcon="{DynamicResource VelaIconSearch}"
+                              Text="{Binding Overview.DeploymentSearchText, Mode=TwoWay}"
+                              IsClearable="True" />
+            </Grid>
+
+            <vela:VelaDataGrid x:Name="DeploymentsGrid"
+                               Height="286"
+                               ItemsSource="{Binding Overview.DeploymentRows}"
+                               SearchText="{Binding Overview.DeploymentSearchText}"
+                               Density="Compact"
+                               SelectionMode="Single"
+                               ShowAlternatingRows="True"
+                               EmptyContent="{DynamicResource StrEmptySearchTitle}"
+                               RowDoubleTapped="OnDeploymentRowDoubleTapped">
+              <vela:VelaDataGrid.FooterContent>
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="statusText"
+                             Text="{DynamicResource StrOverviewGridHint}"
+                             VerticalAlignment="Center" />
+                  <vela:VelaButton Grid.Column="1"
+                                   Variant="Ghost"
+                                   Size="Small"
+                                   Content="{DynamicResource StrOverviewOpenDataViews}"
+                                   Command="{Binding Overview.NavigateToCommand}"
+                                   CommandParameter="dataviews" />
+                </Grid>
+              </vela:VelaDataGrid.FooterContent>
+            </vela:VelaDataGrid>
           </StackPanel>
         </Border>
 
         <Border Grid.Column="1" Classes="card">
-          <StackPanel Spacing="14">
-            <TextBlock Classes="cardTitle" Text="{DynamicResource StrPageDeckPalette}" />
+          <StackPanel Spacing="12" HorizontalAlignment="Center">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle"
+                         Text="{DynamicResource StrOverviewSchedule}"
+                         VerticalAlignment="Center" />
+              <vela:VelaBadge Grid.Column="1"
+                              Tone="Info"
+                              IsOutline="True"
+                              Size="Small"
+                              Content="{Binding Overview.SelectedScheduleDateText}" />
+            </Grid>
 
-            <StackPanel Spacing="6">
-              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrCacheMode}" />
-              <vela:VelaSegmentedControl SelectedIndex="{Binding CacheModeIndex, Mode=TwoWay}">
-                <vela:VelaSegmentedItem Content="KeepAlive" />
-                <vela:VelaSegmentedItem Content="LRU (3)" />
-                <vela:VelaSegmentedItem Content="{DynamicResource StrNone}" />
-              </vela:VelaSegmentedControl>
-            </StackPanel>
+            <vela:VelaCalendar SelectedDate="{Binding Overview.SelectedScheduleDate, Mode=TwoWay}" />
 
-            <StackPanel Spacing="6">
-              <TextBlock Classes="fieldLabel" Text="{DynamicResource StrTransitionMode}" />
-              <vela:VelaSegmentedControl SelectedIndex="{Binding TransitionModeIndex, Mode=TwoWay}">
-                <vela:VelaSegmentedItem Content="{DynamicResource StrInstant}" />
-                <vela:VelaSegmentedItem Content="{DynamicResource StrCompositorFade}" />
-              </vela:VelaSegmentedControl>
-            </StackPanel>
-
-            <vela:VelaSwitch Content="{DynamicResource StrPaletteLiquidGlass}"
-                             IsChecked="{Binding CommandPaletteGlass, Mode=TwoWay}" />
+            <vela:VelaProgress Label="{DynamicResource StrOverviewSprintReady}"
+                               Value="{Binding Overview.SprintProgress}" />
           </StackPanel>
         </Border>
       </Grid>
+
+      <!-- ══ Band 5: Cluster Telemetry Gauges (Left) + Team & Quick Jump (Right) ══ -->
+      <Grid ColumnDefinitions="1.15*,0.85*" ColumnSpacing="14">
+        <Border Classes="card">
+          <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle"
+                         Text="{DynamicResource StrOverviewClusterHealth}"
+                         VerticalAlignment="Center" />
+              <vela:VelaButton Grid.Column="1"
+                               Variant="Secondary"
+                               Size="Small"
+                               Content="{DynamicResource StrRandomize}"
+                               Command="{Binding Overview.RandomizeGaugesCommand}" />
+            </Grid>
+
+            <UniformGrid Columns="3">
+              <charts:VelaGauge Label="CPU"
+                                Value="{Binding Overview.CpuLoad}"
+                                UseSemanticThresholds="True"
+                                Width="130"
+                                Height="116"
+                                StrokeThickness="11" />
+              <charts:VelaGauge Label="{DynamicResource StrMemory}"
+                                Value="{Binding Overview.MemoryLoad}"
+                                UseSemanticThresholds="True"
+                                Width="130"
+                                Height="116"
+                                StrokeThickness="11" />
+              <charts:VelaGauge Label="GPU"
+                                Value="{Binding Overview.GpuSync}"
+                                UseSemanticThresholds="False"
+                                Width="130"
+                                Height="116"
+                                StrokeThickness="11" />
+            </UniformGrid>
+
+            <vela:VelaAlert Tone="Success"
+                            IsDismissible="False"
+                            Title="{DynamicResource StrOperational}"
+                            Description="{DynamicResource StrOverviewClusterAllGood}" />
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle"
+                         Text="{DynamicResource StrOverviewTeamTitle}"
+                         VerticalAlignment="Center" />
+              <vela:VelaAvatarGroup Grid.Column="1" MaxVisible="4" Size="Small" Overlap="8">
+                <vela:VelaAvatar DisplayName="Emma Collins" Tone="Accent" />
+                <vela:VelaAvatar DisplayName="Marcus Chen" Tone="Teal" />
+                <vela:VelaAvatar DisplayName="Kenji Sato" Tone="Violet" />
+                <vela:VelaAvatar DisplayName="Sofia Lind" Tone="Rose" />
+                <vela:VelaAvatar DisplayName="Ada Lovelace" Tone="Sky" />
+              </vela:VelaAvatarGroup>
+            </Grid>
+
+            <vela:VelaListBox x:Name="QuickJumpList"
+                              Variant="Inset"
+                              Density="Compact"
+                              ShowSelectionIndicator="False"
+                              ShowDividers="True"
+                              ItemInvoked="OnQuickJumpInvoked">
+              <vela:VelaListBoxItem Tag="charts"
+                                    Content="{DynamicResource StrNavCharts}"
+                                    Description="{DynamicResource StrOverviewJumpChartsDesc}"
+                                    Icon="{DynamicResource VelaIconChart}"
+                                    Badge="6" />
+              <vela:VelaListBoxItem Tag="shaders"
+                                    Content="{DynamicResource StrNavShaders}"
+                                    Description="{DynamicResource StrOverviewJumpShadersDesc}"
+                                    Icon="{DynamicResource VelaIconSparkles}"
+                                    Badge="GPU" />
+              <vela:VelaListBoxItem Tag="dataviews"
+                                    Content="{DynamicResource StrNavDataViews}"
+                                    Description="{DynamicResource StrOverviewJumpDataDesc}"
+                                    Icon="{DynamicResource VelaIconTable}"
+                                    Badge="AOT" />
+              <vela:VelaListBoxItem Tag="drawer"
+                                    Content="{DynamicResource StrShellSettings}"
+                                    Description="{DynamicResource StrOverviewJumpShellDesc}"
+                                    Icon="{DynamicResource VelaIconSettings}"
+                                    Badge="Drawer" />
+            </vela:VelaListBox>
+          </StackPanel>
+        </Border>
+      </Grid>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

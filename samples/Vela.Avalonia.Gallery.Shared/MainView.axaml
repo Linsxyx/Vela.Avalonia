@@ -63,9 +63,24 @@
                        Width="28" Height="28" />
               </vela:VelaNavigationView.CompactHeader>
 
-              <!-- Top Bar Trailing Slot: Language Toggle + Search Pill + Avatars -->
+              <!-- Top Bar Trailing Slot: Language Toggle + Shell Drawer + Search Pill + Avatars -->
               <vela:VelaNavigationView.TopBarContent>
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <Button Theme="{DynamicResource VelaIconButtonTheme}"
+                          Background="{DynamicResource VelaSurfaceMutedBrush}"
+                          BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                          BorderThickness="1"
+                          CornerRadius="8"
+                          Width="28"
+                          Height="28"
+                          ToolTip.Tip="{DynamicResource StrShellSettings}"
+                          Command="{Binding OpenShellSettingsCommand}">
+                    <PathIcon Width="13"
+                              Height="13"
+                              Data="{DynamicResource VelaIconSettings}"
+                              Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  </Button>
+
                   <Button Theme="{DynamicResource VelaIconButtonTheme}"
                           Background="{DynamicResource VelaSurfaceMutedBrush}"
                           BorderBrush="{DynamicResource VelaBorderSubtleBrush}"

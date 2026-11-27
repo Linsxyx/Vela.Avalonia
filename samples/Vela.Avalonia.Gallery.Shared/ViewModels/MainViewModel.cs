@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.Gallery.Localization;
 using Vela.Avalonia.Gallery.Services;
+using Vela.Avalonia.Gallery.Views;
 using Vela.Avalonia.Motion;
 using Vela.Avalonia.Tokens;
 
@@ -15,6 +16,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly IGalleryShellService _shell;
     private bool _syncingLanguage;
 
+    public OverviewViewModel Overview { get; }
     public ActionsViewModel Actions { get; }
     public InputsViewModel Inputs { get; }
     public PickersViewModel Pickers { get; }
@@ -109,6 +111,7 @@ public partial class MainViewModel : ViewModelBase
         LanguageIndex = Loc.Instance.IsChinese ? 1 : 0;
         _syncingLanguage = false;
 
+        Overview = new OverviewViewModel(shell);
         Actions = new ActionsViewModel(shell);
         Inputs = new InputsViewModel();
         Pickers = new PickersViewModel(shell);
@@ -149,6 +152,7 @@ public partial class MainViewModel : ViewModelBase
     partial void OnIsDarkModeChanged(bool value)
     {
         _shell.SetThemeVariant(value);
+        Overview.SyncHeroShaderColor(SelectedAccent, value);
         RefreshSwatchRings();
     }
 
@@ -160,6 +164,7 @@ public partial class MainViewModel : ViewModelBase
     partial void OnSelectedAccentChanged(VelaAccent value)
     {
         _shell.SetAccent(value);
+        Overview.SyncHeroShaderColor(value, IsDarkMode);
         RefreshSwatchRings();
     }
 
@@ -177,6 +182,21 @@ public partial class MainViewModel : ViewModelBase
 
     [RelayCommand]
     private void OpenCommandPalette() => _shell.OpenCommandPalette();
+
+    [RelayCommand]
+    private async Task OpenShellSettingsAsync()
+    {
+        var loc = Loc.Instance;
+        var drawer = new ShellSettingsDrawer { DataContext = this };
+        await _shell.ShowDrawerAsync(drawer, new VelaDrawerOptions
+        {
+            Title = loc.Get("StrShellSettings"),
+            Description = loc.Get("StrShellSettingsDesc"),
+            Side = VelaDrawerSide.Right,
+            Width = 390,
+            Material = VelaSurfaceMaterial.GlassCard,
+        });
+    }
 
     [RelayCommand]
     private void ClearPageCache()
@@ -261,6 +281,13 @@ public partial class MainViewModel : ViewModelBase
                         : loc.Pick("Solid mode enabled", "已切换为纯色模式"),
                     VelaToastTone.Info);
             },
+        };
+        yield return new VelaCommandItem
+        {
+            Title = loc.Get("StrShellSettings"),
+            Group = appearGroup,
+            Icon = Icon("VelaIconSettings"),
+            Execute = () => _ = OpenShellSettingsAsync(),
         };
         yield return new VelaCommandItem
         {

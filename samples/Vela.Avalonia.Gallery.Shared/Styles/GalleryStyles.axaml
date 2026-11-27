@@ -10,6 +10,11 @@
     <Setter Property="MaxWidth" Value="960" />
   </Style>
 
+  <Style Selector="StackPanel.pageRootWide">
+    <Setter Property="Spacing" Value="16" />
+    <Setter Property="MaxWidth" Value="1180" />
+  </Style>
+
   <Style Selector="Border.card">
     <Setter Property="Background" Value="{DynamicResource VelaSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
