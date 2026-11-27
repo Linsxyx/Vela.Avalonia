@@ -1,0 +1,238 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.LayoutPage"
+             x:DataType="vm:LayoutViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <TextBlock Classes="pageTitle" Text="Navigation &amp; Layout" />
+
+      <!-- Row 1: VelaDockBar -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaDockBar" VerticalAlignment="Center" />
+            <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding DockMaterialIndex, Mode=TwoWay}">
+              <x:String>Solid</x:String>
+              <x:String>Frosted</x:String>
+              <x:String>Liquid Glass</x:String>
+            </vela:VelaSegmentedControl>
+          </Grid>
+
+          <Border CornerRadius="14"
+                  Height="132"
+                  Background="{DynamicResource VelaSurfaceMutedBrush}"
+                  BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                  BorderThickness="1"
+                  ClipToBounds="True">
+            <Grid>
+              <vela:VelaShaderBackground Preset="Aurora"
+                                         Intensity="0.85"
+                                         IsVisible="{Binding ShowDockShader}" />
+
+              <vela:VelaDockBar x:Name="ShowcaseDockBar"
+                                SelectedIndex="{Binding DockSelectedIndex, Mode=TwoWay}"
+                                Material="{Binding DockMaterial}"
+                                ShowSearch="True"
+                                SearchPlaceholder="Search..."
+                                SearchSubmitted="OnDockSearchSubmitted">
+                <vela:VelaDockItem Header="Home" Icon="{DynamicResource VelaIconHome}" />
+                <vela:VelaDockItem Header="Explore" Icon="{DynamicResource VelaIconCompass}" />
+                <vela:VelaDockItem Header="Saved" Icon="{DynamicResource VelaIconBookmark}" Badge="3" />
+                <vela:VelaDockItem Header="Profile" Icon="{DynamicResource VelaIconUser}" />
+              </vela:VelaDockBar>
+            </Grid>
+          </Border>
+
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <TextBlock Classes="statusText" Text="{Binding DockStatus}" VerticalAlignment="Center" />
+            <vela:VelaButton Grid.Column="1" Variant="Secondary" Size="Small" Content="+1 Badge" Command="{Binding IncrementDockBadgeCommand}" />
+            <vela:VelaButton Grid.Column="2" Variant="Ghost" Size="Small" Content="Clear" Command="{Binding ClearDockBadgeCommand}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Row 2: VelaTabs -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="cardTitle" Text="VelaTabs" VerticalAlignment="Center" />
+            <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding TabsVariantIndex, Mode=TwoWay}">
+              <x:String>Pill</x:String>
+              <x:String>Underline</x:String>
+            </vela:VelaSegmentedControl>
+          </Grid>
+
+          <vela:VelaTabs Variant="{Binding TabsVariant}" SelectedIndex="0">
+            <vela:VelaTabItem Header="Overview" Icon="{DynamicResource VelaIconHome}">
+              <vela:VelaTabItem.PageContent>
+                <Border Background="{DynamicResource VelaSurfaceMutedBrush}" CornerRadius="10" Padding="14">
+                  <TextBlock Text="Overview panel · KeepAlive cached" FontSize="13" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                </Border>
+              </vela:VelaTabItem.PageContent>
+            </vela:VelaTabItem>
+            <vela:VelaTabItem Header="Activity" Icon="{DynamicResource VelaIconBell}" Badge="12">
+              <vela:VelaTabItem.PageContent>
+                <Border Background="{DynamicResource VelaSurfaceMutedBrush}" CornerRadius="10" Padding="14">
+                  <vela:VelaCheckBox Content="State persists across tab switches" IsChecked="False" />
+                </Border>
+              </vela:VelaTabItem.PageContent>
+            </vela:VelaTabItem>
+            <vela:VelaTabItem Header="Settings" Icon="{DynamicResource VelaIconSliders}">
+              <vela:VelaTabItem.PageContent>
+                <Border Background="{DynamicResource VelaSurfaceMutedBrush}" CornerRadius="10" Padding="14">
+                  <TextBlock Text="Settings panel · zero teardown" FontSize="13" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                </Border>
+              </vela:VelaTabItem.PageContent>
+            </vela:VelaTabItem>
+          </vela:VelaTabs>
+        </StackPanel>
+      </Border>
+
+      <!-- Row 3: VelaStepper -->
+      <Border Classes="card">
+        <StackPanel Spacing="16">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="cardTitle" Text="VelaStepper" VerticalAlignment="Center" />
+            <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding StepperOrientationIndex, Mode=TwoWay}">
+              <x:String>Horizontal</x:String>
+              <x:String>Vertical</x:String>
+            </vela:VelaSegmentedControl>
+          </Grid>
+
+          <vela:VelaStepper x:Name="DemoStepper"
+                            CurrentStep="{Binding CurrentStep, Mode=TwoWay}"
+                            Orientation="{Binding StepperOrientation}"
+                            StepSelected="OnStepSelected">
+            <vela:VelaStepperItem Title="Account" Description="Identity" />
+            <vela:VelaStepperItem Title="Runtime" Description="Target SDK" />
+            <vela:VelaStepperItem Title="Security" Description="Signing keys" />
+            <vela:VelaStepperItem Title="Deploy" Description="Production" />
+          </vela:VelaStepper>
+
+          <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+            <vela:VelaButton Variant="Secondary" Size="Small" Content="Previous" Command="{Binding PreviousStepCommand}" />
+            <vela:VelaButton Variant="Primary" Size="Small" Content="Next" Command="{Binding NextStepCommand}" />
+            <vela:VelaButton Variant="Ghost" Size="Small" Content="Toggle Error" Command="{Binding ToggleStepErrorCommand}" />
+            <vela:VelaButton Variant="Ghost" Size="Small" Content="Complete All" Command="{Binding CompleteAllStepsCommand}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Row 4: Breadcrumb & Pagination + Accordion -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="10">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="cardTitle" Text="VelaBreadcrumb" VerticalAlignment="Center" />
+                <vela:VelaButton Grid.Column="1" Variant="Secondary" Size="Small" Content="+ Drill" Command="{Binding DrillBreadcrumbCommand}" />
+              </Grid>
+
+              <Border Background="{DynamicResource VelaSurfaceMutedBrush}"
+                      BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                      BorderThickness="1"
+                      CornerRadius="10"
+                      Padding="10,6">
+                <vela:VelaBreadcrumb x:Name="DemoBreadcrumb" ItemClicked="OnBreadcrumbItemClicked">
+                  <vela:VelaBreadcrumbItem Label="Workspace" Icon="{DynamicResource VelaIconHome}" />
+                  <vela:VelaBreadcrumbItem Label="Vela" Icon="{DynamicResource VelaIconFolder}" />
+                  <vela:VelaBreadcrumbItem Label="Controls" />
+                </vela:VelaBreadcrumb>
+              </Border>
+            </StackPanel>
+
+            <Border Height="1" Background="{DynamicResource VelaBorderSubtleBrush}" />
+
+            <StackPanel Spacing="10">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="cardTitle" Text="VelaPagination" VerticalAlignment="Center" />
+                <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding PaginationTotalIndex, Mode=TwoWay}">
+                  <x:String>5</x:String>
+                  <x:String>12</x:String>
+                  <x:String>24</x:String>
+                </vela:VelaSegmentedControl>
+              </Grid>
+
+              <vela:VelaPagination CurrentPage="{Binding CurrentPage, Mode=TwoWay}"
+                                   TotalPages="{Binding TotalPages}" />
+              <TextBlock Classes="statusText" Text="{Binding PaginationSummary}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaAccordion" />
+            <vela:VelaAccordion AllowMultiple="False">
+              <vela:VelaAccordionItem Header="Style isolation" IsExpanded="True">
+                <TextBlock TextWrapping="Wrap"
+                           Text="Uses internal bare primitives so FluentTheme never leaks focus rings." />
+              </vela:VelaAccordionItem>
+              <vela:VelaAccordionItem Header="Page caching">
+                <TextBlock TextWrapping="Wrap"
+                           Text="VelaPageDeck supports KeepAlive, bounded LRU, and None modes." />
+              </vela:VelaAccordionItem>
+              <vela:VelaAccordionItem Header="Reduced motion">
+                <TextBlock TextWrapping="Wrap"
+                           Text="Snaps spring channels and pauses pulse animations globally." />
+              </vela:VelaAccordionItem>
+            </vela:VelaAccordion>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Row 5: VelaResizablePanels -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaResizablePanels" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Classes="statusText" Text="{Binding SplitSharesText}" VerticalAlignment="Center" />
+            <vela:VelaButton Grid.Column="2" Variant="Secondary" Size="Small" Content="Reset" Command="{Binding ResetSplitCommand}" />
+          </Grid>
+
+          <vela:VelaResizablePanels x:Name="DemoSplitPanels"
+                                    Height="180"
+                                    LayoutChanged="OnSplitLayoutChanged">
+            <vela:VelaResizablePane Header="Explorer" DefaultShare="1.0" MinSize="110" IsCollapsible="True">
+              <Border Background="{DynamicResource VelaSidebarBackgroundBrush}" Padding="12">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="EXPLORER" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                  <TextBlock Text="MainView.axaml" FontSize="12.5" />
+                  <TextBlock Text="MainViewModel.cs" FontSize="12.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  <TextBlock Text="VelaTheme.axaml" FontSize="12.5" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                </StackPanel>
+              </Border>
+            </vela:VelaResizablePane>
+
+            <vela:VelaResizablePane Header="Editor" DefaultShare="2.2" MinSize="160">
+              <Border Background="{DynamicResource VelaSurfaceBrush}" Padding="14">
+                <StackPanel Spacing="6">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Editor" FontSize="13.5" FontWeight="SemiBold" />
+                    <vela:VelaBadge Tone="Neutral" IsPill="True" Content="Flex" />
+                  </StackPanel>
+                  <TextBlock Text="Drag dividers to resize, drag past min width to collapse, double-click to reset."
+                             FontSize="12.5"
+                             Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                             TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </vela:VelaResizablePane>
+
+            <vela:VelaResizablePane Header="Inspector" DefaultShare="1.1" MinSize="110" IsCollapsible="True">
+              <Border Background="{DynamicResource VelaSurfaceMutedBrush}" Padding="12">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="INSPECTOR" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                  <TextBlock Text="60 Hz · 0% idle" FontSize="12" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                  <TextBlock Text="2nd-order springs" FontSize="12" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                </StackPanel>
+              </Border>
+            </vela:VelaResizablePane>
+          </vela:VelaResizablePanels>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

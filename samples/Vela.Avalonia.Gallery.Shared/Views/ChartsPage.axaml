@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:charts="using:Vela.Avalonia.Charts"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.ChartsPage"
+             x:DataType="vm:ChartsViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <TextBlock Classes="pageTitle" Text="Charts" />
+
+      <!-- 1. Line Chart -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="cardTitle" Text="VelaLineChart" VerticalAlignment="Center" />
+            <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding LineRangeIndex, Mode=TwoWay}">
+              <x:String>7D</x:String>
+              <x:String>30D</x:String>
+              <x:String>90D</x:String>
+            </vela:VelaSegmentedControl>
+          </Grid>
+
+          <charts:VelaLineChart Height="240"
+                                ValuePrefix="$"
+                                Labels="{Binding LineLabels}"
+                                Series="{Binding LineSeries}" />
+        </StackPanel>
+      </Border>
+
+      <!-- 2. Bar + Donut -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaBarChart" VerticalAlignment="Center" />
+              <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding BarRangeIndex, Mode=TwoWay}">
+                <x:String>Week A</x:String>
+                <x:String>Week B</x:String>
+              </vela:VelaSegmentedControl>
+            </Grid>
+            <charts:VelaBarChart Height="212" Data="{Binding BarData}" />
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaDonutChart" VerticalAlignment="Center" />
+              <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding DonutDatasetIndex, Mode=TwoWay}">
+                <x:String>Q1</x:String>
+                <x:String>Q2</x:String>
+                <x:String>MRR</x:String>
+              </vela:VelaSegmentedControl>
+            </Grid>
+            <charts:VelaDonutChart HorizontalAlignment="Center"
+                                   RingSize="190"
+                                   Thickness="24"
+                                   TotalLabel="{Binding DonutTotalLabel}"
+                                   Data="{Binding DonutData}" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- 3. Gauge + Sparkline -->
+      <Grid ColumnDefinitions="1.15*,0.85*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaGauge" VerticalAlignment="Center" />
+              <vela:VelaButton Grid.Column="1"
+                               Variant="Secondary"
+                               Size="Small"
+                               Content="Randomize"
+                               Command="{Binding RandomizeGaugesCommand}" />
+            </Grid>
+            <UniformGrid Columns="3">
+              <charts:VelaGauge Label="CPU" Value="{Binding CpuLoad}" UseSemanticThresholds="True" Width="134" Height="120" StrokeThickness="12" />
+              <charts:VelaGauge Label="Memory" Value="{Binding MemoryLoad}" UseSemanticThresholds="True" Width="134" Height="120" StrokeThickness="12" />
+              <charts:VelaGauge Label="GPU" Value="{Binding GpuSync}" UseSemanticThresholds="False" Width="134" Height="120" StrokeThickness="12" />
+            </UniformGrid>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaSparkline" />
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                <TextBlock Text="Sessions" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <TextBlock Grid.Column="1" Text="4,218" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <charts:VelaSparkline Grid.Column="2" Width="92" Height="26" Values="{Binding SparkSessions}" />
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                <TextBlock Text="Frame Budget" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <TextBlock Grid.Column="1" Text="1.8 ms" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <charts:VelaSparkline Grid.Column="2" Width="92" Height="26" StrokeColor="#10A870" Values="{Binding SparkBudget}" />
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                <TextBlock Text="Error Rate" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <TextBlock Grid.Column="1" Text="0.04%" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <charts:VelaSparkline Grid.Column="2" Width="92" Height="26" StrokeColor="#EC564B" Values="{Binding SparkErrors}" />
+              </Grid>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- 4. Heatmap -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="cardTitle" Text="VelaActivityHeatmap" />
+          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <charts:VelaActivityHeatmap Entries="{Binding HeatmapEntries}" Weeks="36" CellSize="13" CellGap="3.5" />
+          </ScrollViewer>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

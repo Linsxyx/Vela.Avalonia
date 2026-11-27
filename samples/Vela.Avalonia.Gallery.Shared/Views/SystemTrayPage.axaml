@@ -1,0 +1,187 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.SystemTrayPage"
+             x:DataType="vm:SystemTrayViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="pageTitle" Text="System Tray" VerticalAlignment="Center" />
+        <vela:VelaBadge Grid.Column="1"
+                        Tone="{Binding PlatformBadgeTone}"
+                        IsPill="True"
+                        Content="{Binding PlatformBadgeText}"
+                        VerticalAlignment="Center" />
+      </Grid>
+
+      <!-- Live Light / Dark Bar Preview -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+            <Border CornerRadius="10"
+                    Background="#FFF4F4F6"
+                    BorderBrush="#FFE0E0E4"
+                    BorderThickness="1"
+                    Padding="12,10">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Border Width="48" Height="48" CornerRadius="10" Background="#FFFFFFFF" BorderBrush="#FFE2E2E6" BorderThickness="1">
+                  <Image Source="{Binding PreviewLightBitmap}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Grid.Column="1" Text="Light Bar" FontSize="12.5" FontWeight="Medium" Foreground="#FF585858" VerticalAlignment="Center" />
+                <Border Grid.Column="2" CornerRadius="7" Background="#FFFFFFFF" BorderBrush="#FFDCDCE0" BorderThickness="1" Padding="8,4" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{Binding PreviewLightBitmap}" Width="18" Height="18" />
+                    <TextBlock Text="9:41" FontSize="11.5" FontWeight="SemiBold" Foreground="#FF141414" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </Border>
+
+            <Border Grid.Column="1"
+                    CornerRadius="10"
+                    Background="#FF161618"
+                    BorderBrush="#FF2C2C30"
+                    BorderThickness="1"
+                    Padding="12,10">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Border Width="48" Height="48" CornerRadius="10" Background="#FF242428" BorderBrush="#FF36363C" BorderThickness="1">
+                  <Image Source="{Binding PreviewDarkBitmap}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Grid.Column="1" Text="Dark Bar" FontSize="12.5" FontWeight="Medium" Foreground="#FFA0A0A8" VerticalAlignment="Center" />
+                <Border Grid.Column="2" CornerRadius="7" Background="#FF242428" BorderBrush="#FF36363C" BorderThickness="1" Padding="8,4" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{Binding PreviewDarkBitmap}" Width="18" Height="18" />
+                    <TextBlock Text="9:41" FontSize="11.5" FontWeight="SemiBold" Foreground="#FFF2F2F2" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+              <vela:VelaButton Variant="Primary" Size="Small" Content="Open Flyout" Command="{Binding OpenFlyoutCommand}" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="Hide 3s" Command="{Binding HideWindowBrieflyCommand}" />
+              <vela:VelaButton Variant="Ghost" Size="Small" Content="Toggle Visible" Command="{Binding ToggleTrayVisibleCommand}" />
+            </WrapPanel>
+            <TextBlock Grid.Column="1" Classes="statusText" Text="{Binding StatusText}" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Icon & Badge Studio -->
+      <Border Classes="card" ClipToBounds="False">
+        <StackPanel Spacing="14" ClipToBounds="False">
+          <TextBlock Classes="cardTitle" Text="Icon &amp; Badge" />
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="20" RowDefinitions="Auto,Auto,Auto" RowSpacing="14" ClipToBounds="False">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Glyph" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding GlyphIndex, Mode=TwoWay}">
+                <x:String>Sparkles</x:String>
+                <x:String>Bell</x:String>
+                <x:String>Rocket</x:String>
+                <x:String>Shield</x:String>
+                <x:String>Compass</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Theme Mode" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding ThemeModeIndex, Mode=TwoWay}">
+                <x:String>Auto</x:String>
+                <x:String>Dark</x:String>
+                <x:String>Light</x:String>
+                <x:String>Template</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Badge" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding BadgeVariantIndex, Mode=TwoWay}">
+                <x:String>None</x:String>
+                <x:String>Dot</x:String>
+                <x:String>Count</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Tone" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding BadgeToneIndex, Mode=TwoWay}">
+                <x:String>Accent</x:String>
+                <x:String>Success</x:String>
+                <x:String>Warning</x:String>
+                <x:String>Danger</x:String>
+                <x:String>Info</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Spacing="6" ClipToBounds="False">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="fieldLabel" Text="Badge Count" />
+                <TextBlock Grid.Column="1" Text="{Binding BadgeCountLabel}" FontSize="12" FontWeight="SemiBold" />
+              </Grid>
+              <vela:VelaElasticSlider Minimum="0" Maximum="120" Value="{Binding BadgeCount, Mode=TwoWay}" ShowValue="False" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="6" ClipToBounds="False">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <vela:VelaSwitch IsChecked="{Binding ShowProgressRing, Mode=TwoWay}" />
+                <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Progress Ring" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding ProgressLabel}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+              </Grid>
+              <vela:VelaElasticSlider Minimum="0" Maximum="100" Value="{Binding ProgressPercent, Mode=TwoWay}" ShowValue="False" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Presentation & Window Hooks -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <TextBlock Classes="cardTitle" Text="Flyout &amp; Window" />
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="20" RowDefinitions="Auto,Auto" RowSpacing="12">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Presentation" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding PresentationIndex, Mode=TwoWay}">
+                <x:String>VelaMenu</x:String>
+                <x:String>VelaPopover</x:String>
+                <x:String>Native</x:String>
+                <x:String>Command</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Material" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding MaterialIndex, Mode=TwoWay}">
+                <x:String>Solid</x:String>
+                <x:String>Frosted</x:String>
+                <x:String>GlassCard</x:String>
+                <x:String>LiquidGlass</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
+              <TextBlock Classes="fieldLabel" Text="Placement" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding PlacementIndex, Mode=TwoWay}">
+                <x:String>Auto</x:String>
+                <x:String>TopRight</x:String>
+                <x:String>BottomRight</x:String>
+                <x:String>TopLeft</x:String>
+                <x:String>BottomLeft</x:String>
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+          </Grid>
+
+          <WrapPanel Orientation="Horizontal" ItemSpacing="20" LineSpacing="10">
+            <vela:VelaSwitch Content="Close to tray" IsChecked="{Binding CloseToTray, Mode=TwoWay}" />
+            <vela:VelaSwitch Content="Minimize to tray" IsChecked="{Binding MinimizeToTray, Mode=TwoWay}" />
+            <vela:VelaSwitch Content="Icon plate" IsChecked="{Binding ShowIconPlate, Mode=TwoWay}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.InputsPage"
+             x:DataType="vm:InputsViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot" ClipToBounds="False">
+      <TextBlock Classes="pageTitle" Text="Inputs &amp; Sliders" />
+
+      <!-- Row 1: Text & Tag Inputs -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <TextBlock Classes="cardTitle" Text="VelaInput &amp; VelaTagInput" />
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="12">
+            <vela:VelaInput Label="Email"
+                            PlaceholderText="you@company.com"
+                            LeadingIcon="{DynamicResource VelaIconMail}"
+                            IsClearable="True" />
+
+            <vela:VelaInput Grid.Column="1"
+                            Label="Workspace slug"
+                            Text="vela-invalid!!"
+                            ErrorMessage="Lowercase letters, numbers, and hyphens only."
+                            IsClearable="True" />
+
+            <vela:VelaInput Grid.Row="1"
+                            Label="Password"
+                            PlaceholderText="Enter password..."
+                            PasswordChar="•" />
+
+            <vela:VelaInput Grid.Row="1"
+                            Grid.Column="1"
+                            Label="Disabled"
+                            Text="Read-only preset"
+                            IsEnabled="False" />
+          </Grid>
+
+          <vela:VelaTagInput x:Name="DemoTagInput"
+                             Label="Tags"
+                             PlaceholderText="Add tag..." />
+        </StackPanel>
+      </Border>
+
+      <!-- Row 2: Toggles + Segmented -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaSwitch &amp; VelaCheckBox" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+              <StackPanel Spacing="10">
+                <vela:VelaSwitch Content="Spring physics" IsChecked="True" />
+                <vela:VelaSwitch Content="GPU composition" IsChecked="True" />
+                <vela:VelaSwitch Content="Auto-sync tokens" IsChecked="False" />
+                <vela:VelaSwitch Content="Disabled" IsChecked="True" IsEnabled="False" />
+              </StackPanel>
+
+              <StackPanel Grid.Column="1" Spacing="10">
+                <vela:VelaCheckBox Content="Hardware blur" IsChecked="True" />
+                <vela:VelaCheckBox Content="Tri-state" IsThreeState="True" IsChecked="{x:Null}" />
+                <vela:VelaCheckBox Content="Release notes" IsChecked="False" />
+                <vela:VelaCheckBox Content="Disabled" IsChecked="True" IsEnabled="False" />
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="cardTitle" Text="VelaSegmentedControl" />
+
+            <vela:VelaSegmentedControl SelectedIndex="{Binding SelectedPlanIndex, Mode=TwoWay}">
+              <x:String>Monthly</x:String>
+              <x:String>Quarterly</x:String>
+              <x:String>Yearly · -20%</x:String>
+            </vela:VelaSegmentedControl>
+
+            <TextBlock Classes="statusText" Text="{Binding PlanSummary}" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Row 3: VelaElasticSlider + VelaScrubInput -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16" ClipToBounds="False">
+        <Border Classes="card" ClipToBounds="False">
+          <StackPanel Spacing="24" ClipToBounds="False">
+            <TextBlock Classes="cardTitle" Text="VelaElasticSlider" />
+
+            <vela:VelaElasticSlider Label="Master Volume"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="{Binding Volume, Mode=TwoWay}"
+                                    Step="1"
+                                    Marks="{Binding VolumeMarks}"
+                                    ValueSuffix="%" />
+
+            <vela:VelaElasticSlider Label="Canvas Zoom"
+                                    Minimum="0"
+                                    Maximum="200"
+                                    Value="{Binding CanvasZoom, Mode=TwoWay}"
+                                    Step="5"
+                                    Marks="{Binding ZoomMarks}"
+                                    ValueSuffix="%" />
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="cardTitle" Text="VelaScrubInput" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="12">
+              <vela:VelaScrubInput Label="Width" HandleText="W" Value="{Binding ScrubWidth, Mode=TwoWay}" Minimum="0" Maximum="1200" Step="1" Unit="px" />
+              <vela:VelaScrubInput Grid.Column="1" Label="Radius" HandleText="R" Value="{Binding ScrubRadius, Mode=TwoWay}" Minimum="0" Maximum="64" Step="1" Unit="px" />
+              <vela:VelaScrubInput Grid.Row="1" Label="Opacity" HandleText="%" Value="{Binding ScrubOpacity, Mode=TwoWay}" Minimum="0" Maximum="100" Step="1" Unit="%" />
+              <vela:VelaScrubInput Grid.Row="1" Grid.Column="1" Label="Rotation" HandleText="∠" Value="{Binding ScrubRotation, Mode=TwoWay}" Minimum="-180" Maximum="180" Step="1" Unit="°" />
+            </Grid>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Row 4: VelaRulerSlider -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <TextBlock Classes="cardTitle" Text="VelaRulerSlider" />
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+            <vela:VelaRulerSlider Label="Color Temperature"
+                                  Unit="K"
+                                  Minimum="2500"
+                                  Maximum="8500"
+                                  Step="100"
+                                  MajorEvery="10"
+                                  TickSpacing="9"
+                                  Value="{Binding ColorTemperature, Mode=TwoWay}"
+                                  FormatString="0" />
+
+            <vela:VelaRulerSlider Grid.Column="1"
+                                  Label="Zoom"
+                                  Unit="%"
+                                  Minimum="25"
+                                  Maximum="200"
+                                  Step="5"
+                                  MajorEvery="5"
+                                  TickSpacing="10"
+                                  Value="{Binding RulerZoom, Mode=TwoWay}"
+                                  FormatString="0" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Vela.Avalonia.Gallery.Services;
+using Vela.Avalonia.Gallery.ViewModels;
 using Vela.Avalonia.Tokens;
 
 namespace Vela.Avalonia.Gallery;
@@ -17,13 +19,18 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        var shell = new GalleryShellService();
+        var mainVm = new MainViewModel(shell);
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            desktop.MainWindow = new MainWindow(shell, mainVm);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            singleViewPlatform.MainView = new MainView();
+            var mainView = new MainView();
+            mainView.Initialize(shell, mainVm);
+            singleViewPlatform.MainView = mainView;
         }
 
         base.OnFrameworkInitializationCompleted();

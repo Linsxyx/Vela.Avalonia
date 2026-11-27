@@ -6,5 +6,6 @@
   <Application.Styles>
     <FluentTheme />
     <vela:VelaTheme Accent="Violet" />
+    <StyleInclude Source="avares://Vela.Avalonia.Gallery.Shared/Styles/GalleryStyles.axaml" />
   </Application.Styles>
 </Application>

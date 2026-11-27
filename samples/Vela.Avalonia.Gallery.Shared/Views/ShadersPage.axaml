@@ -1,0 +1,182 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.ShadersPage"
+             x:DataType="vm:ShadersViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot" ClipToBounds="False">
+      <TextBlock Classes="pageTitle" Text="Shaders &amp; Glass" />
+
+      <!-- 1. VelaLiquidGlass Interactive Optical Stage + Tuning -->
+      <Border Classes="card" ClipToBounds="False">
+        <StackPanel Spacing="18" ClipToBounds="False">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="cardTitle" Text="VelaLiquidGlass" VerticalAlignment="Center" />
+            <vela:VelaSwitch Grid.Column="1"
+                             Content="SDF Refraction"
+                             IsChecked="{Binding EnableRefraction, Mode=TwoWay}" />
+          </Grid>
+
+          <Border CornerRadius="16"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  ClipToBounds="True"
+                  Height="290">
+            <Grid>
+              <Border>
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="#EEF2FF" Offset="0" />
+                    <GradientStop Color="#FCE7F3" Offset="0.48" />
+                    <GradientStop Color="#FEF3C7" Offset="1" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+
+              <Canvas IsHitTestVisible="False">
+                <Ellipse Canvas.Left="46" Canvas.Top="24" Width="160" Height="160" Fill="#FF7747FF" Opacity="0.82" />
+                <Ellipse Canvas.Left="210" Canvas.Top="110" Width="180" Height="180" Fill="#FF0562EF" Opacity="0.72" />
+                <Ellipse Canvas.Left="430" Canvas.Top="20" Width="150" Height="150" Fill="#FFEC4899" Opacity="0.75" />
+                <Ellipse Canvas.Left="590" Canvas.Top="100" Width="200" Height="200" Fill="#FF0DB879" Opacity="0.70" />
+                <Border Canvas.Left="110" Canvas.Top="56" Width="620" Height="12" CornerRadius="6" Background="#FF18181B" Opacity="0.82" />
+                <Border Canvas.Left="110" Canvas.Top="86" Width="540" Height="12" CornerRadius="6" Background="#FFF59E0B" Opacity="0.92" />
+                <Border Canvas.Left="110" Canvas.Top="116" Width="580" Height="12" CornerRadius="6" Background="#FF18181B" Opacity="0.82" />
+                <TextBlock Canvas.Left="84" Canvas.Top="168"
+                           Text="LIQUID GLASS · GPU"
+                           FontSize="42"
+                           FontWeight="Bold"
+                           Foreground="#FF18181B"
+                           Opacity="0.86" />
+              </Canvas>
+
+              <Canvas x:Name="GlassStageCanvas">
+                <vela:VelaLiquidGlass x:Name="DraggableGlassPill"
+                                      Canvas.Left="260"
+                                      Canvas.Top="64"
+                                      Width="248"
+                                      Height="104"
+                                      CornerRadius="52"
+                                      EnableRefraction="{Binding EnableRefraction}"
+                                      BlurRadius="{Binding BlurRadius}"
+                                      BevelWidth="{Binding BevelWidth}"
+                                      Refraction="{Binding Refraction}"
+                                      Dispersion="{Binding Dispersion}"
+                                      Specular="0.95"
+                                      Cursor="SizeAll"
+                                      PointerPressed="OnGlassDragStart"
+                                      PointerMoved="OnGlassDragMove"
+                                      PointerReleased="OnGlassDragEnd">
+                  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Drag Me" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                    <TextBlock Text="SkSL SDF Lens" FontSize="11.5" Opacity="0.75" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </vela:VelaLiquidGlass>
+
+                <vela:VelaLiquidGlass Canvas.Left="20"
+                                      Canvas.Top="224"
+                                      CornerRadius="999"
+                                      Padding="12,6"
+                                      EnableRefraction="{Binding EnableRefraction}"
+                                      BlurRadius="{Binding BlurRadius}"
+                                      BevelWidth="14"
+                                      Refraction="{Binding Refraction}"
+                                      Dispersion="{Binding Dispersion}"
+                                      Specular="0.9">
+                  <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <vela:VelaBadge Tone="Success" ShowDot="True" IsPill="True" Content="Skia GPU" />
+                    <TextBlock Text="Glass Pill" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" />
+                  </StackPanel>
+                </vela:VelaLiquidGlass>
+              </Canvas>
+            </Grid>
+          </Border>
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="24" RowDefinitions="Auto,Auto" RowSpacing="20" ClipToBounds="False">
+            <vela:VelaElasticSlider Label="Blur"
+                                    Minimum="0"
+                                    Maximum="20"
+                                    Value="{Binding BlurRadius, Mode=TwoWay}"
+                                    Step="1"
+                                    ValueSuffix=" px" />
+            <vela:VelaElasticSlider Grid.Column="1"
+                                    Label="Bevel"
+                                    Minimum="4"
+                                    Maximum="36"
+                                    Value="{Binding BevelWidth, Mode=TwoWay}"
+                                    Step="1"
+                                    ValueSuffix=" px" />
+            <vela:VelaElasticSlider Grid.Row="1"
+                                    Label="Refraction"
+                                    Minimum="0"
+                                    Maximum="140"
+                                    Value="{Binding RefractionPercent, Mode=TwoWay}"
+                                    Step="5"
+                                    ValueSuffix="%" />
+            <vela:VelaElasticSlider Grid.Row="1"
+                                    Grid.Column="1"
+                                    Label="Dispersion"
+                                    Minimum="0"
+                                    Maximum="140"
+                                    Value="{Binding DispersionPercent, Mode=TwoWay}"
+                                    Step="5"
+                                    ValueSuffix="%" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- 2. VelaShaderBackground × VelaLiquidGlass -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <TextBlock Classes="cardTitle" Text="VelaShaderBackground" VerticalAlignment="Center" />
+            <vela:VelaSegmentedControl Grid.Column="1" SelectedIndex="{Binding ShaderPresetIndex, Mode=TwoWay}">
+              <x:String>Mesh</x:String>
+              <x:String>Aurora</x:String>
+              <x:String>Silk</x:String>
+            </vela:VelaSegmentedControl>
+          </Grid>
+
+          <Border Height="208"
+                  CornerRadius="14"
+                  BorderBrush="{DynamicResource VelaBorderBrush}"
+                  BorderThickness="1"
+                  ClipToBounds="True">
+            <Grid>
+              <vela:VelaShaderBackground Preset="{Binding ShaderPreset}"
+                                         IsAnimated="{Binding AnimateShader}"
+                                         PrimaryColor="{Binding ShaderPrimaryColor}"
+                                         Speed="1.0"
+                                         Intensity="0.85" />
+
+              <vela:VelaLiquidGlass HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    CornerRadius="20"
+                                    Padding="22,14"
+                                    BlurRadius="12"
+                                    BevelWidth="18"
+                                    Refraction="0.8"
+                                    Dispersion="0.6">
+                <TextBlock Text="SkSL Fluid × Liquid Glass"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center" />
+              </vela:VelaLiquidGlass>
+            </Grid>
+          </Border>
+
+          <WrapPanel Orientation="Horizontal" ItemSpacing="16" LineSpacing="10">
+            <vela:VelaSwitch Content="Animate" IsChecked="{Binding AnimateShader, Mode=TwoWay}" />
+            <vela:VelaColorPicker Label="Tint"
+                                  SelectedColor="{Binding PickerTintColor, Mode=TwoWay}"
+                                  ShowAlpha="False" />
+            <vela:VelaButton Variant="Ghost"
+                             Size="Small"
+                             Content="Sync Theme Accent"
+                             Command="{Binding SyncShaderToThemeCommand}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

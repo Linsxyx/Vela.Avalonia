@@ -1,0 +1,141 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.DataDisplayPage"
+             x:DataType="vm:DataDisplayViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="pageTitle" Text="Data Display" VerticalAlignment="Center" />
+        <vela:VelaButton Grid.Column="1"
+                         Variant="Secondary"
+                         Size="Small"
+                         Content="Simulate KPIs"
+                         Command="{Binding SimulateMetricsCommand}" />
+      </Grid>
+
+      <!-- Row 1: VelaMetricCard -->
+      <UniformGrid Columns="3" ColumnSpacing="14">
+        <vela:VelaMetricCard Label="Revenue"
+                             Value="{Binding Revenue}"
+                             Prefix="$"
+                             Delta="+18.4%"
+                             DeltaTone="Success"
+                             Caption="vs. last 30d"
+                             Icon="{DynamicResource VelaIconTrendingUp}" />
+        <vela:VelaMetricCard Label="Active Desktops"
+                             Value="{Binding ActiveUsers}"
+                             Delta="+6.2%"
+                             DeltaTone="Info"
+                             Caption="macOS · Win · Linux"
+                             Icon="{DynamicResource VelaIconCompass}" />
+        <vela:VelaMetricCard Label="Switch Latency"
+                             Value="{Binding SwitchLatency}"
+                             Suffix=" ms"
+                             Decimals="2"
+                             Delta="-94%"
+                             DeltaTone="Accent"
+                             Caption="KeepAlive"
+                             Icon="{DynamicResource VelaIconSparkles}" />
+      </UniformGrid>
+
+      <!-- Row 2: Avatar + Badge -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaAvatar &amp; Group" VerticalAlignment="Center" />
+              <vela:VelaButton Grid.Column="1"
+                               Variant="Secondary"
+                               Size="Small"
+                               Content="Cycle Status"
+                               Command="{Binding CycleAvatarStatusCommand}" />
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+              <vela:VelaAvatar DisplayName="Ada Lovelace" Size="Large" Tone="Accent" Status="{Binding AvatarStatus}" />
+              <vela:VelaAvatar DisplayName="Grace Hopper" Size="Medium" Tone="Teal" Status="Away" />
+              <vela:VelaAvatar DisplayName="Alan Turing" Size="Medium" Tone="Sky" Status="Busy" />
+              <vela:VelaAvatar DisplayName="Linus Torvalds" Size="Small" Tone="Violet" Status="Offline" />
+            </StackPanel>
+
+            <vela:VelaAvatarGroup MaxVisible="4" Size="Medium">
+              <vela:VelaAvatar DisplayName="Elena Vance" Tone="Accent" />
+              <vela:VelaAvatar DisplayName="Marcus Chen" Tone="Teal" />
+              <vela:VelaAvatar DisplayName="Sofia Lind" Tone="Rose" />
+              <vela:VelaAvatar DisplayName="Kenji Sato" Tone="Sky" />
+              <vela:VelaAvatar DisplayName="Nadia Omar" Tone="Amber" />
+              <vela:VelaAvatar DisplayName="Liam Park" Tone="Violet" />
+            </vela:VelaAvatarGroup>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="cardTitle" Text="VelaBadge" />
+
+            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+              <vela:VelaBadge Tone="Neutral" Content="Neutral" />
+              <vela:VelaBadge Tone="Accent" Content="Accent" />
+              <vela:VelaBadge Tone="Success" ShowDot="True" IsPill="True" Content="Operational" />
+              <vela:VelaBadge Tone="Warning" ShowDot="True" IsPill="True" Content="Degraded" />
+              <vela:VelaBadge Tone="Danger" ShowDot="True" IsPill="True" Content="Outage" />
+              <vela:VelaBadge Tone="Info" IsOutline="True" Content="v0.1.0" />
+              <vela:VelaBadge Tone="Neutral" Size="Small" IsOutline="True" Content="Small" />
+              <vela:VelaBadge Tone="Accent" Size="Large" IsPill="True" Content="Large Pill" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Row 3: SettingsGroup + EmptyState -->
+      <Grid ColumnDefinitions="1.25*,0.75*" ColumnSpacing="16">
+        <vela:VelaSettingsGroup Header="VelaSettingsGroup">
+          <vela:VelaSettingsGroup.HeaderAction>
+            <vela:VelaBadge Tone="Success" IsPill="True" Content="Synced" />
+          </vela:VelaSettingsGroup.HeaderAction>
+
+          <vela:VelaSettingsRow Icon="{DynamicResource VelaIconGlobe}" Title="API Endpoint">
+            <vela:VelaCopyButton CopyText="https://api.vela.dev/v1" Label="Copy" Copied="OnCopied" />
+          </vela:VelaSettingsRow>
+
+          <vela:VelaSettingsRow Icon="{DynamicResource VelaIconBell}" Title="Notifications">
+            <vela:VelaSwitch IsChecked="True" />
+          </vela:VelaSettingsRow>
+
+          <vela:VelaSettingsRow Icon="{DynamicResource VelaIconShield}" Title="Renderer">
+            <vela:VelaSelect SelectedIndex="0" Width="156">
+              <x:String>Automatic (GPU)</x:String>
+              <x:String>High Contrast</x:String>
+              <x:String>Software Safe</x:String>
+            </vela:VelaSelect>
+          </vela:VelaSettingsRow>
+
+          <vela:VelaSettingsRow Icon="{DynamicResource VelaIconSettings}"
+                                Title="Diagnostics"
+                                IsClickable="True"
+                                ShowChevron="True"
+                                Command="{Binding OpenDiagnosticsCommand}">
+            <TextBlock Text="Healthy" FontSize="12" Foreground="{DynamicResource VelaTextMutedBrush}" VerticalAlignment="Center" />
+          </vela:VelaSettingsRow>
+        </vela:VelaSettingsGroup>
+
+        <Border Grid.Column="1" Classes="card" Padding="16">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaEmptyState" VerticalAlignment="Center" />
+              <vela:VelaButton Grid.Column="1" Variant="Ghost" Size="Small" Content="Switch" Command="{Binding CycleEmptyStateCommand}" />
+            </Grid>
+
+            <vela:VelaEmptyState Icon="{Binding EmptyIcon}"
+                                 Title="{Binding EmptyTitle}"
+                                 Description="{Binding EmptyDescription}">
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="Create Workflow" Command="{Binding CreateWorkflowCommand}" />
+            </vela:VelaEmptyState>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

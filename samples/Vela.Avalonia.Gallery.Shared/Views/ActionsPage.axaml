@@ -1,0 +1,193 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.ActionsPage"
+             x:DataType="vm:ActionsViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <TextBlock Classes="pageTitle" Text="Actions" />
+
+      <!-- Row 1: VelaButton + VelaSplitButton / VelaCopyButton -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="cardTitle" Text="VelaButton" />
+
+            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+              <vela:VelaButton Variant="Primary" Content="Primary" />
+              <vela:VelaButton Variant="Secondary" Content="Secondary" />
+              <vela:VelaButton Variant="Ghost" Content="Ghost" />
+              <vela:VelaButton Variant="Danger" Content="Danger" />
+              <vela:VelaButton Variant="Secondary" Content="Disabled" IsEnabled="False" />
+            </WrapPanel>
+
+            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+              <vela:VelaButton Variant="Primary"
+                               IsLoading="{Binding IsSaving}"
+                               Content="{Binding SaveButtonText}"
+                               Command="{Binding SaveChangesCommand}" />
+              <vela:VelaButton Variant="Secondary" Size="Small" Content="Small" />
+              <vela:VelaButton Variant="Secondary" Size="Large" Content="Large" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaSplitButton &amp; VelaCopyButton" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Classes="statusText" Text="{Binding SplitStatus}" VerticalAlignment="Center" />
+            </Grid>
+
+            <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10">
+              <vela:VelaSplitButton Variant="Primary"
+                                    LeadingIcon="{DynamicResource VelaIconRocket}"
+                                    Content="{Binding SplitButtonLabel}"
+                                    Command="{Binding ExecuteSplitPrimaryCommand}">
+                <vela:VelaMenuItem Header="Production" Icon="{DynamicResource VelaIconRocket}" Shortcut="⌘⏎" Click="OnSplitProdClick" />
+                <vela:VelaMenuItem Header="Staging" Icon="{DynamicResource VelaIconGlobe}" Shortcut="⇧⌘⏎" Click="OnSplitStagingClick" />
+                <vela:VelaMenuItem Header="Download" Icon="{DynamicResource VelaIconDownload}" Click="OnSplitDownloadClick" />
+                <vela:VelaMenuItem IsSeparator="True" />
+                <vela:VelaMenuItem Header="Rollback" Icon="{DynamicResource VelaIconTrash}" IsDestructive="True" Click="OnSplitRollbackClick" />
+              </vela:VelaSplitButton>
+
+              <vela:VelaSplitButton Variant="Secondary"
+                                    LeadingIcon="{DynamicResource VelaIconShare}"
+                                    Content="Share"
+                                    Command="{Binding SplitShareCommand}">
+                <vela:VelaMenuItem Header="Copy Link" Icon="{DynamicResource VelaIconCopy}" Click="OnSplitCopyLinkClick" />
+                <vela:VelaMenuItem Header="Export Markdown" Icon="{DynamicResource VelaIconEdit}" Click="OnSplitExportMdClick" />
+              </vela:VelaSplitButton>
+            </WrapPanel>
+
+            <Border Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="10,6">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <TextBlock Text="dotnet add package Vela.Avalonia"
+                           FontFamily="JetBrains Mono, Menlo, Consolas, monospace"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+                <vela:VelaCopyButton Grid.Column="1"
+                                     CopyText="dotnet add package Vela.Avalonia"
+                                     IconOnly="True"
+                                     Variant="Plain"
+                                     Copied="OnCopied" />
+              </Grid>
+            </Border>
+
+            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+              <vela:VelaCopyButton CopyText="vela_live_9f8a2c4b71e0" Label="Copy API key" Copied="OnCopied" />
+              <vela:VelaCopyButton CopyText="Vela.Avalonia 12.2" Label="Copy" Variant="Plain" Copied="OnCopied" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Row 2: VelaConfirmMorph + VelaHoldToConfirm -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="cardTitle" Text="VelaConfirmMorph" />
+
+            <StackPanel Spacing="10">
+              <vela:VelaConfirmMorph IdleText="Delete branch"
+                                     Icon="{DynamicResource VelaIconTrash}"
+                                     PromptText="Delete main-v2?"
+                                     ConfirmText="Delete"
+                                     CancelText="Cancel"
+                                     BusyText="Deleting..."
+                                     DoneText="Deleted"
+                                     UndoText="Undo"
+                                     Confirmed="OnBranchDeleted"
+                                     Undone="OnBranchRestored" />
+
+              <vela:VelaConfirmMorph IdleText="Purge cache"
+                                     PromptText="Clear cached pages?"
+                                     ConfirmText="Purge"
+                                     BusyText="Purging..."
+                                     DoneText="Purged"
+                                     UndoText="Restore" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="cardTitle" Text="VelaHoldToConfirm" VerticalAlignment="Center" />
+              <vela:VelaButton Grid.Column="1"
+                               Variant="Ghost"
+                               Size="Small"
+                               Content="Reset"
+                               Command="{Binding ResetAllHoldCommand}" />
+            </Grid>
+
+            <StackPanel Spacing="8">
+              <vela:VelaHoldToConfirm x:Name="HoldDangerBtn"
+                                      Tone="Danger"
+                                      Label="Hold to purge cache"
+                                      ConfirmedLabel="Purged"
+                                      DurationMs="1000"
+                                      HoldChanged="OnHoldChanged"
+                                      Confirmed="OnHoldPurgeConfirmed" />
+              <vela:VelaHoldToConfirm x:Name="HoldAccentBtn"
+                                      Tone="Accent"
+                                      Icon="{DynamicResource VelaIconRocket}"
+                                      Label="Hold to publish v1.0"
+                                      ConfirmedLabel="Published"
+                                      DurationMs="1100"
+                                      HoldChanged="OnHoldChanged"
+                                      Confirmed="OnHoldPublishConfirmed" />
+              <vela:VelaHoldToConfirm x:Name="HoldNeutralBtn"
+                                      Tone="Neutral"
+                                      Icon="{DynamicResource VelaIconShield}"
+                                      Label="Hold to seal archive"
+                                      ConfirmedLabel="Sealed"
+                                      DurationMs="900"
+                                      HoldChanged="OnHoldChanged"
+                                      Confirmed="OnHoldSealConfirmed" />
+            </StackPanel>
+
+            <TextBlock Classes="statusText" Text="{Binding HoldStatus}" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Row 3: VelaFloatingBar -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="cardTitle" Text="VelaFloatingBar" />
+
+          <Border CornerRadius="14" Height="104" ClipToBounds="True">
+            <Grid>
+              <Border>
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="#7747FF" Offset="0" />
+                    <GradientStop Color="#EC4899" Offset="0.52" />
+                    <GradientStop Color="#F59E0B" Offset="1" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+
+              <vela:VelaFloatingBar HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    UseLiquidGlass="True">
+                <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconEdit}" Label="Edit" Click="OnFloatingEditClick" />
+                <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconCopy}" Label="Copy" Click="OnFloatingCopyClick" />
+                <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconShare}" Label="Share" IsToggle="True" />
+                <vela:VelaFloatingBarItem IsSeparator="True" />
+                <vela:VelaFloatingBarItem Icon="{DynamicResource VelaIconTrash}" ToolTipText="Delete" Click="OnFloatingDeleteClick" />
+              </vela:VelaFloatingBar>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
