@@ -188,12 +188,22 @@ public class VelaDialogHost : ContentControl
         base.OnApplyTemplate(e);
     }
 
+    private TopLevel? _attachedTopLevel;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         EnsureOverlayInitialized();
+        if (_attachedTopLevel is not null)
+        {
+            _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+            _attachedTopLevel = null;
+        }
         if (TopLevel.GetTopLevel(this) is TopLevel topLevel)
+        {
+            _attachedTopLevel = topLevel;
             topLevel.AddHandler(KeyDownEvent, OnTopLevelKeyDown, RoutingStrategies.Tunnel);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -201,8 +211,11 @@ public class VelaDialogHost : ContentControl
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
         DisposeShellBindings();
-        if (TopLevel.GetTopLevel(this) is TopLevel topLevel)
-            topLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+        if (_attachedTopLevel is not null)
+        {
+            _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+            _attachedTopLevel = null;
+        }
     }
 
     private void EnsureOverlayInitialized()
@@ -570,6 +583,7 @@ public class VelaDialogHost : ContentControl
                     CornerRadius = cornerRadius,
                     ClipToBounds = true,
                     BackdropEffect = new BlurEffect { Radius = 16 },
+                    BackdropEffectCache = new RetainedBackdropEffectCache(),
                     Child = chrome,
                     [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaLiquidGlassTintBrush"),
                 };

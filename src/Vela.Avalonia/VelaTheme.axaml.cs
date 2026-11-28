@@ -15,13 +15,13 @@ namespace Vela.Avalonia;
 /// </summary>
 public class VelaTheme : Styles, ISupportInitialize
 {
-    private static readonly (VelaThemeModules Flag, Func<ResourceDictionary> Factory)[] ModuleDescriptors =
+    private static readonly (VelaThemeModules Flag, Func<IServiceProvider, ResourceDictionary> Factory)[] ModuleDescriptors =
     [
-        (VelaThemeModules.Core, static () => new VelaCoreModule()),
-        (VelaThemeModules.Shell, static () => new VelaShellModule()),
-        (VelaThemeModules.Inputs, static () => new VelaInputsModule()),
-        (VelaThemeModules.DataViews, static () => new VelaDataViewsModule()),
-        (VelaThemeModules.Glass, static () => new VelaGlassModule()),
+        (VelaThemeModules.Core, static sp => new VelaCoreModule(sp)),
+        (VelaThemeModules.Shell, static sp => new VelaShellModule(sp)),
+        (VelaThemeModules.Inputs, static sp => new VelaInputsModule(sp)),
+        (VelaThemeModules.DataViews, static sp => new VelaDataViewsModule(sp)),
+        (VelaThemeModules.Glass, static sp => new VelaGlassModule(sp)),
     ];
 
     public static readonly StyledProperty<VelaAccent> AccentProperty =
@@ -38,6 +38,7 @@ public class VelaTheme : Styles, ISupportInitialize
     private readonly Dictionary<VelaThemeModules, ResourceDictionary> _moduleDictionaries = new();
 
     private bool _isInitializing;
+    private bool _accentDirtyDuringInit;
     private bool _modulesSynchronized;
     private VelaThemeModules _loadedModules = VelaThemeModules.None;
 
@@ -67,7 +68,12 @@ public class VelaTheme : Styles, ISupportInitialize
         AccentProperty.Changed.AddClassHandler<VelaTheme>((theme, e) =>
         {
             if (e.NewValue is VelaAccent next)
-                theme.ApplyAccent(next);
+            {
+                if (theme._isInitializing)
+                    theme._accentDirtyDuringInit = true;
+                else
+                    theme.ApplyAccent(next);
+            }
         });
 
         ModulesProperty.Changed.AddClassHandler<VelaTheme>((theme, _) =>
@@ -100,6 +106,11 @@ public class VelaTheme : Styles, ISupportInitialize
     public void EndInit()
     {
         _isInitializing = false;
+        if (_accentDirtyDuringInit)
+        {
+            _accentDirtyDuringInit = false;
+            ApplyAccent(Accent);
+        }
         SyncModules();
     }
 
@@ -153,7 +164,7 @@ public class VelaTheme : Styles, ISupportInitialize
             {
                 if (!_moduleDictionaries.TryGetValue(flag, out var dict))
                 {
-                    dict = factory();
+                    dict = factory(new VelaModuleServiceProvider(Resources));
                     _moduleDictionaries[flag] = dict;
                 }
 
@@ -171,7 +182,7 @@ public class VelaTheme : Styles, ISupportInitialize
             }
             else if (!shouldBeLoaded && isLoaded)
             {
-                if (_moduleDictionaries.TryGetValue(flag, out var dict))
+                if (_moduleDictionaries.Remove(flag, out var dict))
                 {
                     var idx = merged.IndexOf(dict);
                     if (idx >= 0)
@@ -189,8 +200,24 @@ public class VelaTheme : Styles, ISupportInitialize
 
     private void ApplyAccent(VelaAccent accent)
     {
-        UpdateAccentDictionary(_lightAccentDict, VelaAccentPalettes.Get(accent, isDark: false));
-        UpdateAccentDictionary(_darkAccentDict, VelaAccentPalettes.Get(accent, isDark: true));
+        // Detach _accentOverlay while batch-updating 26 Color keys so Avalonia performs a single
+        // NotifyHostedResourcesChanged sweep on re-attach instead of 26 full-tree invalidations.
+        var merged = Resources.MergedDictionaries;
+        var overlayIndex = merged.IndexOf(_accentOverlay);
+        if (overlayIndex >= 0)
+            merged.RemoveAt(overlayIndex);
+
+        try
+        {
+            UpdateAccentDictionary(_lightAccentDict, VelaAccentPalettes.Get(accent, isDark: false));
+            UpdateAccentDictionary(_darkAccentDict, VelaAccentPalettes.Get(accent, isDark: true));
+        }
+        finally
+        {
+            if (overlayIndex >= 0)
+                merged.Add(_accentOverlay);
+        }
+
         AccentChanged?.Invoke(this, accent);
     }
 

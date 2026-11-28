@@ -25,7 +25,7 @@
     </Setter>
 
     <Style Selector="^:circle">
-      <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusPill}" />
+      <Setter Property="CornerRadius" Value="{StaticResource VelaRadiusPill}" />
     </Style>
 
     <Style Selector="^:loading /template/ ContentPresenter#PART_Content">

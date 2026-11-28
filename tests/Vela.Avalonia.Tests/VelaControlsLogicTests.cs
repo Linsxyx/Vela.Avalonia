@@ -145,7 +145,7 @@ public class VelaControlsLogicTests
     public void VelaGlassCard_HasSukiInspiredDefaults()
     {
         var card = new VelaGlassCard();
-        Assert.Equal(80.0, card.BlurRadius);
+        Assert.Equal(32.0, card.BlurRadius);
         Assert.True(card.BlurBackground);
         Assert.Equal(VelaGlassTintLevel.HighContrast, card.TintLevel);
         Assert.Equal(new Thickness(1.2), card.RimThickness);

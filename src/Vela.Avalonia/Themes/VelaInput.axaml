@@ -11,7 +11,7 @@
     <Setter Property="CaretBrush" Value="{DynamicResource VelaForegroundBrush}" />
     <Setter Property="SelectionBrush" Value="{DynamicResource VelaAccentSubtleBrush}" />
     <Setter Property="SelectionForegroundBrush" Value="{DynamicResource VelaForegroundBrush}" />
-    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontSize" Value="{StaticResource VelaTextSm}" />
     <Setter Property="MinHeight" Value="40" />
     <Setter Property="Padding" Value="12,0" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -20,7 +20,7 @@
         <StackPanel Spacing="6">
           <!-- Optional Label -->
           <TextBlock Text="{TemplateBinding Label}"
-                     FontSize="{DynamicResource VelaTextSm}"
+                     FontSize="{StaticResource VelaTextSm}"
                      FontWeight="Medium"
                      Foreground="{DynamicResource VelaForegroundBrush}"
                      IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
@@ -60,7 +60,7 @@
               <!-- Clear Button (when IsClearable & non-empty) -->
               <Button x:Name="PART_ClearButton"
                       DockPanel.Dock="Right"
-                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Theme="{StaticResource VelaIconButtonTheme}"
                       Width="22"
                       Height="22"
                       Margin="6,0,-2,0"
@@ -69,7 +69,7 @@
                       IsVisible="False">
                 <PathIcon Width="12"
                           Height="12"
-                          Data="{DynamicResource VelaIconClose}"
+                          Data="{StaticResource VelaIconClose}"
                           Foreground="{DynamicResource VelaTextMutedBrush}" />
               </Button>
 
@@ -115,7 +115,7 @@
 
           <!-- Error message (takes precedence over description) -->
           <TextBlock Text="{TemplateBinding ErrorMessage}"
-                     FontSize="{DynamicResource VelaTextXs}"
+                     FontSize="{StaticResource VelaTextXs}"
                      Foreground="{DynamicResource VelaDangerBrush}"
                      TextWrapping="Wrap"
                      IsVisible="{TemplateBinding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
@@ -123,7 +123,7 @@
           <!-- Supporting description -->
           <TextBlock x:Name="PART_Description"
                      Text="{TemplateBinding Description}"
-                     FontSize="{DynamicResource VelaTextXs}"
+                     FontSize="{StaticResource VelaTextXs}"
                      Foreground="{DynamicResource VelaTextMutedBrush}"
                      TextWrapping="Wrap"
                      IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

@@ -269,6 +269,25 @@ public sealed class VelaLiquidGlassLens : Control
 
             canvas.Save();
             canvas.ClipRoundRect(rrect, SKClipOperation.Intersect, antialias: true);
+
+            // Clip out the flat optical interior where edgeDist >= effectiveBevel so the SkSL
+            // fragment shader only executes on the refractive bezel band (saves 80%+ fragment work).
+            var inset = effectiveBevel + 1.0f;
+            if (w > inset * 2.0f + 2.0f && h > inset * 2.0f + 2.0f)
+            {
+                var innerRect = new SKRect(inset, inset, w - inset, h - inset);
+                var innerRadii = new SKPoint[4]
+                {
+                    new(MathF.Max(0f, radii[0] - inset), MathF.Max(0f, radii[0] - inset)),
+                    new(MathF.Max(0f, radii[1] - inset), MathF.Max(0f, radii[1] - inset)),
+                    new(MathF.Max(0f, radii[2] - inset), MathF.Max(0f, radii[2] - inset)),
+                    new(MathF.Max(0f, radii[3] - inset), MathF.Max(0f, radii[3] - inset)),
+                };
+                using var innerRRect = new SKRoundRect();
+                innerRRect.SetRectRadii(innerRect, innerRadii);
+                canvas.ClipRoundRect(innerRRect, SKClipOperation.Difference, antialias: false);
+            }
+
             canvas.DrawRect(localRect, paint);
             canvas.Restore();
         }
@@ -414,8 +433,17 @@ public class VelaLiquidGlass : ContentControl
     private void SyncBlurEffect()
     {
         if (_backdropHost is null) return;
-        _backdropHost.BackdropEffect = BlurRadius > 0.1
-            ? new BlurEffect { Radius = BlurRadius }
-            : null;
+        _backdropHost.BackdropEffectCache ??= new RetainedBackdropEffectCache();
+        if (BlurRadius > 0.1)
+        {
+            if (_backdropHost.BackdropEffect is BlurEffect existing)
+                existing.Radius = BlurRadius;
+            else
+                _backdropHost.BackdropEffect = new BlurEffect { Radius = BlurRadius };
+        }
+        else
+        {
+            _backdropHost.BackdropEffect = null;
+        }
     }
 }

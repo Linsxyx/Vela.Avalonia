@@ -22,7 +22,7 @@
                       Height="17"
                       VerticalAlignment="Top"
                       Margin="0,1,0,0"
-                      Data="{DynamicResource VelaIconInfo}"
+                      Data="{StaticResource VelaIconInfo}"
                       Foreground="{DynamicResource VelaInfoBrush}" />
 
             <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
@@ -46,7 +46,7 @@
 
             <Button x:Name="PART_DismissButton"
                     Grid.Column="3"
-                    Theme="{DynamicResource VelaIconButtonTheme}"
+                    Theme="{StaticResource VelaIconButtonTheme}"
                     Width="26"
                     Height="26"
                     CornerRadius="999"
@@ -55,7 +55,7 @@
                     IsVisible="{TemplateBinding IsDismissible}">
               <PathIcon Width="12"
                         Height="12"
-                        Data="{DynamicResource VelaIconClose}"
+                        Data="{StaticResource VelaIconClose}"
                         Foreground="{DynamicResource VelaTextMutedBrush}" />
             </Button>
           </Grid>
@@ -64,19 +64,19 @@
     </Setter>
 
     <Style Selector="^:info /template/ PathIcon#PART_ToneIcon">
-      <Setter Property="Data" Value="{DynamicResource VelaIconInfo}" />
+      <Setter Property="Data" Value="{StaticResource VelaIconInfo}" />
       <Setter Property="Foreground" Value="{DynamicResource VelaInfoBrush}" />
     </Style>
     <Style Selector="^:success /template/ PathIcon#PART_ToneIcon">
-      <Setter Property="Data" Value="{DynamicResource VelaIconCheckCircle}" />
+      <Setter Property="Data" Value="{StaticResource VelaIconCheckCircle}" />
       <Setter Property="Foreground" Value="{DynamicResource VelaSuccessBrush}" />
     </Style>
     <Style Selector="^:warning /template/ PathIcon#PART_ToneIcon">
-      <Setter Property="Data" Value="{DynamicResource VelaIconAlertCircle}" />
+      <Setter Property="Data" Value="{StaticResource VelaIconAlertCircle}" />
       <Setter Property="Foreground" Value="{DynamicResource VelaWarningBrush}" />
     </Style>
     <Style Selector="^:danger /template/ PathIcon#PART_ToneIcon">
-      <Setter Property="Data" Value="{DynamicResource VelaIconAlertCircle}" />
+      <Setter Property="Data" Value="{StaticResource VelaIconAlertCircle}" />
       <Setter Property="Foreground" Value="{DynamicResource VelaDangerBrush}" />
     </Style>
   </ControlTheme>

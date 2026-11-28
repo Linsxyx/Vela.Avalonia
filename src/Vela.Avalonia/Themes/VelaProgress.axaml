@@ -4,7 +4,7 @@
 
   <ControlTheme x:Key="{x:Type controls:VelaProgress}" TargetType="controls:VelaProgress">
     <Setter Property="Foreground" Value="{DynamicResource VelaTextSecondaryBrush}" />
-    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontSize" Value="{StaticResource VelaTextSm}" />
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Spacing="8">
@@ -24,7 +24,7 @@
               <PathIcon x:Name="PART_DoneIcon"
                         Width="14"
                         Height="14"
-                        Data="{DynamicResource VelaIconCheckCircle}"
+                        Data="{StaticResource VelaIconCheckCircle}"
                         Foreground="{DynamicResource VelaSuccessBrush}"
                         IsVisible="False" />
               <TextBlock x:Name="PART_Percent"
@@ -40,14 +40,14 @@
           <!-- 7px pill track -->
           <Border x:Name="PART_Track"
                   Height="7"
-                  CornerRadius="{DynamicResource VelaRadiusPill}"
+                  CornerRadius="{StaticResource VelaRadiusPill}"
                   Background="{DynamicResource VelaSurfaceMutedBrush}"
                   BorderBrush="{DynamicResource VelaBorderBrush}"
                   BorderThickness="1"
                   ClipToBounds="True">
             <Grid>
               <Border x:Name="PART_Fill"
-                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      CornerRadius="{StaticResource VelaRadiusPill}"
                       Background="{DynamicResource VelaAccentBrush}">
                 <Border.Transitions>
                   <Transitions>
@@ -60,7 +60,7 @@
               <Border x:Name="PART_IndeterminateBar"
                       Width="110"
                       HorizontalAlignment="Left"
-                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      CornerRadius="{StaticResource VelaRadiusPill}"
                       Background="{DynamicResource VelaAccentBrush}"
                       IsVisible="False">
                 <Border.RenderTransform>

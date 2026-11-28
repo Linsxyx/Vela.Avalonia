@@ -40,7 +40,26 @@ public sealed class VelaShaderEffect
         ("iColor3", "uniform float3 iColor3;"),
     ];
 
+    [Flags]
+    private enum ShaderUniformMask
+    {
+        None = 0,
+        Resolution = 1 << 0,
+        Time = 1 << 1,
+        Preset = 1 << 2,
+        Intensity = 1 << 3,
+        IsDark = 1 << 4,
+        Alpha = 1 << 5,
+        Base = 1 << 6,
+        Color1 = 1 << 7,
+        Color2 = 1 << 8,
+        Color3 = 1 << 9,
+    }
+
+    internal const int MaxSourceCacheEntries = 64;
     private static readonly Dictionary<string, VelaShaderEffect> CacheBySource = new(StringComparer.Ordinal);
+    private static readonly LinkedList<string> CacheLruOrder = new();
+    private static readonly Dictionary<string, LinkedListNode<string>> CacheLruNodes = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, VelaShaderEffect> CacheByResource = new(StringComparer.OrdinalIgnoreCase);
     private static readonly object CacheLock = new();
     private static readonly object LifecycleLock = new();
@@ -50,7 +69,7 @@ public sealed class VelaShaderEffect
     private static readonly Lazy<VelaShaderEffect?> BuiltInAmbientLazy = new(CreateBuiltInAmbient);
 
     private readonly string _compiledSource;
-    private readonly HashSet<string> _declaredUniforms;
+    private readonly ShaderUniformMask _uniformMask;
 
     /// <summary>
     /// The underlying compiled Skia <see cref="SKRuntimeEffect"/>.
@@ -78,7 +97,25 @@ public sealed class VelaShaderEffect
         Effect = effect;
         _compiledSource = compiledSource;
         RawSource = rawSource;
-        _declaredUniforms = new HashSet<string>(effect.Uniforms, StringComparer.Ordinal);
+        ShaderUniformMask mask = ShaderUniformMask.None;
+        foreach (var name in effect.Uniforms)
+        {
+            mask |= name switch
+            {
+                "iResolution" => ShaderUniformMask.Resolution,
+                "iTime" => ShaderUniformMask.Time,
+                "iPreset" => ShaderUniformMask.Preset,
+                "iIntensity" => ShaderUniformMask.Intensity,
+                "iIsDark" => ShaderUniformMask.IsDark,
+                "iAlpha" => ShaderUniformMask.Alpha,
+                "iBase" => ShaderUniformMask.Base,
+                "iColor1" => ShaderUniformMask.Color1,
+                "iColor2" => ShaderUniformMask.Color2,
+                "iColor3" => ShaderUniformMask.Color3,
+                _ => ShaderUniformMask.None,
+            };
+        }
+        _uniformMask = mask;
     }
 
     /// <summary>
@@ -120,6 +157,11 @@ public sealed class VelaShaderEffect
 
             if (CacheBySource.TryGetValue(sksl, out var cached))
             {
+                if (CacheLruNodes.TryGetValue(sksl, out var node))
+                {
+                    CacheLruOrder.Remove(node);
+                    CacheLruOrder.AddLast(node);
+                }
                 effect = cached;
                 error = null;
                 return true;
@@ -136,6 +178,22 @@ public sealed class VelaShaderEffect
 
             var created = new VelaShaderEffect(compiled, prepared, sksl);
             CacheBySource[sksl] = created;
+            CacheLruNodes[sksl] = CacheLruOrder.AddLast(sksl);
+
+            while (CacheBySource.Count > MaxSourceCacheEntries && CacheLruOrder.First is { } oldest)
+            {
+                var oldestKey = oldest.Value;
+                CacheLruOrder.RemoveFirst();
+                CacheLruNodes.Remove(oldestKey);
+                if (CacheBySource.Remove(oldestKey, out var evicted))
+                {
+                    if (!BuiltInAmbientLazy.IsValueCreated || !ReferenceEquals(evicted, BuiltInAmbientLazy.Value))
+                    {
+                        evicted.Effect.Dispose();
+                    }
+                }
+            }
+
             effect = created;
             error = null;
             return true;
@@ -225,38 +283,38 @@ public sealed class VelaShaderEffect
 
         using var uniforms = new SKRuntimeEffectUniforms(Effect);
 
-        if (_declaredUniforms.Contains("iResolution"))
+        if ((_uniformMask & ShaderUniformMask.Resolution) != 0)
         {
             resBuf[0] = width;
             resBuf[1] = height;
             uniforms["iResolution"] = resBuf;
         }
 
-        if (_declaredUniforms.Contains("iTime"))
+        if ((_uniformMask & ShaderUniformMask.Time) != 0)
             uniforms["iTime"] = time;
 
-        if (_declaredUniforms.Contains("iPreset"))
+        if ((_uniformMask & ShaderUniformMask.Preset) != 0)
             uniforms["iPreset"] = (float)preset;
 
-        if (_declaredUniforms.Contains("iIntensity"))
+        if ((_uniformMask & ShaderUniformMask.Intensity) != 0)
             uniforms["iIntensity"] = intensity;
 
-        if (_declaredUniforms.Contains("iIsDark"))
+        if ((_uniformMask & ShaderUniformMask.IsDark) != 0)
             uniforms["iIsDark"] = isDark ? 1.0f : 0.0f;
 
-        if (_declaredUniforms.Contains("iAlpha"))
+        if ((_uniformMask & ShaderUniformMask.Alpha) != 0)
             uniforms["iAlpha"] = alpha;
 
-        if (_declaredUniforms.Contains("iBase"))
+        if ((_uniformMask & ShaderUniformMask.Base) != 0)
             uniforms["iBase"] = FillVec3(baseColor, vec3Buf);
 
-        if (_declaredUniforms.Contains("iColor1"))
+        if ((_uniformMask & ShaderUniformMask.Color1) != 0)
             uniforms["iColor1"] = FillVec3(color1, vec3Buf);
 
-        if (_declaredUniforms.Contains("iColor2"))
+        if ((_uniformMask & ShaderUniformMask.Color2) != 0)
             uniforms["iColor2"] = FillVec3(color2, vec3Buf);
 
-        if (_declaredUniforms.Contains("iColor3"))
+        if ((_uniformMask & ShaderUniformMask.Color3) != 0)
             uniforms["iColor3"] = FillVec3(color3, vec3Buf);
 
         return Effect.ToShader(uniforms);

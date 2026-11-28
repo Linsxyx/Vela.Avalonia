@@ -33,7 +33,27 @@ public readonly record struct VelaAccentPalette(
 
 public static class VelaAccentPalettes
 {
-    public static VelaAccentPalette Get(VelaAccent accent, bool isDark) => (accent, isDark) switch
+    private static readonly VelaAccentPalette[] Cache = BuildCache();
+
+    private static VelaAccentPalette[] BuildCache()
+    {
+        var values = Enum.GetValues<VelaAccent>();
+        var cache = new VelaAccentPalette[values.Length * 2];
+        for (var i = 0; i < values.Length; i++)
+        {
+            cache[i * 2] = Create(values[i], isDark: false);
+            cache[i * 2 + 1] = Create(values[i], isDark: true);
+        }
+        return cache;
+    }
+
+    public static VelaAccentPalette Get(VelaAccent accent, bool isDark)
+    {
+        var idx = ((int)accent << 1) | (isDark ? 1 : 0);
+        return (uint)idx < (uint)Cache.Length ? Cache[idx] : Create(accent, isDark);
+    }
+
+    private static VelaAccentPalette Create(VelaAccent accent, bool isDark) => (accent, isDark) switch
     {
         (VelaAccent.Neutral, false) => new(
             Accent: Color.Parse("#FF353535"),

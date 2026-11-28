@@ -103,7 +103,7 @@
                       Width="14"
                       Height="14"
                       Margin="-4,0,0,0"
-                      Data="{DynamicResource VelaIconChevronRight}"
+                      Data="{StaticResource VelaIconChevronRight}"
                       Foreground="{DynamicResource VelaTextMutedBrush}"
                       VerticalAlignment="Center"
                       IsVisible="{TemplateBinding ShowChevron}" />

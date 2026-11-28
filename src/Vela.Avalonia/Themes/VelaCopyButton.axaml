@@ -15,7 +15,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Button x:Name="PART_Button"
-                Theme="{DynamicResource VelaIconButtonTheme}"
+                Theme="{StaticResource VelaIconButtonTheme}"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -29,14 +29,14 @@
               <PathIcon x:Name="PART_CopyIcon"
                         Width="14"
                         Height="14"
-                        Data="{DynamicResource VelaIconCopy}"
+                        Data="{StaticResource VelaIconCopy}"
                         Foreground="{DynamicResource VelaTextSecondaryBrush}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center" />
               <PathIcon x:Name="PART_CheckIcon"
                         Width="14"
                         Height="14"
-                        Data="{DynamicResource VelaIconCheck}"
+                        Data="{StaticResource VelaIconCheck}"
                         Foreground="{DynamicResource VelaSuccessBrush}"
                         Opacity="0"
                         HorizontalAlignment="Center"

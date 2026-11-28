@@ -4,7 +4,7 @@
 
   <ControlTheme x:Key="{x:Type controls:VelaCheckBox}" TargetType="controls:VelaCheckBox">
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
-    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontSize" Value="{StaticResource VelaTextSm}" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="HorizontalAlignment" Value="Left" />
@@ -47,7 +47,7 @@
                               RecognizesAccessKey="True"
                               IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
             <TextBlock Text="{TemplateBinding Description}"
-                       FontSize="{DynamicResource VelaTextXs}"
+                       FontSize="{StaticResource VelaTextXs}"
                        Foreground="{DynamicResource VelaTextMutedBrush}"
                        TextWrapping="Wrap"
                        IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

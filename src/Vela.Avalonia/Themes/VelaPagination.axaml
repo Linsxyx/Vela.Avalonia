@@ -10,7 +10,7 @@
         <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
           <!-- Previous Button -->
           <Button x:Name="PART_Prev"
-                  Theme="{DynamicResource VelaIconButtonTheme}"
+                  Theme="{StaticResource VelaIconButtonTheme}"
                   Width="34"
                   Height="34"
                   CornerRadius="10"
@@ -19,7 +19,7 @@
                   Background="{DynamicResource VelaSurfaceBrush}">
             <PathIcon Width="14"
                       Height="14"
-                      Data="{DynamicResource VelaIconChevronLeft}"
+                      Data="{StaticResource VelaIconChevronLeft}"
                       Foreground="{DynamicResource VelaTextSecondaryBrush}" />
           </Button>
 
@@ -40,7 +40,7 @@
 
           <!-- Next Button -->
           <Button x:Name="PART_Next"
-                  Theme="{DynamicResource VelaIconButtonTheme}"
+                  Theme="{StaticResource VelaIconButtonTheme}"
                   Width="34"
                   Height="34"
                   CornerRadius="10"
@@ -49,7 +49,7 @@
                   Background="{DynamicResource VelaSurfaceBrush}">
             <PathIcon Width="14"
                       Height="14"
-                      Data="{DynamicResource VelaIconChevronRight}"
+                      Data="{StaticResource VelaIconChevronRight}"
                       Foreground="{DynamicResource VelaTextSecondaryBrush}" />
           </Button>
         </StackPanel>

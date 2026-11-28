@@ -119,10 +119,20 @@ public class VelaFloatingBar : TemplatedControl
         RebuildItems();
     }
 
+    private readonly List<(VelaFloatingBarItem Item, EventHandler<AvaloniaPropertyChangedEventArgs> Handler)> _itemSubscriptions = new();
+
+    private void ClearItemSubscriptions()
+    {
+        foreach (var (item, handler) in _itemSubscriptions)
+            item.PropertyChanged -= handler;
+        _itemSubscriptions.Clear();
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
+        ClearItemSubscriptions();
     }
 
     private void OnTrackPointerExited(object? sender, PointerEventArgs e)
@@ -133,6 +143,7 @@ public class VelaFloatingBar : TemplatedControl
 
     private void RebuildItems()
     {
+        ClearItemSubscriptions();
         if (_itemsHost is null) return;
         _itemsHost.Children.Clear();
 
@@ -210,11 +221,13 @@ public class VelaFloatingBar : TemplatedControl
         }
 
         SyncActiveBg();
-        item.PropertyChanged += (_, ev) =>
+        EventHandler<AvaloniaPropertyChangedEventArgs> handler = (_, ev) =>
         {
             if (ev.Property == VelaFloatingBarItem.IsActiveProperty)
                 SyncActiveBg();
         };
+        item.PropertyChanged += handler;
+        _itemSubscriptions.Add((item, handler));
 
         if (!string.IsNullOrEmpty(item.ToolTipText))
             ToolTip.SetTip(pill, item.ToolTipText);

@@ -114,8 +114,13 @@ public class VelaTabs : ListBox
 
         if (_indicator is not null)
         {
+            _indScale = new ScaleTransform(1.0, 1.0);
             _indTranslate = new TranslateTransform();
-            _indicator.RenderTransform = _indTranslate;
+            var group = new TransformGroup();
+            group.Children.Add(_indScale);
+            group.Children.Add(_indTranslate);
+            _indicator.RenderTransformOrigin = RelativePoint.TopLeft;
+            _indicator.RenderTransform = group;
             _indicator.Opacity = 0;
         }
 
@@ -255,11 +260,28 @@ public class VelaTabs : ListBox
         return active;
     }
 
+    private ScaleTransform? _indScale;
+
     private void ApplyIndicator()
     {
         if (_indicator is null || _indTranslate is null) return;
+        var w = Math.Max(0, _indW.Value);
         _indTranslate.X = _indX.Value;
-        _indicator.Width = Math.Max(0, _indW.Value);
+
+        if (Variant == VelaTabsVariant.Underline && _indScale is not null)
+        {
+            // Unit-width bar scaled on the GPU compositor layer: zero per-frame layout passes.
+            if (Math.Abs(_indicator.Width - 1.0) > 1e-3)
+                _indicator.Width = 1.0;
+            _indScale.ScaleX = w;
+        }
+        else
+        {
+            if (_indScale is not null && Math.Abs(_indScale.ScaleX - 1.0) > 1e-3)
+                _indScale.ScaleX = 1.0;
+            if (Math.Abs(_indicator.Width - w) > 0.25)
+                _indicator.Width = w;
+        }
     }
 
     private void UpdatePseudoClasses()

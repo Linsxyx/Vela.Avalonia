@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Rendering.Composition;
 using Avalonia.Skia;
@@ -125,11 +126,16 @@ public class VelaShaderBackground : Control
         IsHitTestVisible = false;
     }
 
+    private bool _hasEffectiveViewport = true;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         VelaTheme.AccentChanged += OnAccentChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
+        VelaMotionOptions.ReducedMotionChanged += OnReducedMotionChanged;
+        EffectiveViewportChanged += OnEffectiveViewportChanged;
+        _hasEffectiveViewport = true;
         AttachHostWindow(TopLevel.GetTopLevel(this) as Window);
 
         var compositor = ElementComposition.GetElementVisual(this)?.Compositor;
@@ -150,6 +156,8 @@ public class VelaShaderBackground : Control
     {
         VelaTheme.AccentChanged -= OnAccentChanged;
         ActualThemeVariantChanged -= OnThemeVariantChanged;
+        VelaMotionOptions.ReducedMotionChanged -= OnReducedMotionChanged;
+        EffectiveViewportChanged -= OnEffectiveViewportChanged;
         DetachHostWindow();
 
         if (_customVisual is not null)
@@ -160,6 +168,18 @@ public class VelaShaderBackground : Control
         }
 
         base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnReducedMotionChanged(object? sender, EventArgs e) => SendConfigMessage();
+
+    private void OnEffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
+    {
+        var visibleInViewport = e.EffectiveViewport.Width > 0 && e.EffectiveViewport.Height > 0;
+        if (_hasEffectiveViewport != visibleInViewport)
+        {
+            _hasEffectiveViewport = visibleInViewport;
+            SendConfigMessage();
+        }
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -230,7 +250,7 @@ public class VelaShaderBackground : Control
 
     private bool ComputeShouldAnimate()
     {
-        if (!IsAnimated || VelaMotionOptions.ReducedMotion || !IsEffectivelyVisible)
+        if (!IsAnimated || VelaMotionOptions.ReducedMotion || !IsEffectivelyVisible || !_hasEffectiveViewport)
             return false;
 
         if (_windowMinimized)

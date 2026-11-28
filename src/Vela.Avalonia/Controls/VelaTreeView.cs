@@ -194,7 +194,8 @@ public class VelaTreeView : TemplatedControl
 
     protected override Type StyleKeyOverride => typeof(VelaTreeView);
 
-    internal readonly ObservableCollection<VelaTreeRowState> _visibleRows = new();
+    internal readonly VelaObservableList<VelaTreeRowState> _visibleRows = new();
+    internal readonly HashSet<VelaTreeRowControl> _realizedRows = new();
     private readonly HashSet<object> _expandedItems = new(ReferenceEqualityComparer.Instance);
     private readonly HashSet<object> _selectedItems = new(ReferenceEqualityComparer.Instance);
     private readonly List<object> _selectedItemsList = new();
@@ -656,10 +657,7 @@ public class VelaTreeView : TemplatedControl
 
     private void RefreshRowsVisual()
     {
-        if (_listBox is null)
-            return;
-
-        foreach (var rowCtrl in _listBox.GetVisualDescendants().OfType<VelaTreeRowControl>())
+        foreach (var rowCtrl in _realizedRows)
             rowCtrl.SyncFromBoundRow(animateChevron: false);
     }
 
@@ -680,9 +678,7 @@ public class VelaTreeView : TemplatedControl
         foreach (var root in roots)
             ProjectNode(root, parent: null, depth: 0, filter, hasFilter, nextRows, visited);
 
-        _visibleRows.Clear();
-        foreach (var row in nextRows)
-            _visibleRows.Add(row);
+        _visibleRows.ReplaceAll(nextRows);
 
         VisibleCount = _visibleRows.Count;
         UpdateEmptyState();
@@ -1081,6 +1077,32 @@ internal sealed class VelaTreeRowControl : Border
         Child = rootPanel;
     }
 
+    private VelaTreeView? _registeredOwner;
+    private StackPanel? _defaultPanel;
+    private TextBlock? _defaultTitle;
+    private TextBlock? _defaultDesc;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        RegisterWithOwner(_row?.Owner);
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        RegisterWithOwner(null);
+    }
+
+    private void RegisterWithOwner(VelaTreeView? owner)
+    {
+        if (ReferenceEquals(_registeredOwner, owner))
+            return;
+        _registeredOwner?._realizedRows.Remove(this);
+        _registeredOwner = owner;
+        _registeredOwner?._realizedRows.Add(this);
+    }
+
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
@@ -1090,6 +1112,8 @@ internal sealed class VelaTreeRowControl : Border
             var animateChevron = sameItem && next.Owner.ConsumeShouldAnimateToggle(next.Item);
             _row = next;
             _boundItem = next.Item;
+            if (VisualRoot is not null)
+                RegisterWithOwner(next.Owner);
             SyncFromBoundRow(animateChevron);
         }
         else
@@ -1132,7 +1156,12 @@ internal sealed class VelaTreeRowControl : Border
         {
             _icon.IsVisible = false;
             _badge.IsVisible = false;
-            if (!ReferenceEquals(_lastTemplate, template) || _contentHost.Content is not Control existing || !ReferenceEquals(existing.DataContext, _row.Item))
+            if (ReferenceEquals(_lastTemplate, template) && _contentHost.Content is Control existing && template.Match(_row.Item))
+            {
+                if (!ReferenceEquals(existing.DataContext, _row.Item))
+                    existing.DataContext = _row.Item;
+            }
+            else
             {
                 _lastTemplate = template;
                 var built = template.Build(_row.Item);
@@ -1148,47 +1177,39 @@ internal sealed class VelaTreeRowControl : Border
         _icon.Data = _row.Icon;
         _icon.IsVisible = _row.Icon is not null;
 
-        if (!string.IsNullOrEmpty(_row.Description))
+        if (_defaultPanel is null)
         {
-            var stack = new StackPanel
+            _defaultTitle = new TextBlock
             {
-                Orientation = Orientation.Horizontal,
-                Spacing = 8,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            var title = new TextBlock
-            {
-                Text = _row.Label,
                 FontSize = 13,
-                FontWeight = _row.IsSelected ? FontWeight.SemiBold : FontWeight.Normal,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center,
                 [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
             };
-            var desc = new TextBlock
+            _defaultDesc = new TextBlock
             {
-                Text = _row.Description,
                 FontSize = 11.5,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center,
                 [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             };
-            stack.Children.Add(title);
-            stack.Children.Add(desc);
-            _contentHost.Content = stack;
-        }
-        else
-        {
-            _contentHost.Content = new TextBlock
+            _defaultPanel = new StackPanel
             {
-                Text = _row.Label,
-                FontSize = 13,
-                FontWeight = _row.IsSelected ? FontWeight.SemiBold : FontWeight.Normal,
-                TextTrimming = TextTrimming.CharacterEllipsis,
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
                 VerticalAlignment = VerticalAlignment.Center,
-                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
+                Children = { _defaultTitle, _defaultDesc },
             };
         }
+
+        _defaultTitle!.Text = _row.Label;
+        _defaultTitle.FontWeight = _row.IsSelected ? FontWeight.SemiBold : FontWeight.Normal;
+        var hasDesc = !string.IsNullOrEmpty(_row.Description);
+        _defaultDesc!.Text = hasDesc ? _row.Description : string.Empty;
+        _defaultDesc.IsVisible = hasDesc;
+
+        if (!ReferenceEquals(_contentHost.Content, _defaultPanel))
+            _contentHost.Content = _defaultPanel;
 
         _badge.Content = _row.Badge;
         _badge.Tone = _row.BadgeTone;

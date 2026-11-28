@@ -857,6 +857,7 @@ public class VelaNavigationView : TemplatedControl
     private void ApplyPaneBackdrop()
     {
         if (_paneBorder is null) return;
+        _paneBorder.BackdropEffectCache ??= new RetainedBackdropEffectCache();
         _paneBorder.BackdropEffect = PaneVariant == VelaNavigationPaneVariant.Frosted
             ? new BlurEffect { Radius = 18 }
             : null;

@@ -19,7 +19,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
     <Setter Property="BorderThickness" Value="0,0,0,1" />
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
-    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontSize" Value="{StaticResource VelaTextSm}" />
     <Setter Property="Padding" Value="0,0,28,16" />
     <Setter Property="HeaderPadding" Value="0,13" />
     <Setter Property="Template">
@@ -60,7 +60,7 @@
                           Grid.Column="1"
                           Width="14"
                           Height="14"
-                          Data="{DynamicResource VelaIconChevronDown}"
+                          Data="{StaticResource VelaIconChevronDown}"
                           Foreground="{DynamicResource VelaTextMutedBrush}"
                           VerticalAlignment="Center" />
               </Grid>
@@ -71,7 +71,7 @@
               <Border Padding="{TemplateBinding Padding}">
                 <ContentPresenter Content="{TemplateBinding Content}"
                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                  TextElement.FontSize="{DynamicResource VelaTextSm}"
+                                  TextElement.FontSize="{StaticResource VelaTextSm}"
                                   TextElement.Foreground="{DynamicResource VelaTextSecondaryBrush}" />
               </Border>
             </controls:VelaCollapsePanel>

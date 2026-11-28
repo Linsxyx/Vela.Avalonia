@@ -138,7 +138,30 @@ public class VelaStepper : TemplatedControl
         base.OnAttachedToVisualTree(e);
         VelaTheme.AccentChanged += OnThemeOrAccentChanged;
         ActualThemeVariantChanged += OnThemeVariantChanged;
+        SyncStepSubscriptions();
         UpdateStepStates(animate: false);
+    }
+
+    private readonly HashSet<VelaStepperItem> _subscribedSteps = new();
+
+    private void SyncStepSubscriptions()
+    {
+        foreach (var item in _subscribedSteps)
+            item.PropertyChanged -= OnStepItemPropertyChanged;
+        _subscribedSteps.Clear();
+
+        foreach (var item in Steps)
+        {
+            if (_subscribedSteps.Add(item))
+                item.PropertyChanged += OnStepItemPropertyChanged;
+        }
+    }
+
+    private void ClearStepSubscriptions()
+    {
+        foreach (var item in _subscribedSteps)
+            item.PropertyChanged -= OnStepItemPropertyChanged;
+        _subscribedSteps.Clear();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -146,6 +169,7 @@ public class VelaStepper : TemplatedControl
         base.OnDetachedFromVisualTree(e);
         VelaTheme.AccentChanged -= OnThemeOrAccentChanged;
         ActualThemeVariantChanged -= OnThemeVariantChanged;
+        ClearStepSubscriptions();
         _runner.Stop();
     }
 
@@ -154,16 +178,7 @@ public class VelaStepper : TemplatedControl
 
     private void OnStepsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.OldItems is not null)
-        {
-            foreach (VelaStepperItem item in e.OldItems)
-                item.PropertyChanged -= OnStepItemPropertyChanged;
-        }
-        if (e.NewItems is not null)
-        {
-            foreach (VelaStepperItem item in e.NewItems)
-                item.PropertyChanged += OnStepItemPropertyChanged;
-        }
+        SyncStepSubscriptions();
         RebuildVisuals();
     }
 

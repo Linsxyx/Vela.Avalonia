@@ -291,10 +291,17 @@ public class VelaDockBar : TemplatedControl
         }, DispatcherPriority.Loaded);
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        SyncItemSubscriptions();
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
+        ClearItemSubscriptions();
         DetachTemplateHandlers();
     }
 
@@ -314,18 +321,31 @@ public class VelaDockBar : TemplatedControl
         if (_searchBox is not null) _searchBox.KeyDown -= OnSearchBoxKeyDown;
     }
 
-    private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private readonly HashSet<VelaDockItem> _subscribedItems = new();
+
+    private void SyncItemSubscriptions()
     {
-        if (e.OldItems is not null)
+        foreach (var item in _subscribedItems)
+            item.PropertyChanged -= OnDockItemPropertyChanged;
+        _subscribedItems.Clear();
+
+        foreach (var item in Items)
         {
-            foreach (VelaDockItem item in e.OldItems)
-                item.PropertyChanged -= OnDockItemPropertyChanged;
-        }
-        if (e.NewItems is not null)
-        {
-            foreach (VelaDockItem item in e.NewItems)
+            if (_subscribedItems.Add(item))
                 item.PropertyChanged += OnDockItemPropertyChanged;
         }
+    }
+
+    private void ClearItemSubscriptions()
+    {
+        foreach (var item in _subscribedItems)
+            item.PropertyChanged -= OnDockItemPropertyChanged;
+        _subscribedItems.Clear();
+    }
+
+    private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SyncItemSubscriptions();
         RebuildTabs();
     }
 
@@ -736,13 +756,21 @@ public class VelaDockBar : TemplatedControl
         var blur = Material switch
         {
             VelaSurfaceMaterial.Frosted => new BlurEffect { Radius = 18 },
-            VelaSurfaceMaterial.GlassCard => new BlurEffect { Radius = 64 },
+            VelaSurfaceMaterial.GlassCard => new BlurEffect { Radius = 32 },
             VelaSurfaceMaterial.LiquidGlass => new BlurEffect { Radius = 10 },
             _ => null,
         };
 
-        if (_tabsBackdrop is not null) _tabsBackdrop.BackdropEffect = blur;
-        if (_searchBackdrop is not null) _searchBackdrop.BackdropEffect = blur;
+        if (_tabsBackdrop is not null)
+        {
+            _tabsBackdrop.BackdropEffectCache ??= new RetainedBackdropEffectCache();
+            _tabsBackdrop.BackdropEffect = blur;
+        }
+        if (_searchBackdrop is not null)
+        {
+            _searchBackdrop.BackdropEffectCache ??= new RetainedBackdropEffectCache();
+            _searchBackdrop.BackdropEffect = blur;
+        }
 
         var enableLens = Material == VelaSurfaceMaterial.LiquidGlass;
         if (_tabsLens is not null) _tabsLens.IsVisible = enableLens;

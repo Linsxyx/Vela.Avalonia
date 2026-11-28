@@ -93,20 +93,33 @@ public class VelaCommandPalette : ContentControl
         _runner = new SpringRunner(this, OnTick);
     }
 
+    private TopLevel? _attachedTopLevel;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         EnsureOverlayInitialized();
+        if (_attachedTopLevel is not null)
+        {
+            _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+            _attachedTopLevel = null;
+        }
         if (TopLevel.GetTopLevel(this) is TopLevel topLevel)
+        {
+            _attachedTopLevel = topLevel;
             topLevel.AddHandler(KeyDownEvent, OnTopLevelKeyDown, RoutingStrategies.Tunnel);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
-        if (TopLevel.GetTopLevel(this) is TopLevel topLevel)
-            topLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+        if (_attachedTopLevel is not null)
+        {
+            _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+            _attachedTopLevel = null;
+        }
     }
 
     public void Open()
@@ -383,6 +396,116 @@ public class VelaCommandPalette : ContentControl
         _glassSurface.IsVisible = UseLiquidGlass;
     }
 
+    private sealed class PooledCommandRow
+    {
+        public Border Root { get; }
+        public PathIcon Icon { get; }
+        public TextBlock Title { get; }
+        public TextBlock Description { get; }
+        public Border ShortcutBadge { get; }
+        public TextBlock ShortcutText { get; }
+        public int RowIndex;
+
+        public PooledCommandRow(VelaCommandPalette owner)
+        {
+            var grid = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"),
+                ColumnSpacing = 10,
+            };
+
+            Icon = new PathIcon
+            {
+                Width = 15,
+                Height = 15,
+                VerticalAlignment = VerticalAlignment.Center,
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
+            };
+            grid.Children.Add(Icon);
+
+            Title = new TextBlock
+            {
+                FontSize = 13.5,
+                FontWeight = FontWeight.Medium,
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
+            };
+            Description = new TextBlock
+            {
+                FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
+            };
+
+            var copyStack = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                VerticalAlignment = VerticalAlignment.Center,
+                Children = { Title, Description },
+            };
+            Grid.SetColumn(copyStack, 1);
+            grid.Children.Add(copyStack);
+
+            ShortcutText = new TextBlock
+            {
+                FontSize = 11,
+                FontWeight = FontWeight.Medium,
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
+            };
+            ShortcutBadge = new Border
+            {
+                Padding = new Thickness(6, 2),
+                CornerRadius = new CornerRadius(5),
+                BorderThickness = new Thickness(1),
+                VerticalAlignment = VerticalAlignment.Center,
+                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceBrush"),
+                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
+                Child = ShortcutText,
+            };
+            Grid.SetColumn(ShortcutBadge, 2);
+            grid.Children.Add(ShortcutBadge);
+
+            Root = new Border
+            {
+                Height = 38,
+                Padding = new Thickness(10, 0),
+                CornerRadius = new CornerRadius(9),
+                Background = Brushes.Transparent,
+                Cursor = new Cursor(StandardCursorType.Hand),
+                Child = grid,
+            };
+
+            Root.PointerEntered += (_, _) => owner.SetActiveIndex(RowIndex, animate: true);
+            Root.PointerPressed += (_, ev) =>
+            {
+                if (ev.GetCurrentPoint(Root).Properties.IsLeftButtonPressed)
+                {
+                    owner.ExecuteIndex(RowIndex);
+                    ev.Handled = true;
+                }
+            };
+        }
+
+        public void Bind(VelaCommandItem cmd, int index)
+        {
+            RowIndex = index;
+            Icon.Data = cmd.Icon;
+            Icon.IsVisible = cmd.Icon is not null;
+            Title.Text = cmd.Title;
+            var hasDesc = !string.IsNullOrEmpty(cmd.Description);
+            Description.Text = hasDesc ? cmd.Description : string.Empty;
+            Description.IsVisible = hasDesc;
+            var hasShortcut = !string.IsNullOrEmpty(cmd.Shortcut);
+            ShortcutText.Text = hasShortcut ? cmd.Shortcut : string.Empty;
+            ShortcutBadge.IsVisible = hasShortcut;
+        }
+    }
+
+    private readonly List<PooledCommandRow> _rowPool = new();
+    private readonly List<TextBlock> _groupHeaderPool = new();
+
     private void RebuildResults()
     {
         if (_resultsHost is null || _emptyState is null) return;
@@ -410,118 +533,49 @@ public class VelaCommandPalette : ContentControl
             return;
         }
 
+        var groupIdx = 0;
+        var rowPoolIdx = 0;
         foreach (var group in matches)
         {
-            _resultsHost.Children.Add(new TextBlock
+            TextBlock header;
+            if (groupIdx < _groupHeaderPool.Count)
             {
-                Text = group.Key,
-                FontSize = 11.5,
-                FontWeight = FontWeight.Medium,
-                Margin = new Thickness(10, 8, 10, 3),
-                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
-            });
+                header = _groupHeaderPool[groupIdx];
+            }
+            else
+            {
+                header = new TextBlock
+                {
+                    FontSize = 11.5,
+                    FontWeight = FontWeight.Medium,
+                    Margin = new Thickness(10, 8, 10, 3),
+                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
+                };
+                _groupHeaderPool.Add(header);
+            }
+            groupIdx++;
+            header.Text = group.Key;
+            _resultsHost.Children.Add(header);
 
             foreach (var cmd in group)
             {
                 var rowIndex = _visibleRows.Count;
-                var row = BuildResultRow(cmd, rowIndex);
-                _visibleRows.Add((cmd, row));
-                _resultsHost.Children.Add(row);
-            }
-        }
-    }
-
-    private Border BuildResultRow(VelaCommandItem cmd, int index)
-    {
-        var grid = new Grid
-        {
-            ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"),
-            ColumnSpacing = 10,
-        };
-
-        if (cmd.Icon is not null)
-        {
-            grid.Children.Add(new PathIcon
-            {
-                Width = 15,
-                Height = 15,
-                Data = cmd.Icon,
-                VerticalAlignment = VerticalAlignment.Center,
-                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
-            });
-        }
-
-        var copyStack = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        copyStack.Children.Add(new TextBlock
-        {
-            Text = cmd.Title,
-            FontSize = 13.5,
-            FontWeight = FontWeight.Medium,
-            VerticalAlignment = VerticalAlignment.Center,
-            [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
-        });
-        if (!string.IsNullOrEmpty(cmd.Description))
-        {
-            copyStack.Children.Add(new TextBlock
-            {
-                Text = cmd.Description,
-                FontSize = 12,
-                VerticalAlignment = VerticalAlignment.Center,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
-            });
-        }
-        Grid.SetColumn(copyStack, 1);
-        grid.Children.Add(copyStack);
-
-        if (!string.IsNullOrEmpty(cmd.Shortcut))
-        {
-            var kbd = new Border
-            {
-                Padding = new Thickness(6, 2),
-                CornerRadius = new CornerRadius(5),
-                BorderThickness = new Thickness(1),
-                VerticalAlignment = VerticalAlignment.Center,
-                [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaSurfaceBrush"),
-                [!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderBrush"),
-                Child = new TextBlock
+                PooledCommandRow pooled;
+                if (rowPoolIdx < _rowPool.Count)
                 {
-                    Text = cmd.Shortcut,
-                    FontSize = 11,
-                    FontWeight = FontWeight.Medium,
-                    [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
-                },
-            };
-            Grid.SetColumn(kbd, 2);
-            grid.Children.Add(kbd);
-        }
-
-        var row = new Border
-        {
-            Height = 38,
-            Padding = new Thickness(10, 0),
-            CornerRadius = new CornerRadius(9),
-            Background = Brushes.Transparent,
-            Cursor = new Cursor(StandardCursorType.Hand),
-            Child = grid,
-        };
-
-        row.PointerEntered += (_, _) => SetActiveIndex(index, animate: true);
-        row.PointerPressed += (_, ev) =>
-        {
-            if (ev.GetCurrentPoint(row).Properties.IsLeftButtonPressed)
-            {
-                ExecuteIndex(index);
-                ev.Handled = true;
+                    pooled = _rowPool[rowPoolIdx];
+                }
+                else
+                {
+                    pooled = new PooledCommandRow(this);
+                    _rowPool.Add(pooled);
+                }
+                rowPoolIdx++;
+                pooled.Bind(cmd, rowIndex);
+                _visibleRows.Add((cmd, pooled.Root));
+                _resultsHost.Children.Add(pooled.Root);
             }
-        };
-
-        return row;
+        }
     }
 
     private void SetActiveIndex(int index, bool animate)

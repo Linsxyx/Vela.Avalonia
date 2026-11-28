@@ -609,8 +609,8 @@ public class VelaGlassMenu : TemplatedControl
             Height = 12,
             Data = ChevronLeftGeometry,
             VerticalAlignment = VerticalAlignment.Center,
+            [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
         };
-        chevron.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaTextSecondaryBrush"));
 
         var label = new TextBlock
         {
@@ -619,8 +619,8 @@ public class VelaGlassMenu : TemplatedControl
             FontWeight = FontWeight.SemiBold,
             VerticalAlignment = VerticalAlignment.Center,
             TextTrimming = TextTrimming.CharacterEllipsis,
+            [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush"),
         };
-        label.Bind(TextBlock.ForegroundProperty, this.GetResourceObservable("VelaForegroundBrush"));
         Grid.SetColumn(label, 1);
 
         grid.Children.Add(chevron);
@@ -700,8 +700,8 @@ public class VelaGlassMenu : TemplatedControl
                 FontSize = 11.5,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(6, 0, 0, 0),
+                [!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             };
-            shortcut.Bind(TextBlock.ForegroundProperty, this.GetResourceObservable("VelaTextMutedBrush"));
             Grid.SetColumn(shortcut, 2);
             grid.Children.Add(shortcut);
         }
@@ -716,8 +716,8 @@ public class VelaGlassMenu : TemplatedControl
                 Data = ChevronRightGeometry,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(4, 0, 0, 0),
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextMutedBrush"),
             };
-            chevron.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaTextMutedBrush"));
             Grid.SetColumn(chevron, 3);
             grid.Children.Add(chevron);
         }
@@ -731,8 +731,8 @@ public class VelaGlassMenu : TemplatedControl
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(2, 0, 0, 0),
                 IsVisible = item.IsChecked,
+                [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaAccentBrush"),
             };
-            checkIcon.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable("VelaAccentBrush"));
             Grid.SetColumn(checkIcon, 3);
             grid.Children.Add(checkIcon);
         }
@@ -787,15 +787,18 @@ public class VelaGlassMenu : TemplatedControl
 
         if (item.IsDestructive)
         {
-            var danger = this.GetResourceObservable("VelaDangerBrush");
-            entry.HeaderText?.Bind(TextBlock.ForegroundProperty, danger);
-            entry.LeadingIcon?.Bind(PathIcon.ForegroundProperty, danger);
+            if (entry.HeaderText is not null)
+                entry.HeaderText[!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaDangerBrush");
+            if (entry.LeadingIcon is not null)
+                entry.LeadingIcon[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaDangerBrush");
         }
         else
         {
-            entry.HeaderText?.Bind(TextBlock.ForegroundProperty, this.GetResourceObservable("VelaForegroundBrush"));
+            if (entry.HeaderText is not null)
+                entry.HeaderText[!TextBlock.ForegroundProperty] = VelaResourceBinding.Create("VelaForegroundBrush");
             var iconKey = item.IsChecked ? "VelaAccentBrush" : "VelaTextSecondaryBrush";
-            entry.LeadingIcon?.Bind(PathIcon.ForegroundProperty, this.GetResourceObservable(iconKey));
+            if (entry.LeadingIcon is not null)
+                entry.LeadingIcon[!PathIcon.ForegroundProperty] = VelaResourceBinding.Create(iconKey);
         }
     }
 
@@ -806,8 +809,8 @@ public class VelaGlassMenu : TemplatedControl
             Height = 1,
             Margin = new Thickness(10, 4),
             IsHitTestVisible = false,
+            [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaGlassDividerBrush"),
         };
-        line.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaGlassDividerBrush"));
         return line;
     }
 
@@ -876,8 +879,8 @@ public class VelaGlassMenu : TemplatedControl
         }
         else
         {
-            _highlight.Bind(Border.BackgroundProperty, this.GetResourceObservable("VelaGlassMenuHighlightBrush"));
-            _highlight.Bind(Border.BorderBrushProperty, this.GetResourceObservable("VelaGlassMenuHighlightBorderBrush"));
+            _highlight[!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaGlassMenuHighlightBrush");
+            _highlight[!Border.BorderBrushProperty] = VelaResourceBinding.Create("VelaGlassMenuHighlightBorderBrush");
         }
     }
 

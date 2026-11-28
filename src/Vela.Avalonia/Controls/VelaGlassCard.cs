@@ -30,7 +30,7 @@ public enum VelaGlassTintLevel
 public class VelaGlassCard : ContentControl
 {
     public static readonly StyledProperty<double> BlurRadiusProperty =
-        AvaloniaProperty.Register<VelaGlassCard, double>(nameof(BlurRadius), 80.0);
+        AvaloniaProperty.Register<VelaGlassCard, double>(nameof(BlurRadius), 32.0);
 
     public static readonly StyledProperty<bool> BlurBackgroundProperty =
         AvaloniaProperty.Register<VelaGlassCard, bool>(nameof(BlurBackground), true);
@@ -98,9 +98,18 @@ public class VelaGlassCard : ContentControl
         if (_blurBackdrop is null)
             return;
 
-        _blurBackdrop.BackdropEffect = BlurBackground && BlurRadius > 0.1
-            ? new BlurEffect { Radius = Math.Clamp(BlurRadius, 0.0, 120.0) }
-            : null;
+        if (BlurBackground && BlurRadius > 0.1)
+        {
+            var clamped = Math.Clamp(BlurRadius, 0.0, 120.0);
+            if (_blurBackdrop.BackdropEffect is BlurEffect existing)
+                existing.Radius = clamped;
+            else
+                _blurBackdrop.BackdropEffect = new BlurEffect { Radius = clamped };
+        }
+        else
+        {
+            _blurBackdrop.BackdropEffect = null;
+        }
     }
 }
 

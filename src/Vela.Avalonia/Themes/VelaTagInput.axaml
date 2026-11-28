@@ -7,7 +7,7 @@
       <ControlTemplate>
         <StackPanel Spacing="6">
           <TextBlock Text="{TemplateBinding Label}"
-                     FontSize="{DynamicResource VelaTextSm}"
+                     FontSize="{StaticResource VelaTextSm}"
                      FontWeight="Medium"
                      Foreground="{DynamicResource VelaForegroundBrush}"
                      IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
@@ -33,7 +33,7 @@
           </Border>
 
           <TextBlock Text="{TemplateBinding Description}"
-                     FontSize="{DynamicResource VelaTextXs}"
+                     FontSize="{StaticResource VelaTextXs}"
                      Foreground="{DynamicResource VelaTextMutedBrush}"
                      TextWrapping="Wrap"
                      IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

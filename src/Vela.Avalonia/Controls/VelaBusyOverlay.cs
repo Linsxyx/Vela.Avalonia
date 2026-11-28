@@ -27,9 +27,17 @@ public sealed class VelaSpinnerRing : Control
     public double StrokeThickness { get => GetValue(StrokeThicknessProperty); set => SetValue(StrokeThicknessProperty, value); }
     public IBrush? Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
 
+    private readonly Action<TimeSpan> _frameCallback;
     private double _angleDeg;
-    private bool _scheduled;
+    private bool _framePending;
     private TimeSpan? _lastFrame;
+    private double _cachedRadius = -1;
+    private StreamGeometry? _cachedArcGeo;
+    private IBrush? _cachedTrackBrush;
+    private IBrush? _cachedActiveBrush;
+    private double _cachedStroke = -1;
+    private Pen? _cachedTrackPen;
+    private Pen? _cachedArcPen;
 
     static VelaSpinnerRing()
     {
@@ -39,6 +47,7 @@ public sealed class VelaSpinnerRing : Control
 
     public VelaSpinnerRing()
     {
+        _frameCallback = OnFrame;
         Width = 24;
         Height = 24;
         IsHitTestVisible = false;
@@ -47,21 +56,40 @@ public sealed class VelaSpinnerRing : Control
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        ActualThemeVariantChanged += OnThemeOrResourceChanged;
+        ResourcesChanged += OnResourcesChanged;
+        InvalidateBrushCache();
         UpdateLoop();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        _scheduled = false;
+        ActualThemeVariantChanged -= OnThemeOrResourceChanged;
+        ResourcesChanged -= OnResourcesChanged;
         _lastFrame = null;
+    }
+
+    private void OnResourcesChanged(object? sender, ResourcesChangedEventArgs e) => OnThemeOrResourceChanged(sender, EventArgs.Empty);
+
+    private void OnThemeOrResourceChanged(object? sender, EventArgs e)
+    {
+        InvalidateBrushCache();
+        InvalidateVisual();
+    }
+
+    private void InvalidateBrushCache()
+    {
+        _cachedTrackBrush = null;
+        _cachedActiveBrush = null;
+        _cachedTrackPen = null;
+        _cachedArcPen = null;
     }
 
     private void UpdateLoop()
     {
         if (!IsActive || !IsEffectivelyVisible || VisualRoot is null)
         {
-            _scheduled = false;
             _lastFrame = null;
             return;
         }
@@ -71,20 +99,20 @@ public sealed class VelaSpinnerRing : Control
 
     private void ScheduleNextFrame()
     {
-        if (_scheduled || !IsActive || !IsEffectivelyVisible)
+        if (_framePending || !IsActive || !IsEffectivelyVisible)
             return;
 
         var top = TopLevel.GetTopLevel(this);
         if (top is null)
             return;
 
-        _scheduled = true;
-        top.RequestAnimationFrame(OnFrame);
+        _framePending = true;
+        top.RequestAnimationFrame(_frameCallback);
     }
 
     private void OnFrame(TimeSpan ts)
     {
-        _scheduled = false;
+        _framePending = false;
         if (!IsActive || !IsEffectivelyVisible || VisualRoot is null)
         {
             _lastFrame = null;
@@ -116,35 +144,47 @@ public sealed class VelaSpinnerRing : Control
         var cx = Bounds.Width * 0.5;
         var cy = Bounds.Height * 0.5;
 
-        var trackBrush = this.TryFindResource("VelaBorderBrush", ActualThemeVariant, out var tb) && tb is IBrush b1
+        var trackBrush = _cachedTrackBrush ??= this.TryFindResource("VelaBorderBrush", ActualThemeVariant, out var tb) && tb is IBrush b1
             ? b1
             : Brushes.Gray;
         var activeBrush = Foreground
-            ?? (this.TryFindResource("VelaAccentBrush", ActualThemeVariant, out var ab) && ab is IBrush b2
+            ?? (_cachedActiveBrush ??= this.TryFindResource("VelaAccentBrush", ActualThemeVariant, out var ab) && ab is IBrush b2
                 ? b2
                 : Brushes.DodgerBlue);
 
-        // Subtle full track circle
-        var trackPen = new Pen(trackBrush, stroke);
-        context.DrawEllipse(null, trackPen, new Point(cx, cy), r, r);
-
-        // Animated 105-degree rounded arc
-        const double sweepDeg = 105.0;
-        var startRad = _angleDeg * Math.PI / 180.0;
-        var endRad = (_angleDeg + sweepDeg) * Math.PI / 180.0;
-
-        var startPt = new Point(cx + r * Math.Cos(startRad), cy + r * Math.Sin(startRad));
-        var endPt = new Point(cx + r * Math.Cos(endRad), cy + r * Math.Sin(endRad));
-
-        var geo = new StreamGeometry();
-        using (var ctx = geo.Open())
+        if (_cachedTrackPen is null || !ReferenceEquals(_cachedTrackPen.Brush, trackBrush) || Math.Abs(_cachedStroke - stroke) > 1e-4)
         {
-            ctx.BeginFigure(startPt, false);
-            ctx.ArcTo(endPt, new Size(r, r), 0, false, SweepDirection.Clockwise);
+            _cachedTrackPen = new Pen(trackBrush, stroke);
+            _cachedStroke = stroke;
+        }
+        if (_cachedArcPen is null || !ReferenceEquals(_cachedArcPen.Brush, activeBrush) || Math.Abs(_cachedArcPen.Thickness - stroke) > 1e-4)
+        {
+            _cachedArcPen = new Pen(activeBrush, stroke, lineCap: PenLineCap.Round);
         }
 
-        var arcPen = new Pen(activeBrush, stroke, lineCap: PenLineCap.Round);
-        context.DrawGeometry(null, arcPen, geo);
+        // Subtle full track circle
+        context.DrawEllipse(null, _cachedTrackPen, new Point(cx, cy), r, r);
+
+        // Cached 105-degree arc centered at origin, rotated via GPU transform
+        if (_cachedArcGeo is null || Math.Abs(_cachedRadius - r) > 0.05)
+        {
+            const double sweepRad = 105.0 * Math.PI / 180.0;
+            var geo = new StreamGeometry();
+            using (var ctx = geo.Open())
+            {
+                ctx.BeginFigure(new Point(r, 0), false);
+                ctx.ArcTo(new Point(r * Math.Cos(sweepRad), r * Math.Sin(sweepRad)), new Size(r, r), 0, false, SweepDirection.Clockwise);
+            }
+            _cachedArcGeo = geo;
+            _cachedRadius = r;
+        }
+
+        var angleRad = _angleDeg * Math.PI / 180.0;
+        var transform = Matrix.CreateRotation(angleRad) * Matrix.CreateTranslation(cx, cy);
+        using (context.PushTransform(transform))
+        {
+            context.DrawGeometry(null, _cachedArcPen, _cachedArcGeo);
+        }
     }
 }
 
@@ -228,9 +268,18 @@ public class VelaBusyOverlay : TemplatedControl
     private void ApplyBlur()
     {
         if (_backdrop is null) return;
-        _backdrop.BackdropEffect = UseBackdropBlur && BlurRadius > 0.5
-            ? new BlurEffect { Radius = BlurRadius }
-            : null;
+        _backdrop.BackdropEffectCache ??= new RetainedBackdropEffectCache();
+        if (UseBackdropBlur && BlurRadius > 0.5)
+        {
+            if (_backdrop.BackdropEffect is BlurEffect existing)
+                existing.Radius = BlurRadius;
+            else
+                _backdrop.BackdropEffect = new BlurEffect { Radius = BlurRadius };
+        }
+        else
+        {
+            _backdrop.BackdropEffect = null;
+        }
     }
 
     private void OnBusyChanged(bool animate)

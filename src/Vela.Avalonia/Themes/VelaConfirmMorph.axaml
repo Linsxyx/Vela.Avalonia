@@ -7,8 +7,8 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Height="{DynamicResource VelaControlHeightSm}"
-                CornerRadius="{DynamicResource VelaRadiusPill}"
+        <Border Height="{StaticResource VelaControlHeightSm}"
+                CornerRadius="{StaticResource VelaRadiusPill}"
                 Background="{DynamicResource VelaSurfaceRaisedBrush}"
                 BorderBrush="{DynamicResource VelaBorderBrush}"
                 BorderThickness="1"
@@ -16,13 +16,13 @@
                 ClipToBounds="True">
           <!-- Smoothly springs pill width as faces swap -->
           <controls:VelaMorphSlotPanel>
-            <Panel Height="{DynamicResource VelaControlHeightSm}">
+            <Panel Height="{StaticResource VelaControlHeightSm}">
               <!-- Face 1: Idle -->
               <Button x:Name="PART_IdleButton"
-                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Theme="{StaticResource VelaIconButtonTheme}"
                       Height="34"
                       Padding="14,0,16,0"
-                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      CornerRadius="{StaticResource VelaRadiusPill}"
                       IsVisible="False">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                   <PathIcon Width="15"
@@ -53,10 +53,10 @@
                            VerticalAlignment="Center" />
 
                 <Button x:Name="PART_CancelButton"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Theme="{StaticResource VelaIconButtonTheme}"
                         Height="28"
                         Padding="11,0"
-                        CornerRadius="{DynamicResource VelaRadiusPill}">
+                        CornerRadius="{StaticResource VelaRadiusPill}">
                   <TextBlock Text="{TemplateBinding CancelText}"
                              FontSize="12.5"
                              FontWeight="Medium"
@@ -64,10 +64,10 @@
                 </Button>
 
                 <Button x:Name="PART_ConfirmButton"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Theme="{StaticResource VelaIconButtonTheme}"
                         Height="28"
                         Padding="12,0"
-                        CornerRadius="{DynamicResource VelaRadiusPill}"
+                        CornerRadius="{StaticResource VelaRadiusPill}"
                         Background="{DynamicResource VelaDangerBrush}">
                   <TextBlock Text="{TemplateBinding ConfirmText}"
                              FontSize="12.5"
@@ -112,7 +112,7 @@
                           IsVisible="False">
                 <PathIcon Width="15"
                           Height="15"
-                          Data="{DynamicResource VelaIconCheckCircle}"
+                          Data="{StaticResource VelaIconCheckCircle}"
                           Foreground="{DynamicResource VelaSuccessBrush}" />
                 <TextBlock Text="{TemplateBinding DoneText}"
                            FontSize="13"
@@ -120,10 +120,10 @@
                            Foreground="{DynamicResource VelaForegroundBrush}"
                            VerticalAlignment="Center" />
                 <Button x:Name="PART_UndoButton"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Theme="{StaticResource VelaIconButtonTheme}"
                         Height="28"
                         Padding="10,0"
-                        CornerRadius="{DynamicResource VelaRadiusPill}"
+                        CornerRadius="{StaticResource VelaRadiusPill}"
                         IsVisible="{TemplateBinding UndoText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                   <TextBlock Text="{TemplateBinding UndoText}"
                              FontSize="12.5"

@@ -18,25 +18,25 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
               <Button x:Name="PART_PrevButton"
-                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Theme="{StaticResource VelaIconButtonTheme}"
                       Width="30"
                       Height="30"
                       CornerRadius="999">
-                <PathIcon Width="15" Height="15" Data="{DynamicResource VelaIconChevronLeft}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <PathIcon Width="15" Height="15" Data="{StaticResource VelaIconChevronLeft}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
               </Button>
               <Button x:Name="PART_TodayButton"
-                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Theme="{StaticResource VelaIconButtonTheme}"
                       Height="30"
                       Padding="10,0"
                       CornerRadius="999">
                 <TextBlock Text="Today" FontSize="12.5" FontWeight="Medium" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
               </Button>
               <Button x:Name="PART_NextButton"
-                      Theme="{DynamicResource VelaIconButtonTheme}"
+                      Theme="{StaticResource VelaIconButtonTheme}"
                       Width="30"
                       Height="30"
                       CornerRadius="999">
-                <PathIcon Width="15" Height="15" Data="{DynamicResource VelaIconChevronRight}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+                <PathIcon Width="15" Height="15" Data="{StaticResource VelaIconChevronRight}" Foreground="{DynamicResource VelaTextSecondaryBrush}" />
               </Button>
             </StackPanel>
           </Grid>
@@ -78,7 +78,7 @@
       <ControlTemplate>
         <StackPanel Spacing="6">
           <TextBlock Text="{TemplateBinding Label}"
-                     FontSize="{DynamicResource VelaTextSm}"
+                     FontSize="{StaticResource VelaTextSm}"
                      FontWeight="Medium"
                      Foreground="{DynamicResource VelaForegroundBrush}"
                      IsVisible="{TemplateBinding Label, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
@@ -110,24 +110,24 @@
               <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
                 <PathIcon Width="15"
                           Height="15"
-                          Data="{DynamicResource VelaIconCalendar}"
+                          Data="{StaticResource VelaIconCalendar}"
                           Foreground="{DynamicResource VelaTextMutedBrush}"
                           VerticalAlignment="Center" />
                 <TextBlock x:Name="PART_DisplayText"
                            Grid.Column="1"
                            Text="{TemplateBinding DisplayText}"
-                           FontSize="{DynamicResource VelaTextSm}"
+                           FontSize="{StaticResource VelaTextSm}"
                            Foreground="{DynamicResource VelaTextMutedBrush}"
                            VerticalAlignment="Center" />
                 <Button x:Name="PART_ClearButton"
                         Grid.Column="2"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Theme="{StaticResource VelaIconButtonTheme}"
                         Width="22"
                         Height="22"
                         CornerRadius="999"
                         Focusable="False"
                         IsVisible="False">
-                  <PathIcon Width="11" Height="11" Data="{DynamicResource VelaIconClose}" Foreground="{DynamicResource VelaTextMutedBrush}" />
+                  <PathIcon Width="11" Height="11" Data="{StaticResource VelaIconClose}" Foreground="{DynamicResource VelaTextMutedBrush}" />
                 </Button>
               </Grid>
             </Button>

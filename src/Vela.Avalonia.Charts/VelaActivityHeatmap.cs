@@ -33,18 +33,36 @@ public class VelaActivityHeatmap : Control
     public double CellSize { get => GetValue(CellSizeProperty); set => SetValue(CellSizeProperty, Math.Clamp(value, 8.0, 24.0)); }
     public double CellGap { get => GetValue(CellGapProperty); set => SetValue(CellGapProperty, Math.Clamp(value, 1.0, 8.0)); }
 
-    private readonly List<(Rect Rect, DateTime Date, int Count)> _hitCells = new();
-    private int _hoveredIndex = -1;
+    private static readonly string[] DayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
+    private const double LeftPad = 30.0;
+    private const double TopPad = 22.0;
+
+    private readonly Dictionary<DateTime, int> _lookup = new();
+    private int _maxCount = 1;
+    private bool _lookupDirty = true;
+
+    private bool _paletteDirty = true;
+    private IBrush _mutedBrush = Brushes.Gray;
+    private IBrush _fgBrush = Brushes.Black;
+    private Pen _hoverPen = new(Brushes.Black, 1.4);
+    private readonly SolidColorBrush[] _levelBrushes = new SolidColorBrush[5];
+
+    private int _hoveredCol = -1;
+    private int _hoveredRow = -1;
+    private DateTime _cachedStartSun;
+    private DateTime _cachedToday;
 
     static VelaActivityHeatmap()
     {
         AffectsMeasure<VelaActivityHeatmap>(WeeksProperty, CellSizeProperty, CellGapProperty);
         AffectsRender<VelaActivityHeatmap>(EntriesProperty, WeeksProperty, CellSizeProperty, CellGapProperty);
+        EntriesProperty.Changed.AddClassHandler<VelaActivityHeatmap>((h, _) => h._lookupDirty = true);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        _paletteDirty = true;
         ActualThemeVariantChanged += OnRefresh;
         VelaTheme.AccentChanged += OnAccentRefresh;
     }
@@ -56,8 +74,17 @@ public class VelaActivityHeatmap : Control
         VelaTheme.AccentChanged -= OnAccentRefresh;
     }
 
-    private void OnRefresh(object? sender, EventArgs e) => InvalidateVisual();
-    private void OnAccentRefresh(object? sender, VelaAccent e) => InvalidateVisual();
+    private void OnRefresh(object? sender, EventArgs e)
+    {
+        _paletteDirty = true;
+        InvalidateVisual();
+    }
+
+    private void OnAccentRefresh(object? sender, VelaAccent e)
+    {
+        _paletteDirty = true;
+        InvalidateVisual();
+    }
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -71,18 +98,33 @@ public class VelaActivityHeatmap : Control
     {
         base.OnPointerMoved(e);
         var pt = e.GetPosition(this);
-        var next = -1;
-        for (var i = 0; i < _hitCells.Count; i++)
+        var step = CellSize + CellGap;
+        var nextCol = -1;
+        var nextRow = -1;
+
+        var relX = pt.X - LeftPad;
+        var relY = pt.Y - TopPad;
+        if (relX >= 0 && relY >= 0 && step > 0)
         {
-            if (_hitCells[i].Rect.Contains(pt))
+            var col = (int)(relX / step);
+            var row = (int)(relY / step);
+            var inCellX = relX - col * step;
+            var inCellY = relY - row * step;
+            if (col >= 0 && col < Weeks && row >= 0 && row < 7 && inCellX <= CellSize && inCellY <= CellSize)
             {
-                next = i;
-                break;
+                var day = _cachedStartSun.AddDays(col * 7 + row);
+                if (day <= _cachedToday)
+                {
+                    nextCol = col;
+                    nextRow = row;
+                }
             }
         }
-        if (next != _hoveredIndex)
+
+        if (nextCol != _hoveredCol || nextRow != _hoveredRow)
         {
-            _hoveredIndex = next;
+            _hoveredCol = nextCol;
+            _hoveredRow = nextRow;
             InvalidateVisual();
         }
     }
@@ -90,53 +132,76 @@ public class VelaActivityHeatmap : Control
     protected override void OnPointerExited(PointerEventArgs e)
     {
         base.OnPointerExited(e);
-        if (_hoveredIndex >= 0)
+        if (_hoveredCol >= 0 || _hoveredRow >= 0)
         {
-            _hoveredIndex = -1;
+            _hoveredCol = -1;
+            _hoveredRow = -1;
             InvalidateVisual();
         }
     }
 
-    public override void Render(DrawingContext context)
+    private void EnsureLookup()
     {
-        var lookup = new Dictionary<DateTime, int>();
-        var maxCount = 1;
+        if (!_lookupDirty)
+            return;
+
+        _lookupDirty = false;
+        _lookup.Clear();
+        _maxCount = 1;
         if (Entries is not null)
         {
             foreach (var e in Entries)
             {
                 var d = e.Date.Date;
-                lookup[d] = e.Count;
-                if (e.Count > maxCount) maxCount = e.Count;
+                _lookup[d] = e.Count;
+                if (e.Count > _maxCount) _maxCount = e.Count;
             }
         }
+    }
 
-        var step = CellSize + CellGap;
-        const double leftPad = 30.0;
-        const double topPad = 22.0;
+    private void EnsurePalette()
+    {
+        if (!_paletteDirty)
+            return;
 
-        var mutedBrush = ChartPalette.ResolveBrush(this, "VelaTextMutedBrush", Brushes.Gray);
-        var fgBrush = ChartPalette.ResolveBrush(this, "VelaForegroundBrush", Brushes.Black);
+        _paletteDirty = false;
+        _mutedBrush = ChartPalette.ResolveBrush(this, "VelaTextMutedBrush", Brushes.Gray);
+        _fgBrush = ChartPalette.ResolveBrush(this, "VelaForegroundBrush", Brushes.Black);
         var emptyColor = ChartPalette.ResolveColor(this, "VelaSurfaceMutedColor", Colors.LightGray);
         var accent = ChartPalette.ResolveSeriesColor(this, 0);
 
+        _hoverPen = new Pen(_fgBrush, 1.4);
+        _levelBrushes[0] = new SolidColorBrush(emptyColor);
+        _levelBrushes[1] = new SolidColorBrush(accent, 0.24);
+        _levelBrushes[2] = new SolidColorBrush(accent, 0.48);
+        _levelBrushes[3] = new SolidColorBrush(accent, 0.74);
+        _levelBrushes[4] = new SolidColorBrush(accent, 1.0);
+    }
+
+    public override void Render(DrawingContext context)
+    {
+        EnsureLookup();
+        EnsurePalette();
+
+        var step = CellSize + CellGap;
+
         // Weekday labels (Mon, Wed, Fri)
-        string[] dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
         for (var r = 0; r < 7; r++)
         {
-            if (string.IsNullOrEmpty(dayLabels[r])) continue;
-            var ft = ChartPalette.MakeText(dayLabels[r], 10.5, mutedBrush);
-            context.DrawText(ft, new Point(0, topPad + r * step + (CellSize - ft.Height) / 2.0));
+            if (string.IsNullOrEmpty(DayLabels[r])) continue;
+            var ft = ChartPalette.MakeText(DayLabels[r], 10.5, _mutedBrush);
+            context.DrawText(ft, new Point(0, TopPad + r * step + (CellSize - ft.Height) / 2.0));
         }
 
         // End on current week's Saturday
         var today = DateTime.Today;
         var endSat = today.AddDays(6 - (int)today.DayOfWeek);
         var startSun = endSat.AddDays(-(Weeks * 7 - 1));
+        _cachedToday = today;
+        _cachedStartSun = startSun;
 
-        _hitCells.Clear();
         var lastMonth = -1;
-        var hoverPen = new Pen(fgBrush, 1.4);
+        var invMax = 4.0 / _maxCount;
 
         for (var col = 0; col < Weeks; col++)
         {
@@ -144,46 +209,36 @@ public class VelaActivityHeatmap : Control
             if (colDate.Month != lastMonth)
             {
                 lastMonth = colDate.Month;
-                var mFt = ChartPalette.MakeText(colDate.ToString("MMM", CultureInfo.InvariantCulture), 10.5, mutedBrush);
-                context.DrawText(mFt, new Point(leftPad + col * step, 4));
+                var mFt = ChartPalette.MakeText(colDate.ToString("MMM", CultureInfo.InvariantCulture), 10.5, _mutedBrush);
+                context.DrawText(mFt, new Point(LeftPad + col * step, 4));
             }
 
+            var x = LeftPad + col * step;
             for (var row = 0; row < 7; row++)
             {
                 var day = startSun.AddDays(col * 7 + row);
                 if (day > today) continue;
 
-                lookup.TryGetValue(day, out var count);
-                var rect = new Rect(leftPad + col * step, topPad + row * step, CellSize, CellSize);
-                var cellIndex = _hitCells.Count;
-                _hitCells.Add((rect, day, count));
-
-                var level = count <= 0 ? 0 : Math.Clamp((int)Math.Ceiling((count / (double)maxCount) * 4.0), 1, 4);
-                var fill = level switch
-                {
-                    0 => new SolidColorBrush(emptyColor),
-                    1 => new SolidColorBrush(accent, 0.24),
-                    2 => new SolidColorBrush(accent, 0.48),
-                    3 => new SolidColorBrush(accent, 0.74),
-                    _ => new SolidColorBrush(accent, 1.0),
-                };
-
-                var isHovered = _hoveredIndex == cellIndex;
-                context.DrawRectangle(fill, isHovered ? hoverPen : null, new RoundedRect(rect, 3.5));
+                _lookup.TryGetValue(day, out var count);
+                var rect = new Rect(x, TopPad + row * step, CellSize, CellSize);
+                var level = count <= 0 ? 0 : Math.Clamp((int)Math.Ceiling(count * invMax), 1, 4);
+                var isHovered = _hoveredCol == col && _hoveredRow == row;
+                context.DrawRectangle(_levelBrushes[level], isHovered ? _hoverPen : null, new RoundedRect(rect, 3.5));
             }
         }
 
         // Bottom live readout / legend line
-        var footerY = topPad + 7 * step + 6;
-        if (_hoveredIndex >= 0 && _hoveredIndex < _hitCells.Count)
+        var footerY = TopPad + 7 * step + 6;
+        if (_hoveredCol >= 0 && _hoveredRow >= 0)
         {
-            var (_, d, c) = _hitCells[_hoveredIndex];
-            var text = $"{c} contributions on {d.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture)}";
-            context.DrawText(ChartPalette.MakeText(text, 11.5, fgBrush, FontWeight.Medium), new Point(leftPad, footerY));
+            var hoveredDay = startSun.AddDays(_hoveredCol * 7 + _hoveredRow);
+            _lookup.TryGetValue(hoveredDay, out var hoveredCount);
+            var text = $"{hoveredCount} contributions on {hoveredDay.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture)}";
+            context.DrawText(ChartPalette.MakeText(text, 11.5, _fgBrush, FontWeight.Medium), new Point(LeftPad, footerY));
         }
         else
         {
-            context.DrawText(ChartPalette.MakeText("Hover any square to inspect daily activity", 11.5, mutedBrush), new Point(leftPad, footerY));
+            context.DrawText(ChartPalette.MakeText("Hover any square to inspect daily activity", 11.5, _mutedBrush), new Point(LeftPad, footerY));
         }
     }
 }

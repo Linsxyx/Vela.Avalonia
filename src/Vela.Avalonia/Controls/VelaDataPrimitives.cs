@@ -363,10 +363,20 @@ public sealed class VelaTreeChevron : Control
         _runner.Wake();
     }
 
+    private static Cursor? s_handCursor;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        UpdateCursor();
+    }
+
     private void UpdateCursor()
     {
-        Cursor = HasChildren ? new Cursor(StandardCursorType.Hand) : Cursor.Default;
         IsHitTestVisible = HasChildren;
+        if (VisualRoot is null)
+            return;
+        Cursor = HasChildren ? (s_handCursor ??= new Cursor(StandardCursorType.Hand)) : Cursor.Default;
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -408,6 +418,25 @@ public sealed class VelaTreeChevron : Control
         return active;
     }
 
+    private static StreamGeometry? s_chevronGeometry;
+    private Pen? _cachedPen;
+    private IBrush? _cachedPenBrush;
+
+    private static StreamGeometry GetChevronGeometry()
+    {
+        if (s_chevronGeometry is not null)
+            return s_chevronGeometry;
+
+        var geom = new StreamGeometry();
+        using var ctx = geom.Open();
+        ctx.BeginFigure(new Point(-2.2, -4.0), isFilled: false);
+        ctx.LineTo(new Point(2.4, 0.0));
+        ctx.LineTo(new Point(-2.2, 4.0));
+        ctx.EndFigure(isClosed: false);
+        s_chevronGeometry = geom;
+        return geom;
+    }
+
     public override void Render(DrawingContext context)
     {
         if (!HasChildren)
@@ -419,30 +448,44 @@ public sealed class VelaTreeChevron : Control
             context.DrawRectangle(HoverBackground, null, rect.Deflate(1), 6, 6);
         }
 
-        if (Foreground is null)
+        var fg = Foreground;
+        if (fg is null)
             return;
+
+        if (_cachedPen is null || !ReferenceEquals(_cachedPenBrush, fg))
+        {
+            _cachedPenBrush = fg;
+            _cachedPen = new Pen(fg, 1.55, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
+        }
 
         var cx = rect.Width * 0.5;
         var cy = rect.Height * 0.5;
-        var pen = new Pen(Foreground, 1.55, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
-
         var radians = _angleSpring.Value * Math.PI / 180.0;
-        var transform = Matrix.CreateTranslation(-cx, -cy)
-                        * Matrix.CreateRotation(radians)
-                        * Matrix.CreateTranslation(cx, cy);
+        var transform = Matrix.CreateRotation(radians) * Matrix.CreateTranslation(cx, cy);
 
         using (context.PushTransform(transform))
         {
-            var geom = new StreamGeometry();
-            using (var ctx = geom.Open())
-            {
-                ctx.BeginFigure(new Point(cx - 2.2, cy - 4.0), isFilled: false);
-                ctx.LineTo(new Point(cx + 2.4, cy));
-                ctx.LineTo(new Point(cx - 2.2, cy + 4.0));
-                ctx.EndFigure(isClosed: false);
-            }
-            context.DrawGeometry(null, pen, geom);
+            context.DrawGeometry(null, _cachedPen, GetChevronGeometry());
         }
+    }
+}
+
+/// <summary>
+/// Observable collection supporting single-notification bulk replacement to avoid O(N) CollectionChanged storms.
+/// </summary>
+internal sealed class VelaObservableList<T> : System.Collections.ObjectModel.ObservableCollection<T>
+{
+    public void ReplaceAll(IEnumerable<T> items)
+    {
+        CheckReentrancy();
+        Items.Clear();
+        foreach (var item in items)
+            Items.Add(item);
+
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(Count)));
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("Item[]"));
+        OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(
+            System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
     }
 }
 
@@ -703,6 +746,8 @@ public abstract class VelaDataGridColumn : AvaloniaObject
 
     internal abstract Control CreateCellContent(object item);
 
+    internal virtual bool TryUpdateCellContent(Control existing, object item) => false;
+
     internal virtual object? GetSortValue(object item) => SortKeySelector?.Invoke(item);
 
     internal virtual string? GetSearchableText(object item)
@@ -799,6 +844,21 @@ public class VelaDataGridTextColumn : VelaDataGridColumn
         return tb;
     }
 
+    internal override bool TryUpdateCellContent(Control existing, object item)
+    {
+        if (existing is not TextBlock tb)
+            return false;
+
+        if (ValueSelector is not null)
+            tb.Text = FormatValue(ValueSelector(item));
+        else if (Binding is not null)
+            tb.DataContext = item;
+        else
+            tb.Text = FormatValue(item);
+
+        return true;
+    }
+
     internal override object? GetSortValue(object item)
     {
         if (SortKeySelector is not null)
@@ -883,6 +943,20 @@ public class VelaDataGridBadgeColumn : VelaDataGridColumn
         return badge;
     }
 
+    internal override bool TryUpdateCellContent(Control existing, object item)
+    {
+        if (existing is not VelaBadge badge)
+            return false;
+
+        badge.Tone = ToneSelector?.Invoke(item) ?? DefaultTone;
+        if (ValueSelector is not null)
+            badge.Content = ValueSelector(item);
+        else if (Binding is not null)
+            badge.DataContext = item;
+
+        return true;
+    }
+
     internal override object? GetSortValue(object item)
     {
         if (SortKeySelector is not null)
@@ -919,8 +993,15 @@ public class VelaDataGridCheckBoxColumn : VelaDataGridColumn
         HorizontalAlignment = HorizontalAlignment.Center;
     }
 
+    private sealed class CheckBoxCellState
+    {
+        public object Item = null!;
+        public bool Suppress;
+    }
+
     internal override Control CreateCellContent(object item)
     {
+        var state = new CheckBoxCellState { Item = item, Suppress = true };
         var cb = new VelaCheckBox
         {
             IsThreeState = IsThreeState,
@@ -928,14 +1009,32 @@ public class VelaDataGridCheckBoxColumn : VelaDataGridColumn
             IsChecked = ValueSelector?.Invoke(item) ?? false,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment,
+            Tag = state,
         };
+        state.Suppress = false;
 
         if (!IsReadOnly && ValueSetter is not null)
         {
-            cb.IsCheckedChanged += (_, _) => ValueSetter(item, cb.IsChecked);
+            cb.IsCheckedChanged += (_, _) =>
+            {
+                if (cb.Tag is CheckBoxCellState s && !s.Suppress)
+                    ValueSetter(s.Item, cb.IsChecked);
+            };
         }
 
         return cb;
+    }
+
+    internal override bool TryUpdateCellContent(Control existing, object item)
+    {
+        if (existing is not VelaCheckBox cb || cb.Tag is not CheckBoxCellState state)
+            return false;
+
+        state.Item = item;
+        state.Suppress = true;
+        cb.IsChecked = ValueSelector?.Invoke(item) ?? false;
+        state.Suppress = false;
+        return true;
     }
 
     internal override object? GetSortValue(object item)
@@ -980,6 +1079,23 @@ public class VelaDataGridTemplateColumn : VelaDataGridColumn
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment,
         };
+    }
+
+    internal override bool TryUpdateCellContent(Control existing, object item)
+    {
+        if (existing is ContentPresenter cp)
+        {
+            cp.Content = item;
+            return true;
+        }
+
+        if (CellTemplate is not null && CellTemplate.Match(item))
+        {
+            existing.DataContext = item;
+            return true;
+        }
+
+        return false;
     }
 
     internal override string? GetSearchableText(object item)

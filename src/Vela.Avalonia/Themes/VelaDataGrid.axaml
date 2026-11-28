@@ -100,14 +100,7 @@
       <Setter Property="Background" Value="{DynamicResource VelaBorderSubtleBrush}" />
     </Style>
 
-    <!-- Body row states -->
-    <Style Selector="^ /template/ ListBox#PART_List Border.vela-table-row">
-      <Setter Property="Transitions">
-        <Transitions>
-          <BrushTransition Property="Background" Duration="0:0:0.10" />
-        </Transitions>
-      </Setter>
-    </Style>
+    <!-- Body row states (no per-row BrushTransition so virtualized recycling stays jank-free) -->
     <Style Selector="^ /template/ ListBox#PART_List Border.vela-table-row:alternate">
       <Setter Property="Background" Value="{DynamicResource VelaBackgroundBrush}" />
     </Style>

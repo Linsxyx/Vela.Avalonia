@@ -3,11 +3,11 @@
                     xmlns:controls="using:Vela.Avalonia.Controls">
 
   <ControlTheme x:Key="{x:Type controls:VelaButton}" TargetType="controls:VelaButton">
-    <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightMd}" />
+    <Setter Property="MinHeight" Value="{StaticResource VelaControlHeightMd}" />
     <Setter Property="Padding" Value="16,0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusControl}" />
+    <Setter Property="CornerRadius" Value="{StaticResource VelaRadiusControl}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontSize" Value="{StaticResource VelaTextSm}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -29,7 +29,6 @@
               <BrushTransition Property="Background" Duration="0:0:0.16" />
               <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
               <DoubleTransition Property="Opacity" Duration="0:0:0.16" />
-              <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.16" />
             </Transitions>
           </Border.Transitions>
 
@@ -72,15 +71,15 @@
     </Setter>
 
     <Style Selector="^:sm">
-      <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightSm}" />
+      <Setter Property="MinHeight" Value="{StaticResource VelaControlHeightSm}" />
       <Setter Property="Padding" Value="12,0" />
     </Style>
     <Style Selector="^:md">
-      <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightMd}" />
+      <Setter Property="MinHeight" Value="{StaticResource VelaControlHeightMd}" />
       <Setter Property="Padding" Value="16,0" />
     </Style>
     <Style Selector="^:lg">
-      <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightLg}" />
+      <Setter Property="MinHeight" Value="{StaticResource VelaControlHeightLg}" />
       <Setter Property="Padding" Value="20,0" />
     </Style>
 

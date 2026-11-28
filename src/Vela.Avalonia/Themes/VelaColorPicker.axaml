@@ -10,7 +10,7 @@
       <ControlTemplate>
         <Grid>
           <Button x:Name="PART_Trigger"
-                  Theme="{DynamicResource VelaIconButtonTheme}"
+                  Theme="{StaticResource VelaIconButtonTheme}"
                   Background="{DynamicResource VelaSurfaceBrush}"
                   BorderBrush="{DynamicResource VelaBorderBrush}"
                   BorderThickness="1"
@@ -90,7 +90,7 @@
                         Height="36">
                   <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
                     <Button x:Name="PART_FormatButton"
-                            Theme="{DynamicResource VelaIconButtonTheme}"
+                            Theme="{StaticResource VelaIconButtonTheme}"
                             Background="{DynamicResource VelaSurfaceBrush}"
                             BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
                             BorderThickness="1"
@@ -147,7 +147,7 @@
 
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                   <Button x:Name="PART_AddSwatch"
-                          Theme="{DynamicResource VelaIconButtonTheme}"
+                          Theme="{StaticResource VelaIconButtonTheme}"
                           Width="22"
                           Height="22"
                           CornerRadius="999"
@@ -157,7 +157,7 @@
                           ToolTip.Tip="Save current color">
                     <PathIcon Width="11"
                               Height="11"
-                              Data="{DynamicResource VelaIconPlus}"
+                              Data="{StaticResource VelaIconPlus}"
                               Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                   </Button>
                   <StackPanel x:Name="PART_SwatchesHost"
@@ -220,7 +220,7 @@
                       Height="36">
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
                   <Button x:Name="PART_FormatButton"
-                          Theme="{DynamicResource VelaIconButtonTheme}"
+                          Theme="{StaticResource VelaIconButtonTheme}"
                           Background="{DynamicResource VelaSurfaceBrush}"
                           BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
                           BorderThickness="1"
@@ -277,7 +277,7 @@
 
               <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                 <Button x:Name="PART_AddSwatch"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Theme="{StaticResource VelaIconButtonTheme}"
                         Width="22"
                         Height="22"
                         CornerRadius="999"
@@ -287,7 +287,7 @@
                         ToolTip.Tip="Save current color">
                   <PathIcon Width="11"
                             Height="11"
-                            Data="{DynamicResource VelaIconPlus}"
+                            Data="{StaticResource VelaIconPlus}"
                             Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                 </Button>
                 <StackPanel x:Name="PART_SwatchesHost"

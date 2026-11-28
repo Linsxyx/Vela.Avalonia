@@ -76,7 +76,7 @@
                 <PathIcon x:Name="PART_Chevron"
                           Width="12.5"
                           Height="12.5"
-                          Data="{DynamicResource VelaIconChevronDown}"
+                          Data="{StaticResource VelaIconChevronDown}"
                           Foreground="{DynamicResource VelaTextMutedBrush}"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center" />
@@ -256,7 +256,7 @@
                 <!-- Pane Toggle Button (auto-hides when ShowTopBar is true so toggle lives cleanly in TopBar) -->
                 <Button x:Name="PART_PaneToggle"
                         Grid.Column="1"
-                        Theme="{DynamicResource VelaIconButtonTheme}"
+                        Theme="{StaticResource VelaIconButtonTheme}"
                         Width="30"
                         Height="30"
                         Margin="4,0"
@@ -266,7 +266,7 @@
                   <PathIcon x:Name="PART_ToggleIcon"
                             Width="14"
                             Height="14"
-                            Data="{DynamicResource VelaIconChevronLeft}"
+                            Data="{StaticResource VelaIconChevronLeft}"
                             Foreground="{DynamicResource VelaTextMutedBrush}" />
                 </Button>
               </Grid>
@@ -287,7 +287,7 @@
                               Width="13"
                               Height="13"
                               Margin="0,0,7,0"
-                              Data="{DynamicResource VelaIconSearch}"
+                              Data="{StaticResource VelaIconSearch}"
                               Foreground="{DynamicResource VelaTextMutedBrush}"
                               VerticalAlignment="Center" />
                     <TextBox Theme="{DynamicResource VelaBareTextBoxTheme}"
@@ -367,7 +367,7 @@
                       IsVisible="{TemplateBinding TopBarCustomContent, Converter={x:Static ObjectConverters.IsNull}}">
                   <Button x:Name="PART_TopBarToggle"
                           Grid.Column="0"
-                          Theme="{DynamicResource VelaIconButtonTheme}"
+                          Theme="{StaticResource VelaIconButtonTheme}"
                           Width="30"
                           Height="30"
                           CornerRadius="8"
@@ -375,7 +375,7 @@
                           ToolTip.Tip="Toggle sidebar">
                     <PathIcon Width="15"
                               Height="15"
-                              Data="{DynamicResource VelaIconSidebar}"
+                              Data="{StaticResource VelaIconSidebar}"
                               Foreground="{DynamicResource VelaTextSecondaryBrush}" />
                   </Button>
 

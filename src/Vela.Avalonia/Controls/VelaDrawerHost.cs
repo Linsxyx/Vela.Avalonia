@@ -63,20 +63,36 @@ public class VelaDrawerHost : ContentControl
         _runner = new SpringRunner(this, OnTick);
     }
 
+    private TopLevel? _attachedTopLevel;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         EnsureOverlayInitialized();
+        if (_attachedTopLevel is not null)
+        {
+            _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+            _attachedTopLevel = null;
+        }
         if (TopLevel.GetTopLevel(this) is TopLevel topLevel)
+        {
+            _attachedTopLevel = topLevel;
             topLevel.AddHandler(KeyDownEvent, OnTopLevelKeyDown, RoutingStrategies.Tunnel);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
-        if (TopLevel.GetTopLevel(this) is TopLevel topLevel)
-            topLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+        foreach (var d in _sheetBindings)
+            d.Dispose();
+        _sheetBindings.Clear();
+        if (_attachedTopLevel is not null)
+        {
+            _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);
+            _attachedTopLevel = null;
+        }
     }
 
     private void EnsureOverlayInitialized()
@@ -215,6 +231,7 @@ public class VelaDrawerHost : ContentControl
                 CornerRadius = new CornerRadius(20),
                 ClipToBounds = true,
                 BackdropEffect = new BlurEffect { Radius = 14 },
+                BackdropEffectCache = new RetainedBackdropEffectCache(),
                 Child = chrome,
                 [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaLiquidGlassTintBrush"),
             };

@@ -299,6 +299,7 @@ internal sealed class VelaTrayFlyoutWindow : Window
             surface.Background = isDark
                 ? new SolidColorBrush(Color.FromArgb(0xDC, 0x1F, 0x1F, 0x22))
                 : new SolidColorBrush(Color.FromArgb(0xE2, 0xFF, 0xFF, 0xFF));
+            surface.BackdropEffectCache = new RetainedBackdropEffectCache();
             surface.BackdropEffect = new BlurEffect { Radius = 24.0 };
         }
         else

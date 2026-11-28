@@ -25,10 +25,64 @@ public sealed class VelaRulerTape : Control
     internal string FormatString { get; set; } = "0";
     internal bool IsDragging { get; set; }
 
+    private static readonly Typeface LabelTypeface = new(FontFamily.Default, FontStyle.Normal, FontWeight.Medium);
+
+    private bool _paletteDirty = true;
+    private IBrush _labelBrush = Brushes.Gray;
+    private IBrush _accentBrush = Brushes.DodgerBlue;
+    private Pen _minorPen = new(Brushes.Gray, 1.0);
+    private Pen _halfPen = new(Brushes.Gray, 1.15);
+    private Pen _majorPen = new(Brushes.Gray, 1.4);
+    private Pen _needlePen = new(Brushes.DodgerBlue, 2.0, lineCap: PenLineCap.Round);
+
     public VelaRulerTape()
     {
         IsHitTestVisible = false;
         ClipToBounds = true;
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _paletteDirty = true;
+        ActualThemeVariantChanged += OnThemeOrAccentChanged;
+        VelaTheme.AccentChanged += OnAccentChanged;
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        ActualThemeVariantChanged -= OnThemeOrAccentChanged;
+        VelaTheme.AccentChanged -= OnAccentChanged;
+    }
+
+    private void OnThemeOrAccentChanged(object? sender, EventArgs e)
+    {
+        _paletteDirty = true;
+        InvalidateVisual();
+    }
+
+    private void OnAccentChanged(object? sender, Tokens.VelaAccent e)
+    {
+        _paletteDirty = true;
+        InvalidateVisual();
+    }
+
+    private void EnsurePalette()
+    {
+        if (!_paletteDirty)
+            return;
+
+        _paletteDirty = false;
+        var minorBrush = ResolveBrush("VelaBorderStrongBrush", Brushes.Gray);
+        var majorBrush = ResolveBrush("VelaTextSecondaryBrush", Brushes.Gray);
+        _labelBrush = ResolveBrush("VelaTextMutedBrush", Brushes.Gray);
+        _accentBrush = ResolveBrush("VelaAccentBrush", Brushes.DodgerBlue);
+
+        _minorPen = new Pen(minorBrush, 1.0);
+        _halfPen = new Pen(majorBrush, 1.15);
+        _majorPen = new Pen(majorBrush, 1.4);
+        _needlePen = new Pen(_accentBrush, 2.0, lineCap: PenLineCap.Round);
     }
 
     public override void Render(DrawingContext context)
@@ -38,17 +92,10 @@ public sealed class VelaRulerTape : Control
         if (w <= 4 || h <= 4 || Step <= 0 || TickSpacing <= 0)
             return;
 
+        EnsurePalette();
+
         var centerX = w * 0.5;
         var perUnit = TickSpacing / Step;
-
-        var minorBrush = ResolveBrush("VelaBorderStrongBrush", Brushes.Gray);
-        var majorBrush = ResolveBrush("VelaTextSecondaryBrush", Brushes.Gray);
-        var labelBrush = ResolveBrush("VelaTextMutedBrush", Brushes.Gray);
-        var accentBrush = ResolveBrush("VelaAccentBrush", Brushes.DodgerBlue);
-
-        var minorPen = new Pen(minorBrush, 1.0);
-        var halfPen = new Pen(majorBrush, 1.15);
-        var majorPen = new Pen(majorBrush, 1.4);
 
         var totalTicks = (int)Math.Round((Maximum - Minimum) / Step);
         var halfSpanUnits = (w * 0.5 + 40.0) / perUnit;
@@ -57,7 +104,6 @@ public sealed class VelaRulerTape : Control
 
         var halfEvery = MajorEvery % 2 == 0 ? MajorEvery / 2 : -1;
         var baseLineY = 10.0;
-        var typeface = new Typeface(FontFamily.Default, FontStyle.Normal, FontWeight.Medium);
 
         for (var i = firstIdx; i <= lastIdx; i++)
         {
@@ -76,7 +122,7 @@ public sealed class VelaRulerTape : Control
 
             using (context.PushOpacity(edgeFade * (isMajor ? 0.95 : 0.72)))
             {
-                var pen = isMajor ? majorPen : isHalf ? halfPen : minorPen;
+                var pen = isMajor ? _majorPen : isHalf ? _halfPen : _minorPen;
                 context.DrawLine(pen, new Point(x, baseLineY), new Point(x, baseLineY + tickH));
 
                 if (isMajor)
@@ -86,18 +132,17 @@ public sealed class VelaRulerTape : Control
                         labelText,
                         CultureInfo.InvariantCulture,
                         FlowDirection.LeftToRight,
-                        typeface,
+                        LabelTypeface,
                         10.5,
-                        labelBrush);
+                        _labelBrush);
                     context.DrawText(ft, new Point(x - ft.Width * 0.5, baseLineY + 28.0));
                 }
             }
         }
 
         // Center fixed accent needle
-        var needlePen = new Pen(accentBrush, 2.0, lineCap: PenLineCap.Round);
-        context.DrawLine(needlePen, new Point(centerX, 4.0), new Point(centerX, 34.0));
-        context.DrawEllipse(accentBrush, null, new Point(centerX, 5.0), 3.0, 3.0);
+        context.DrawLine(_needlePen, new Point(centerX, 4.0), new Point(centerX, 34.0));
+        context.DrawEllipse(_accentBrush, null, new Point(centerX, 5.0), 3.0, 3.0);
     }
 
     private IBrush ResolveBrush(string key, IBrush fallback) =>

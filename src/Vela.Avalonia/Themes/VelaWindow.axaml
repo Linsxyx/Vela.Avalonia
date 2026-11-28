@@ -205,7 +205,7 @@
                                   chrome:WindowDecorationProperties.ElementRole="User"
                                   ToolTip.Tip="Close">
                             <PathIcon Width="10" Height="10"
-                                      Data="{DynamicResource VelaIconClose}" />
+                                      Data="{StaticResource VelaIconClose}" />
                           </Button>
                         </StackPanel>
                       </StackPanel>

@@ -67,9 +67,19 @@ public class VelaLineChart : Control
     private readonly SpringChannel _crosshairOpacity = new(0.0, VelaMotionTokens.Springs.Snappy);
     private readonly SpringRunner _runner;
 
+    private static readonly DashStyle CrosshairDashStyle = new([3, 3], 0);
+
     private int _hoveredIndex = -1;
     private bool _hasRevealed;
     private Rect _plotRect;
+
+    private bool _paletteDirty = true;
+    private IBrush _mutedBrush = Brushes.Gray;
+    private IBrush _fgBrush = Brushes.Black;
+    private IBrush _surfaceBrush = Brushes.White;
+    private IBrush _borderBrush = Brushes.Gray;
+    private Color _borderStrongColor = Colors.Gray;
+    private Pen _gridPen = new(Brushes.LightGray, 1.0);
 
     static VelaLineChart()
     {
@@ -102,8 +112,32 @@ public class VelaLineChart : Control
         _runner.Stop();
     }
 
-    private void OnThemeOrAccentChanged(object? sender, EventArgs e) => InvalidateVisual();
-    private void OnAccentChanged(object? sender, VelaAccent e) => InvalidateVisual();
+    private void OnThemeOrAccentChanged(object? sender, EventArgs e)
+    {
+        _paletteDirty = true;
+        InvalidateVisual();
+    }
+
+    private void OnAccentChanged(object? sender, VelaAccent e)
+    {
+        _paletteDirty = true;
+        InvalidateVisual();
+    }
+
+    private void EnsurePalette()
+    {
+        if (!_paletteDirty)
+            return;
+
+        _paletteDirty = false;
+        var gridBrush = ChartPalette.ResolveBrush(this, "VelaBorderSubtleBrush", Brushes.LightGray);
+        _mutedBrush = ChartPalette.ResolveBrush(this, "VelaTextMutedBrush", Brushes.Gray);
+        _fgBrush = ChartPalette.ResolveBrush(this, "VelaForegroundBrush", Brushes.Black);
+        _surfaceBrush = ChartPalette.ResolveBrush(this, "VelaSurfaceRaisedBrush", Brushes.White);
+        _borderBrush = ChartPalette.ResolveBrush(this, "VelaBorderBrush", Brushes.Gray);
+        _borderStrongColor = ChartPalette.ResolveColor(this, "VelaBorderStrongColor", Colors.Gray);
+        _gridPen = new Pen(gridBrush, 1.0);
+    }
 
     private void OnSeriesChanged()
     {
@@ -255,11 +289,11 @@ public class VelaLineChart : Control
 
         _plotRect = new Rect(leftPad, topPad, Math.Max(10, Bounds.Width - leftPad - rightPad), Math.Max(10, Bounds.Height - topPad - bottomPad));
 
-        var gridBrush = ChartPalette.ResolveBrush(this, "VelaBorderSubtleBrush", Brushes.LightGray);
-        var mutedBrush = ChartPalette.ResolveBrush(this, "VelaTextMutedBrush", Brushes.Gray);
-        var fgBrush = ChartPalette.ResolveBrush(this, "VelaForegroundBrush", Brushes.Black);
-        var surfaceBrush = ChartPalette.ResolveBrush(this, "VelaSurfaceRaisedBrush", Brushes.White);
-        var borderBrush = ChartPalette.ResolveBrush(this, "VelaBorderBrush", Brushes.Gray);
+        EnsurePalette();
+        var mutedBrush = _mutedBrush;
+        var fgBrush = _fgBrush;
+        var surfaceBrush = _surfaceBrush;
+        var borderBrush = _borderBrush;
 
         // 1. Interactive Legend Row
         _legendHits.Clear();
@@ -284,13 +318,12 @@ public class VelaLineChart : Control
 
         // 2. Horizontal Gridlines & Y-Axis ticks
         var maxY = Math.Max(1.0, _maxYSpring.Value);
-        var gridPen = new Pen(gridBrush, 1.0);
         const int yTicks = 4;
         for (var i = 0; i <= yTicks; i++)
         {
             var ratio = i / (double)yTicks;
             var y = _plotRect.Bottom - ratio * _plotRect.Height;
-            context.DrawLine(gridPen, new Point(_plotRect.Left, y), new Point(_plotRect.Right, y));
+            context.DrawLine(_gridPen, new Point(_plotRect.Left, y), new Point(_plotRect.Right, y));
 
             var tickVal = maxY * ratio;
             var ft = ChartPalette.MakeText($"{ValuePrefix}{ChartPalette.FormatCompact(tickVal)}", 11, mutedBrush);
@@ -354,8 +387,8 @@ public class VelaLineChart : Control
         if (chAlpha > 0.01 && _hoveredIndex >= 0 && count > 1)
         {
             var cx = _crosshairX.Value;
-            var chPen = new Pen(new SolidColorBrush(ChartPalette.ResolveColor(this, "VelaBorderStrongColor", Colors.Gray), chAlpha * 0.85), 1.0,
-                dashStyle: new DashStyle([3, 3], 0));
+            var chPen = new Pen(new SolidColorBrush(_borderStrongColor, chAlpha * 0.85), 1.0,
+                dashStyle: CrosshairDashStyle);
             context.DrawLine(chPen, new Point(cx, _plotRect.Top), new Point(cx, _plotRect.Bottom));
 
             var readoutLines = new List<(Color Color, string Text)>();

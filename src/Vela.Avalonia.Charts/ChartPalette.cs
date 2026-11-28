@@ -31,12 +31,26 @@ internal static class ChartPalette
     public static IBrush ResolveBrush(Control control, string key, IBrush fallback)
         => control.TryFindResource(key, control.ActualThemeVariant, out var res) && res is IBrush b ? b : fallback;
 
+    private static readonly Typeface RegularTypeface = new("Inter, sans-serif", FontStyle.Normal, FontWeight.Normal);
+    private static readonly Typeface MediumTypeface = new("Inter, sans-serif", FontStyle.Normal, FontWeight.Medium);
+    private static readonly Typeface SemiBoldTypeface = new("Inter, sans-serif", FontStyle.Normal, FontWeight.SemiBold);
+    private static readonly Typeface BoldTypeface = new("Inter, sans-serif", FontStyle.Normal, FontWeight.Bold);
+
+    private static Typeface GetTypeface(FontWeight weight) => weight switch
+    {
+        FontWeight.Normal => RegularTypeface,
+        FontWeight.Medium => MediumTypeface,
+        FontWeight.SemiBold => SemiBoldTypeface,
+        FontWeight.Bold => BoldTypeface,
+        _ => new Typeface("Inter, sans-serif", FontStyle.Normal, weight),
+    };
+
     public static FormattedText MakeText(string text, double size, IBrush brush, FontWeight weight = FontWeight.Normal)
         => new(
             text,
             CultureInfo.CurrentCulture,
             FlowDirection.LeftToRight,
-            new Typeface("Inter, sans-serif", FontStyle.Normal, weight),
+            GetTypeface(weight),
             size,
             brush);
 

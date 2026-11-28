@@ -3,9 +3,9 @@
                     xmlns:controls="using:Vela.Avalonia.Controls">
 
   <ControlTheme x:Key="{x:Type controls:VelaSwitch}" TargetType="controls:VelaSwitch">
-    <Setter Property="MinHeight" Value="{DynamicResource VelaControlHeightMd}" />
+    <Setter Property="MinHeight" Value="{StaticResource VelaControlHeightMd}" />
     <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
-    <Setter Property="FontSize" Value="{DynamicResource VelaTextSm}" />
+    <Setter Property="FontSize" Value="{StaticResource VelaTextSm}" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
@@ -15,7 +15,7 @@
         <StackPanel Orientation="Horizontal" Spacing="12" Background="Transparent" VerticalAlignment="Center">
           <Grid Width="42" Height="24" VerticalAlignment="Center">
             <Border x:Name="PART_TrackOff"
-                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    CornerRadius="{StaticResource VelaRadiusPill}"
                     Background="{DynamicResource VelaControlTrackBrush}">
               <Border.Transitions>
                 <Transitions>
@@ -25,7 +25,7 @@
             </Border>
 
             <Border x:Name="PART_TrackOn"
-                    CornerRadius="{DynamicResource VelaRadiusPill}"
+                    CornerRadius="{StaticResource VelaRadiusPill}"
                     Background="{DynamicResource VelaControlOnBrush}"
                     Opacity="0" />
 
@@ -33,7 +33,7 @@
               <Border x:Name="PART_Thumb"
                       Width="18"
                       Height="18"
-                      CornerRadius="{DynamicResource VelaRadiusPill}"
+                      CornerRadius="{StaticResource VelaRadiusPill}"
                       Background="{DynamicResource VelaControlThumbBrush}"
                       BoxShadow="{DynamicResource VelaControlThumbShadow}">
                 <Border.Transitions>

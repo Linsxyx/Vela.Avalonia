@@ -58,7 +58,7 @@ public class VelaComboBox : TemplatedControl
 
     protected override Type StyleKeyOverride => typeof(VelaComboBox);
 
-    private readonly ObservableCollection<object> _filtered = new();
+    private readonly VelaObservableList<object> _filtered = new();
     private readonly SpringChannel _chevronAngle = new(0.0, VelaMotionTokens.Springs.Snappy);
     private readonly SpringRunner _runner;
 
@@ -279,9 +279,9 @@ public class VelaComboBox : TemplatedControl
 
     private void RefreshFilter(bool showAll)
     {
-        _filtered.Clear();
         var query = showAll ? null : _searchBox?.Text?.Trim();
         var hasQuery = !string.IsNullOrEmpty(query);
+        var next = new List<object>();
 
         if (ItemsSource is not null)
         {
@@ -289,9 +289,10 @@ public class VelaComboBox : TemplatedControl
             {
                 if (item is null) continue;
                 if (!hasQuery || FormatItem(item).Contains(query!, StringComparison.OrdinalIgnoreCase))
-                    _filtered.Add(item);
+                    next.Add(item);
             }
         }
+        _filtered.ReplaceAll(next);
 
         if (_emptyLabel is not null)
             _emptyLabel.IsVisible = _filtered.Count == 0;

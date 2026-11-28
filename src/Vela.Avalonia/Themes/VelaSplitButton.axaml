@@ -75,7 +75,7 @@
                 <PathIcon x:Name="PART_Chevron"
                           Width="14"
                           Height="14"
-                          Data="{DynamicResource VelaIconChevronDown}"
+                          Data="{StaticResource VelaIconChevronDown}"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center" />
               </Button>

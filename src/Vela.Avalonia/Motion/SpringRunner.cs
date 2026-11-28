@@ -104,7 +104,7 @@ public sealed class SpringRunner
         private readonly List<SpringRunner> _active = new(8);
         private readonly List<SpringRunner> _snapshot = new(8);
         private readonly Action<TimeSpan> _frameCallback;
-        private bool _scheduled;
+        private bool _framePending;
         private TimeSpan? _lastFrame;
 
         public TopLevelSpringPump(TopLevel topLevel)
@@ -126,14 +126,15 @@ public sealed class SpringRunner
             _active.Remove(runner);
             if (_active.Count == 0)
             {
-                _scheduled = false;
+                // Keep _framePending true if an RAF callback is already in flight so a
+                // same-frame Wake() cannot enqueue a second concurrent animation pump.
                 _lastFrame = null;
             }
         }
 
         private void ScheduleIfNeeded()
         {
-            if (_scheduled || _active.Count == 0)
+            if (_framePending || _active.Count == 0)
                 return;
 
             if (!_topLevelRef.TryGetTarget(out var topLevel))
@@ -142,19 +143,17 @@ public sealed class SpringRunner
                 return;
             }
 
-            _scheduled = true;
+            _framePending = true;
             _lastFrame = null;
             topLevel.RequestAnimationFrame(_frameCallback);
         }
 
         private void OnFrame(TimeSpan timestamp)
         {
-            if (!_scheduled)
-                return;
+            _framePending = false;
 
             if (!_topLevelRef.TryGetTarget(out var topLevel) || _active.Count == 0)
             {
-                _scheduled = false;
                 _lastFrame = null;
                 _active.Clear();
                 return;
@@ -179,11 +178,11 @@ public sealed class SpringRunner
 
             if (_active.Count > 0)
             {
+                _framePending = true;
                 topLevel.RequestAnimationFrame(_frameCallback);
             }
             else
             {
-                _scheduled = false;
                 _lastFrame = null;
             }
         }

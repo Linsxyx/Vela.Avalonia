@@ -218,7 +218,8 @@ public class VelaTreeTable : TemplatedControl
 
     protected override Type StyleKeyOverride => typeof(VelaTreeTable);
 
-    internal readonly ObservableCollection<VelaTreeTableRowState> _visibleRows = new();
+    internal readonly VelaObservableList<VelaTreeTableRowState> _visibleRows = new();
+    internal readonly HashSet<VelaTreeTableRowControl> _realizedRows = new();
     internal readonly List<VelaDataGridColumn> _visibleColumns = new();
     private readonly HashSet<object> _expandedItems = new(ReferenceEqualityComparer.Instance);
     private readonly HashSet<object> _initializedItems = new(ReferenceEqualityComparer.Instance);
@@ -272,6 +273,11 @@ public class VelaTreeTable : TemplatedControl
         base.OnApplyTemplate(e);
 
         DetachBodyScroll();
+        if (_listBox is not null)
+        {
+            _listBox.TemplateApplied -= OnListBoxTemplateApplied;
+            _listBox.PropertyChanged -= OnListBoxPropertyChanged;
+        }
 
         _headerScroll = e.NameScope.Find<ScrollViewer>("PART_HeaderScroll");
         _headerPanel = e.NameScope.Find<StackPanel>("PART_HeaderPanel");
@@ -991,19 +997,13 @@ public class VelaTreeTable : TemplatedControl
 
     private void SyncRealizedRowWidths()
     {
-        if (_listBox is null)
-            return;
-
-        foreach (var rowCtrl in _listBox.GetVisualDescendants().OfType<VelaTreeTableRowControl>())
+        foreach (var rowCtrl in _realizedRows)
             rowCtrl.SyncColumnWidths();
     }
 
     private void RefreshVisibleRowsVisual(bool rebuildCells = false)
     {
-        if (_listBox is null)
-            return;
-
-        foreach (var rowCtrl in _listBox.GetVisualDescendants().OfType<VelaTreeTableRowControl>())
+        foreach (var rowCtrl in _realizedRows)
             rowCtrl.SyncFromBoundRow(rebuildCells, animateChevron: false);
     }
 
@@ -1028,9 +1028,7 @@ public class VelaTreeTable : TemplatedControl
         for (var i = 0; i < nextRows.Count; i++)
             nextRows[i].RowIndex = i;
 
-        _visibleRows.Clear();
-        foreach (var row in nextRows)
-            _visibleRows.Add(row);
+        _visibleRows.ReplaceAll(nextRows);
 
         VisibleCount = _visibleRows.Count;
         SyncSelectAllCheckBox();
@@ -1328,7 +1326,6 @@ internal sealed class VelaTreeTableRowControl : Border
     {
         Classes.Add("vela-table-row");
         Background = Brushes.Transparent;
-        Cursor = new Cursor(StandardCursorType.Hand);
 
         _cellsPanel = new StackPanel
         {
@@ -1336,6 +1333,38 @@ internal sealed class VelaTreeTableRowControl : Border
         };
 
         Child = _cellsPanel;
+        this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
+    }
+
+    private static Cursor? s_handCursor;
+    private VelaTreeTable? _registeredOwner;
+    private PathIcon? _treeIcon;
+    private Grid? _treeGrid;
+    private int _builtTreeColIndex = -1;
+    private bool _builtShowCheckBoxes;
+    private bool _builtShowVerticalGridLines;
+    private bool _hasBuiltCells;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        Cursor ??= s_handCursor ??= new Cursor(StandardCursorType.Hand);
+        RegisterWithOwner(_row?.Owner);
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        RegisterWithOwner(null);
+    }
+
+    private void RegisterWithOwner(VelaTreeTable? owner)
+    {
+        if (ReferenceEquals(_registeredOwner, owner))
+            return;
+        _registeredOwner?._realizedRows.Remove(this);
+        _registeredOwner = owner;
+        _registeredOwner?._realizedRows.Add(this);
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -1345,10 +1374,11 @@ internal sealed class VelaTreeTableRowControl : Border
         {
             var sameItem = ReferenceEquals(_boundItem, next.Item);
             var animateChevron = sameItem && next.Owner.ConsumeShouldAnimateToggle(next.Item);
-            var checkMismatch = (_checkBox is not null) != next.Owner.ShowCheckBoxes;
             _row = next;
             _boundItem = next.Item;
-            SyncFromBoundRow(rebuildCells: !sameItem || checkMismatch || _cellHosts.Count != next.Owner._visibleColumns.Count, animateChevron);
+            if (VisualRoot is not null)
+                RegisterWithOwner(next.Owner);
+            SyncFromBoundRow(rebuildCells: false, animateChevron, updateCellValues: !sameItem);
         }
         else
         {
@@ -1357,7 +1387,7 @@ internal sealed class VelaTreeTableRowControl : Border
         }
     }
 
-    internal void SyncFromBoundRow(bool rebuildCells, bool animateChevron)
+    internal void SyncFromBoundRow(bool rebuildCells, bool animateChevron, bool updateCellValues = false)
     {
         if (_row is null)
             return;
@@ -1365,15 +1395,36 @@ internal sealed class VelaTreeTableRowControl : Border
         var owner = _row.Owner;
         Height = VelaColumnLayoutEngine.GetRowHeight(owner.Density, isTreeView: false);
         BorderThickness = owner.ShowHorizontalGridLines ? new Thickness(0, 0, 0, 1) : new Thickness(0);
-        this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
 
         PseudoClasses.Set(":selected", _row.IsSelected);
         PseudoClasses.Set(":alternate", owner.ShowAlternatingRows && (_row.RowIndex % 2 == 1));
 
-        if (rebuildCells)
+        if (rebuildCells || !CanReuseBuiltCells(owner))
             RebuildCells(animateChevron);
         else
-            SyncStateOnly(animateChevron);
+            SyncStateOnly(animateChevron, updateCellValues);
+    }
+
+    private bool CanReuseBuiltCells(VelaTreeTable owner)
+    {
+        var cols = owner._visibleColumns;
+        var treeColIdx = Math.Clamp(owner.TreeColumnIndex, 0, Math.Max(0, cols.Count - 1));
+        if (!_hasBuiltCells
+            || _builtShowCheckBoxes != owner.ShowCheckBoxes
+            || _builtShowVerticalGridLines != owner.ShowVerticalGridLines
+            || _builtTreeColIndex != treeColIdx
+            || _cellHosts.Count != cols.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < cols.Count; i++)
+        {
+            if (!ReferenceEquals(_cellHosts[i].Column, cols[i]))
+                return false;
+        }
+
+        return true;
     }
 
     internal void SyncColumnWidths()
@@ -1382,7 +1433,7 @@ internal sealed class VelaTreeTableRowControl : Border
             host.Width = Math.Max(24.0, col.ActualWidth);
     }
 
-    private void SyncStateOnly(bool animateChevron)
+    private void SyncStateOnly(bool animateChevron, bool updateCellValues)
     {
         if (_row is null)
             return;
@@ -1409,7 +1460,51 @@ internal sealed class VelaTreeTableRowControl : Border
             _chevron.SetExpanded(_row.IsExpanded, animateChevron);
         }
 
-        SyncColumnWidths();
+        if (_treeIcon is not null)
+        {
+            _treeIcon.Data = _row.Icon;
+            _treeIcon.IsVisible = _row.Icon is not null;
+        }
+
+        if (updateCellValues)
+        {
+            for (var i = 0; i < _cellHosts.Count; i++)
+            {
+                var (host, col) = _cellHosts[i];
+                host.Width = Math.Max(24.0, col.ActualWidth);
+                if (i == _builtTreeColIndex && _treeGrid is not null)
+                {
+                    Control? existing = null;
+                    for (var c = 0; c < _treeGrid.Children.Count; c++)
+                    {
+                        if (Grid.GetColumn(_treeGrid.Children[c]) == 3)
+                        {
+                            existing = _treeGrid.Children[c];
+                            break;
+                        }
+                    }
+
+                    if (existing is null || !col.TryUpdateCellContent(existing, _row.Item))
+                    {
+                        if (existing is not null)
+                            _treeGrid.Children.Remove(existing);
+                        var rawCell = col.CreateCellContent(_row.Item);
+                        rawCell.Margin = new Thickness(2, 0, 0, 0);
+                        Grid.SetColumn(rawCell, 3);
+                        _treeGrid.Children.Add(rawCell);
+                    }
+                }
+                else
+                {
+                    if (host.Child is not Control existing || !col.TryUpdateCellContent(existing, _row.Item))
+                        host.Child = col.CreateCellContent(_row.Item);
+                }
+            }
+        }
+        else
+        {
+            SyncColumnWidths();
+        }
     }
 
     private void RebuildCells(bool animateChevron)
@@ -1418,11 +1513,18 @@ internal sealed class VelaTreeTableRowControl : Border
             return;
 
         var owner = _row.Owner;
+        var colsForSig = owner._visibleColumns;
+        _builtShowCheckBoxes = owner.ShowCheckBoxes;
+        _builtShowVerticalGridLines = owner.ShowVerticalGridLines;
+        _builtTreeColIndex = Math.Clamp(owner.TreeColumnIndex, 0, Math.Max(0, colsForSig.Count - 1));
+        _hasBuiltCells = true;
         _cellsPanel.Children.Clear();
         _cellHosts.Clear();
         _checkBox = null;
         _guides = null;
         _chevron = null;
+        _treeIcon = null;
+        _treeGrid = null;
 
         if (owner.ShowCheckBoxes)
         {
@@ -1482,34 +1584,32 @@ internal sealed class VelaTreeTableRowControl : Border
                         _row.Owner.ToggleExpand(_row.Item);
                 };
 
-                var treeGrid = new Grid
+                _treeGrid = new Grid
                 {
                     ColumnDefinitions = ColumnDefinitions.Parse("Auto,Auto,Auto,*"),
                 };
                 Grid.SetColumn(_guides, 0);
                 Grid.SetColumn(_chevron, 1);
-                treeGrid.Children.Add(_guides);
-                treeGrid.Children.Add(_chevron);
+                _treeGrid.Children.Add(_guides);
+                _treeGrid.Children.Add(_chevron);
 
-                if (_row.Icon is not null)
+                _treeIcon = new PathIcon
                 {
-                    var icon = new PathIcon
-                    {
-                        Width = 15,
-                        Height = 15,
-                        Data = _row.Icon,
-                        Margin = new Thickness(2, 0, 7, 0),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
-                    };
-                    Grid.SetColumn(icon, 2);
-                    treeGrid.Children.Add(icon);
-                }
+                    Width = 15,
+                    Height = 15,
+                    Data = _row.Icon,
+                    IsVisible = _row.Icon is not null,
+                    Margin = new Thickness(2, 0, 7, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    [!PathIcon.ForegroundProperty] = VelaResourceBinding.Create("VelaTextSecondaryBrush"),
+                };
+                Grid.SetColumn(_treeIcon, 2);
+                _treeGrid.Children.Add(_treeIcon);
 
                 rawCell.Margin = new Thickness(2, 0, 0, 0);
                 Grid.SetColumn(rawCell, 3);
-                treeGrid.Children.Add(rawCell);
-                cellInner = treeGrid;
+                _treeGrid.Children.Add(rawCell);
+                cellInner = _treeGrid;
             }
             else
             {

@@ -50,7 +50,7 @@
       <Setter Property="FontSize" Value="13" />
     </Style>
     <Style Selector="^:pill">
-      <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusPill}" />
+      <Setter Property="CornerRadius" Value="{StaticResource VelaRadiusPill}" />
     </Style>
 
     <!-- Semantic Tones (OKLab soft tints) -->

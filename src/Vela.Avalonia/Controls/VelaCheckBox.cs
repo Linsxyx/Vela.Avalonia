@@ -55,28 +55,52 @@ public sealed class VelaCheckMark : Control
             return;
 
         var drawDist = total * progress;
-        var pen = new Pen(Stroke, 1.85, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
-
-        var geom = new StreamGeometry();
-        using (var ctx = geom.Open())
+        if (_cachedPen is null || !ReferenceEquals(_cachedStroke, Stroke))
         {
-            ctx.BeginFigure(p0, isFilled: false);
-            if (drawDist <= len1)
-            {
-                var t = drawDist / len1;
-                ctx.LineTo(new Point(Lerp(p0.X, p1.X, t), Lerp(p0.Y, p1.Y, t)));
-            }
-            else
-            {
-                ctx.LineTo(p1);
-                var t = Math.Clamp((drawDist - len1) / Math.Max(len2, 1e-4), 0.0, 1.0);
-                ctx.LineTo(new Point(Lerp(p1.X, p2.X, t), Lerp(p1.Y, p2.Y, t)));
-            }
-            ctx.EndFigure(isClosed: false);
+            _cachedStroke = Stroke;
+            _cachedPen = new Pen(Stroke, 1.85, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
         }
 
-        context.DrawGeometry(null, pen, geom);
+        if (_cachedGeom is null
+            || Math.Abs(_cachedWidth - Bounds.Width) > 0.01
+            || Math.Abs(_cachedHeight - Bounds.Height) > 0.01
+            || Math.Abs(_cachedProgress - progress) > 1e-4
+            || Math.Abs(_cachedMorph - m) > 1e-4)
+        {
+            var geom = new StreamGeometry();
+            using (var ctx = geom.Open())
+            {
+                ctx.BeginFigure(p0, isFilled: false);
+                if (drawDist <= len1)
+                {
+                    var t = drawDist / len1;
+                    ctx.LineTo(new Point(Lerp(p0.X, p1.X, t), Lerp(p0.Y, p1.Y, t)));
+                }
+                else
+                {
+                    ctx.LineTo(p1);
+                    var t = Math.Clamp((drawDist - len1) / Math.Max(len2, 1e-4), 0.0, 1.0);
+                    ctx.LineTo(new Point(Lerp(p1.X, p2.X, t), Lerp(p1.Y, p2.Y, t)));
+                }
+                ctx.EndFigure(isClosed: false);
+            }
+            _cachedGeom = geom;
+            _cachedWidth = Bounds.Width;
+            _cachedHeight = Bounds.Height;
+            _cachedProgress = progress;
+            _cachedMorph = m;
+        }
+
+        context.DrawGeometry(null, _cachedPen, _cachedGeom);
     }
+
+    private Pen? _cachedPen;
+    private IBrush? _cachedStroke;
+    private StreamGeometry? _cachedGeom;
+    private double _cachedWidth = -1;
+    private double _cachedHeight = -1;
+    private double _cachedProgress = -1;
+    private double _cachedMorph = -1;
 
     private static double Dist(Point a, Point b) => Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
 }
