@@ -83,11 +83,12 @@ public class VelaDrawerHost : ContentControl
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        base.OnDetachedFromVisualTree(e);
         _runner.Stop();
-        foreach (var d in _sheetBindings)
-            d.Dispose();
-        _sheetBindings.Clear();
+        if (!_isOpen)
+            FinishClose();
+        else
+            ClearSheetBindings();
+        base.OnDetachedFromVisualTree(e);
         if (_attachedTopLevel is not null)
         {
             _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);

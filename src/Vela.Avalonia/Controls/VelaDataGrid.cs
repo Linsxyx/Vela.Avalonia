@@ -997,12 +997,14 @@ public class VelaDataGrid : TemplatedControl
 
     private void RebuildRows()
     {
-        var items = new List<object>();
+        var search = SearchText?.Trim();
+        var hasSearch = !string.IsNullOrEmpty(search);
+        var hasFilter = hasSearch || FilterPredicate is not null;
+
+        var initialCapacity = !hasFilter && ItemsSource is ICollection sourceCol ? sourceCol.Count : 0;
+        var items = new List<object>(initialCapacity);
         if (ItemsSource is not null)
         {
-            var search = SearchText?.Trim();
-            var hasSearch = !string.IsNullOrEmpty(search);
-
             foreach (var item in ItemsSource)
             {
                 if (item is null)
@@ -1048,15 +1050,21 @@ public class VelaDataGrid : TemplatedControl
         if (SearchPredicate is not null)
             return SearchPredicate(item, query);
 
-        foreach (var col in Columns)
+        var hasVisibleColumn = false;
+        for (var i = 0; i < Columns.Count; i++)
         {
+            var col = Columns[i];
             if (!col.IsVisible)
                 continue;
 
+            hasVisibleColumn = true;
             var text = col.GetSearchableText(item);
             if (!string.IsNullOrEmpty(text) && text.Contains(query, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
+
+        if (hasVisibleColumn)
+            return false;
 
         var fallback = item.ToString();
         return !string.IsNullOrEmpty(fallback) && fallback.Contains(query, StringComparison.OrdinalIgnoreCase);
@@ -1109,11 +1117,17 @@ internal sealed class VelaDataGridRowControl : Border
         this[!BorderBrushProperty] = VelaResourceBinding.Create("VelaBorderSubtleBrush");
     }
 
+    private static readonly Thickness HorizontalGridBorder = new(0, 0, 0, 1);
+    private static readonly Thickness ZeroBorder = new(0);
     private static Cursor? s_handCursor;
     private VelaDataGrid? _registeredOwner;
     private bool _builtShowCheckBoxes;
     private bool _builtShowVerticalGridLines;
     private bool _hasBuiltCells;
+    private double _appliedHeight = double.NaN;
+    private bool? _appliedHorizontalGridLines;
+    private bool _appliedSelected;
+    private bool _appliedAlternate;
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -1159,11 +1173,33 @@ internal sealed class VelaDataGridRowControl : Border
             return;
 
         var owner = _row.Owner;
-        Height = VelaColumnLayoutEngine.GetRowHeight(owner.Density, isTreeView: false);
-        BorderThickness = owner.ShowHorizontalGridLines ? new Thickness(0, 0, 0, 1) : new Thickness(0);
+        var nextHeight = VelaColumnLayoutEngine.GetRowHeight(owner.Density, isTreeView: false);
+        if (_appliedHeight != nextHeight)
+        {
+            _appliedHeight = nextHeight;
+            Height = nextHeight;
+        }
 
-        PseudoClasses.Set(":selected", _row.IsSelected);
-        PseudoClasses.Set(":alternate", owner.ShowAlternatingRows && (_row.RowIndex % 2 == 1));
+        var showHorizontal = owner.ShowHorizontalGridLines;
+        if (_appliedHorizontalGridLines != showHorizontal)
+        {
+            _appliedHorizontalGridLines = showHorizontal;
+            BorderThickness = showHorizontal ? HorizontalGridBorder : ZeroBorder;
+        }
+
+        var isSelected = _row.IsSelected;
+        if (_appliedSelected != isSelected)
+        {
+            _appliedSelected = isSelected;
+            PseudoClasses.Set(":selected", isSelected);
+        }
+
+        var isAlternate = owner.ShowAlternatingRows && (_row.RowIndex % 2 == 1);
+        if (_appliedAlternate != isAlternate)
+        {
+            _appliedAlternate = isAlternate;
+            PseudoClasses.Set(":alternate", isAlternate);
+        }
 
         if (rebuildCells || !CanReuseBuiltCells(owner))
             RebuildCells();
@@ -1195,8 +1231,13 @@ internal sealed class VelaDataGridRowControl : Border
 
     internal void SyncColumnWidths()
     {
-        foreach (var (host, col) in _cellHosts)
-            host.Width = Math.Max(24.0, col.ActualWidth);
+        for (var i = 0; i < _cellHosts.Count; i++)
+        {
+            var (host, col) = _cellHosts[i];
+            var nextWidth = Math.Max(24.0, col.ActualWidth);
+            if (Math.Abs(host.Width - nextWidth) > 0.01)
+                host.Width = nextWidth;
+        }
     }
 
     private void SyncStateOnly(bool updateCellValues)
@@ -1204,7 +1245,7 @@ internal sealed class VelaDataGridRowControl : Border
         if (_row is null)
             return;
 
-        if (_checkBox is not null)
+        if (_checkBox is not null && _checkBox.IsChecked != _row.IsSelected)
         {
             _suppressCheckEvent = true;
             _checkBox.IsChecked = _row.IsSelected;
@@ -1216,7 +1257,9 @@ internal sealed class VelaDataGridRowControl : Border
             for (var i = 0; i < _cellHosts.Count; i++)
             {
                 var (host, col) = _cellHosts[i];
-                host.Width = Math.Max(24.0, col.ActualWidth);
+                var nextWidth = Math.Max(24.0, col.ActualWidth);
+                if (Math.Abs(host.Width - nextWidth) > 0.01)
+                    host.Width = nextWidth;
                 if (host.Child is not Control existing || !col.TryUpdateCellContent(existing, _row.Item))
                     host.Child = col.CreateCellContent(_row.Item);
             }

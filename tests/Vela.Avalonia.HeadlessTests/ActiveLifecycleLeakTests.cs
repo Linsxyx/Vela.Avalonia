@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Vela.Avalonia.Controls;
 using Vela.Avalonia.HeadlessTests.Infrastructure;
 using Vela.Avalonia.Motion;
@@ -169,6 +170,113 @@ public class ActiveLifecycleLeakTests
         Assert.False(
             bodyRef.TryGetTarget(out _),
             "Memory leak detected: drawer body survived full GC after VelaDrawerHost.Close().");
+    }
+
+    [AvaloniaFact]
+    public void VelaDialogHost_DetachedMidCloseAnimation_CollectsHostAndDialogContent()
+    {
+        var (hostRef, contentRef) = OpenCloseAndDetachMidAnimation();
+        HeadlessLeakVerifier.ForceFullGcAndFlush();
+
+        Assert.False(
+            hostRef.TryGetTarget(out _),
+            "Memory leak detected: VelaDialogHost survived full GC when detached mid-close animation.");
+        Assert.False(
+            contentRef.TryGetTarget(out _),
+            "Memory leak detected: dialog content survived full GC when VelaDialogHost was detached mid-close animation.");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static (WeakReference<VelaDialogHost> HostRef, WeakReference<Control> ContentRef) OpenCloseAndDetachMidAnimation()
+    {
+        var previousReducedMotion = VelaMotionOptions.ReducedMotion;
+        VelaMotionOptions.ReducedMotion = false;
+        try
+        {
+            var window = new Window { Width = 640, Height = 480 };
+            var host = new VelaDialogHost { Content = new TextBlock { Text = "Base" } };
+            window.Content = host;
+            window.Show();
+            HeadlessLeakVerifier.FlushLayoutAndRender(window);
+
+            var body = new Border
+            {
+                Width = 280,
+                Height = 140,
+                Child = new TextBlock { Text = "Mid-Exit Dialog Body" },
+            };
+            var hostRef = new WeakReference<VelaDialogHost>(host);
+            var weakRef = new WeakReference<Control>(body);
+
+            _ = host.ShowAsync<object?>(body);
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            host.Close();
+            // Detach immediately while close spring animation is still running
+            window.Content = null;
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+
+            return (hostRef, weakRef);
+        }
+        finally
+        {
+            VelaMotionOptions.ReducedMotion = previousReducedMotion;
+        }
+    }
+
+    [AvaloniaFact]
+    public void VelaDrawerHost_DetachedMidCloseAnimation_CollectsHostAndDrawerBody()
+    {
+        var (hostRef, bodyRef) = OpenCloseAndDetachDrawerMidAnimation();
+        HeadlessLeakVerifier.ForceFullGcAndFlush();
+
+        Assert.False(
+            hostRef.TryGetTarget(out _),
+            "Memory leak detected: VelaDrawerHost survived full GC when detached mid-close animation.");
+        Assert.False(
+            bodyRef.TryGetTarget(out _),
+            "Memory leak detected: drawer body survived full GC when VelaDrawerHost was detached mid-close animation.");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static (WeakReference<VelaDrawerHost> HostRef, WeakReference<Control> BodyRef) OpenCloseAndDetachDrawerMidAnimation()
+    {
+        var previousReducedMotion = VelaMotionOptions.ReducedMotion;
+        VelaMotionOptions.ReducedMotion = false;
+        try
+        {
+            var window = new Window { Width = 640, Height = 480 };
+            var host = new VelaDrawerHost { Content = new TextBlock { Text = "Base" } };
+            window.Content = host;
+            window.Show();
+            HeadlessLeakVerifier.FlushLayoutAndRender(window);
+
+            var body = new Border
+            {
+                Width = 260,
+                Child = new TextBlock { Text = "Mid-Exit Drawer Body" },
+            };
+            var hostRef = new WeakReference<VelaDrawerHost>(host);
+            var weakRef = new WeakReference<Control>(body);
+
+            _ = host.ShowAsync(body);
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            host.Close();
+            // Detach immediately while close spring animation is still running
+            window.Content = null;
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+
+            return (hostRef, weakRef);
+        }
+        finally
+        {
+            VelaMotionOptions.ReducedMotion = previousReducedMotion;
+        }
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

@@ -208,9 +208,11 @@ public class VelaDialogHost : ContentControl
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        base.OnDetachedFromVisualTree(e);
         _runner.Stop();
         DisposeShellBindings();
+        if (!_isOpen)
+            FinishCloseCleanup();
+        base.OnDetachedFromVisualTree(e);
         if (_attachedTopLevel is not null)
         {
             _attachedTopLevel.RemoveHandler(KeyDownEvent, OnTopLevelKeyDown);

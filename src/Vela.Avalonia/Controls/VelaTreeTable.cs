@@ -1068,29 +1068,38 @@ public class VelaTreeTable : TemplatedControl
         }
 
         var selfMatch = MatchesFilters(item, search, hasSearch);
-        var childRows = new List<VelaTreeTableRowState>();
+        if (children.Count == 0)
+        {
+            if (!selfMatch)
+                return false;
+
+            output.Add(CreateRowState(item, parent, depth, hasChildren, isExpanded: false));
+            return true;
+        }
+
+        var insertIndex = output.Count;
+        output.Add(null!);
         var anyChildMatched = false;
 
-        foreach (var child in children)
+        for (var i = 0; i < children.Count; i++)
         {
-            if (ProjectNode(child, item, depth + 1, search, hasSearch, hasFilter: true, childRows, visited))
+            if (ProjectNode(children[i], item, depth + 1, search, hasSearch, hasFilter: true, output, visited))
                 anyChildMatched = true;
         }
 
         if (!selfMatch && !anyChildMatched)
+        {
+            output.RemoveAt(insertIndex);
             return false;
+        }
 
         var expandedInFilter = hasChildren && (anyChildMatched || _expandedItems.Contains(item));
-        output.Add(CreateRowState(item, parent, depth, hasChildren, expandedInFilter));
+        output[insertIndex] = CreateRowState(item, parent, depth, hasChildren, expandedInFilter);
 
-        if (anyChildMatched)
+        if (!anyChildMatched && expandedInFilter)
         {
-            output.AddRange(childRows);
-        }
-        else if (expandedInFilter)
-        {
-            foreach (var child in children)
-                ProjectNode(child, item, depth + 1, search: null, hasSearch: false, hasFilter: false, output, visited);
+            for (var i = 0; i < children.Count; i++)
+                ProjectNode(children[i], item, depth + 1, search: null, hasSearch: false, hasFilter: false, output, visited);
         }
 
         return true;
@@ -1152,6 +1161,8 @@ public class VelaTreeTable : TemplatedControl
             .ToList();
     }
 
+    private static readonly List<object> s_emptyObjectList = new(0);
+
     private bool MatchesFilters(object item, string? search, bool hasSearch)
     {
         if (FilterPredicate is not null && !FilterPredicate(item))
@@ -1163,15 +1174,21 @@ public class VelaTreeTable : TemplatedControl
         if (SearchPredicate is not null)
             return SearchPredicate(item, search!);
 
-        foreach (var col in Columns)
+        var hasVisibleColumn = false;
+        for (var i = 0; i < Columns.Count; i++)
         {
+            var col = Columns[i];
             if (!col.IsVisible)
                 continue;
 
+            hasVisibleColumn = true;
             var text = col.GetSearchableText(item);
             if (!string.IsNullOrEmpty(text) && text.Contains(search!, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
+
+        if (hasVisibleColumn)
+            return false;
 
         var fallback = item.ToString();
         return !string.IsNullOrEmpty(fallback) && fallback.Contains(search!, StringComparison.OrdinalIgnoreCase);
@@ -1179,14 +1196,18 @@ public class VelaTreeTable : TemplatedControl
 
     private List<object> GetRootItems()
     {
-        var list = new List<object>();
-        if (ItemsSource is not null)
+        if (ItemsSource is null)
+            return s_emptyObjectList;
+
+        var capacity = ItemsSource is ICollection col ? col.Count : 0;
+        if (capacity == 0 && ItemsSource is ICollection)
+            return s_emptyObjectList;
+
+        var list = new List<object>(capacity);
+        foreach (var item in ItemsSource)
         {
-            foreach (var item in ItemsSource)
-            {
-                if (item is not null)
-                    list.Add(item);
-            }
+            if (item is not null)
+                list.Add(item);
         }
         return list;
     }
@@ -1202,14 +1223,18 @@ public class VelaTreeTable : TemplatedControl
         if (raw is INotifyCollectionChanged incc)
             SubscribeCollection(incc);
 
-        var list = new List<object>();
-        if (raw is not null)
+        if (raw is null)
+            return s_emptyObjectList;
+
+        var capacity = raw is ICollection col ? col.Count : 0;
+        if (capacity == 0 && raw is ICollection)
+            return s_emptyObjectList;
+
+        var list = new List<object>(capacity);
+        foreach (var child in raw)
         {
-            foreach (var child in raw)
-            {
-                if (child is not null)
-                    list.Add(child);
-            }
+            if (child is not null)
+                list.Add(child);
         }
         return list;
     }

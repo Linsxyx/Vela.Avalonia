@@ -850,11 +850,22 @@ public class VelaDataGridTextColumn : VelaDataGridColumn
             return false;
 
         if (ValueSelector is not null)
-            tb.Text = FormatValue(ValueSelector(item));
+        {
+            var next = FormatValue(ValueSelector(item));
+            if (!string.Equals(tb.Text, next, StringComparison.Ordinal))
+                tb.Text = next;
+        }
         else if (Binding is not null)
-            tb.DataContext = item;
+        {
+            if (!ReferenceEquals(tb.DataContext, item))
+                tb.DataContext = item;
+        }
         else
-            tb.Text = FormatValue(item);
+        {
+            var next = FormatValue(item);
+            if (!string.Equals(tb.Text, next, StringComparison.Ordinal))
+                tb.Text = next;
+        }
 
         return true;
     }
@@ -883,9 +894,10 @@ public class VelaDataGridTextColumn : VelaDataGridColumn
     {
         if (raw is null)
             return string.Empty;
-        if (!string.IsNullOrEmpty(StringFormat))
-            return string.Format(CultureInfo.CurrentCulture, StringFormat, raw);
-        return Convert.ToString(raw, CultureInfo.CurrentCulture) ?? string.Empty;
+        var fmt = StringFormat;
+        if (!string.IsNullOrEmpty(fmt))
+            return string.Format(CultureInfo.CurrentCulture, fmt, raw);
+        return raw as string ?? Convert.ToString(raw, CultureInfo.CurrentCulture) ?? string.Empty;
     }
 }
 
