@@ -27,6 +27,7 @@ public partial class MainViewModel : ViewModelBase
     public ShadersViewModel Shaders { get; }
     public ChartsViewModel Charts { get; }
     public SystemTrayViewModel SystemTray { get; }
+    public ShowcaseViewModel Showcase { get; }
 
     public ObservableCollection<AccentSwatchViewModel> AccentSwatches { get; } = new();
 
@@ -122,6 +123,7 @@ public partial class MainViewModel : ViewModelBase
         Shaders = new ShadersViewModel(shell);
         Charts = new ChartsViewModel();
         SystemTray = new SystemTrayViewModel(shell, ToggleDarkMode, ToggleLanguage);
+        Showcase = new ShowcaseViewModel();
 
         foreach (var accent in Enum.GetValues<VelaAccent>())
         {
@@ -240,6 +242,7 @@ public partial class MainViewModel : ViewModelBase
         yield return NavCmd(loc.Get("StrNavShaders"), "shaders", "VelaIconSparkles", "G S");
         yield return NavCmd(loc.Get("StrNavCharts"), "charts", "VelaIconChart", "G C");
         yield return NavCmd(loc.Get("StrNavTray"), "tray", "VelaIconBell", "G T");
+        yield return NavCmd(loc.Get("StrNavShowcase"), "showcase", "VelaIconSparkles", "G W");
         yield return NavCmd(loc.Get("StrNavStress"), "stress", "VelaIconTrendingUp", "G B");
 
         yield return new VelaCommandItem

@@ -74,6 +74,7 @@ public partial class MainView : UserControl
             "shaders" => new ShadersPage { DataContext = _viewModel.Shaders },
             "charts" => new ChartsPage { DataContext = _viewModel.Charts },
             "tray" => new SystemTrayPage { DataContext = _viewModel.SystemTray },
+            "showcase" => new ShowcasePage { DataContext = _viewModel.Showcase },
             "stress" => new HeavyStressPage(),
             _ => null,
         };

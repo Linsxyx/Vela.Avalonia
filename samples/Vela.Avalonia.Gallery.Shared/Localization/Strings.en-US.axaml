@@ -418,4 +418,17 @@
   <x:String x:Key="StrGlassCardDemoDesc">Deep frosted backdrop blur with a theme-adaptive contrast veil and diagonal luminous rim.</x:String>
   <x:String x:Key="StrBgLayerDemoTitle">Adaptive Scrim &amp; Blur Layer</x:String>
   <x:String x:Key="StrBgLayerDemoDesc">Keep foreground typography crisp over animated shaders or custom wallpaper images.</x:String>
+
+  <!-- Showcase / Signature Controls -->
+  <x:String x:Key="StrNavShowcase">Showcase</x:String>
+  <x:String x:Key="StrShowcaseSubtitle">Signature interactive controls with bespoke choreography and vector rendering.</x:String>
+  <x:String x:Key="StrPaymentFlowDesc">A card tap goes to a processor, then the network, then the bank and back with authorization, then settlement; each hop lights up with a status label and the amount travels as a chip.</x:String>
+  <x:String x:Key="StrPaymentFlowHint">Click canvas or press Space/Enter to pause · R to restart · ←/→ to step through stages.</x:String>
+  <x:String x:Key="StrPlay">Play</x:String>
+  <x:String x:Key="StrPause">Pause</x:String>
+  <x:String x:Key="StrRestart">Restart</x:String>
+  <x:String x:Key="StrStepNext">Step →</x:String>
+  <x:String x:Key="StrAmount">Amount</x:String>
+  <x:String x:Key="StrSpeed">Speed</x:String>
+  <x:String x:Key="StrLoop">Loop</x:String>
 </ResourceDictionary>

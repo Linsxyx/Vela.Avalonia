@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vela="using:Vela.Avalonia.Controls"
+             xmlns:vm="using:Vela.Avalonia.Gallery.ViewModels"
+             x:Class="Vela.Avalonia.Gallery.Views.ShowcasePage"
+             x:DataType="vm:ShowcaseViewModel">
+  <ScrollViewer Classes="pageScroll">
+    <StackPanel Classes="pageRoot">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="pageTitle" Text="{DynamicResource StrNavShowcase}" />
+          <TextBlock Text="{DynamicResource StrShowcaseSubtitle}"
+                     FontSize="13"
+                     Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+        </StackPanel>
+      </Grid>
+
+      <!-- Payment Flow Card -->
+      <Border Classes="card">
+        <StackPanel Spacing="18">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="4">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Classes="cardTitle" Text="Payment flow" VerticalAlignment="Center" />
+                <vela:VelaBadge Tone="Accent" Size="Small" IsPill="True" Content="Live · keyboard ready" />
+              </StackPanel>
+              <TextBlock Text="{DynamicResource StrPaymentFlowDesc}"
+                         FontSize="12.5"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource VelaTextSecondaryBrush}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+              <vela:VelaButton x:Name="PlayPauseBtn"
+                               Variant="Secondary"
+                               Size="Small"
+                               Content="{DynamicResource StrPause}"
+                               Click="OnPlayPauseClick" />
+              <vela:VelaButton Variant="Secondary"
+                               Size="Small"
+                               Content="{DynamicResource StrRestart}"
+                               Click="OnRestartClick" />
+              <vela:VelaButton Variant="Ghost"
+                               Size="Small"
+                               Content="{DynamicResource StrStepNext}"
+                               Click="OnStepNextClick" />
+            </StackPanel>
+          </Grid>
+
+          <!-- The Payment Flow Control -->
+          <vela:VelaPaymentFlow x:Name="PaymentFlowControl"
+                                Amount="{Binding PaymentAmount}"
+                                InitialBalance="{Binding InitialBalance}"
+                                IsLooping="{Binding IsLooping}"
+                                PlaybackSpeed="{Binding PlaybackSpeed}"
+                                AutoPlay="True" />
+
+          <!-- Interactive Controls Footer -->
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource StrAmount}"
+                         FontSize="12"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         VerticalAlignment="Center" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding AmountPresetIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="$42.50" />
+                <vela:VelaSegmentedItem Content="$128.00" />
+                <vela:VelaSegmentedItem Content="$1,499" />
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource StrSpeed}"
+                         FontSize="12"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         VerticalAlignment="Center" />
+              <vela:VelaSegmentedControl SelectedIndex="{Binding SpeedIndex, Mode=TwoWay}">
+                <vela:VelaSegmentedItem Content="0.5×" />
+                <vela:VelaSegmentedItem Content="1×" />
+                <vela:VelaSegmentedItem Content="1.5×" />
+                <vela:VelaSegmentedItem Content="2×" />
+              </vela:VelaSegmentedControl>
+            </StackPanel>
+
+            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource StrLoop}"
+                         FontSize="12"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         VerticalAlignment="Center" />
+              <vela:VelaSwitch IsChecked="{Binding IsLooping, Mode=TwoWay}" />
+            </StackPanel>
+          </Grid>
+
+          <TextBlock Text="{DynamicResource StrPaymentFlowHint}"
+                     FontSize="11.5"
+                     Foreground="{DynamicResource VelaTextMutedBrush}" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -18,5 +18,6 @@
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaAccordion.axaml" />
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaResizablePanels.axaml" />
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaMetricCard.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaPaymentFlow.axaml" />
   </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

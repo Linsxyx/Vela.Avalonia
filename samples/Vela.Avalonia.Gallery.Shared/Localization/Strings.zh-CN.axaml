@@ -418,4 +418,17 @@
   <x:String x:Key="StrGlassCardDemoDesc">高半径背景模糊搭配主题自适应对比遮罩与对角线高光边框。</x:String>
   <x:String x:Key="StrBgLayerDemoTitle">自适应遮罩与模糊背景层</x:String>
   <x:String x:Key="StrBgLayerDemoDesc">在动态着色器或自定义壁纸之上，保持前景文字始终清晰可读。</x:String>
+
+  <!-- Showcase / Signature Controls -->
+  <x:String x:Key="StrNavShowcase">特色控件</x:String>
+  <x:String x:Key="StrShowcaseSubtitle">精选交互式特色控件，融合精细动效编排与高分矢量绘制。</x:String>
+  <x:String x:Key="StrPaymentFlowDesc">一次刷卡请求依次经过支付网关、卡组织网络与发卡行并返回授权，随后进入清算结算；每个节点会点亮状态标签，金额以胶囊芯片形式沿路径流转。</x:String>
+  <x:String x:Key="StrPaymentFlowHint">点击画布或按 Space / Enter 播放暂停 · 按 R 重播 · 按 ← / → 逐阶段步进。</x:String>
+  <x:String x:Key="StrPlay">播放</x:String>
+  <x:String x:Key="StrPause">暂停</x:String>
+  <x:String x:Key="StrRestart">重播</x:String>
+  <x:String x:Key="StrStepNext">单步 →</x:String>
+  <x:String x:Key="StrAmount">金额</x:String>
+  <x:String x:Key="StrSpeed">倍速</x:String>
+  <x:String x:Key="StrLoop">循环</x:String>
 </ResourceDictionary>
