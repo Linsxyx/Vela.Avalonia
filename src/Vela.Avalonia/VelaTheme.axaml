@@ -14,4 +14,9 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
+
+  <!-- Wrap long string ToolTip content cleanly within MaxWidth -->
+  <Style Selector="ToolTip TextBlock">
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
 </Styles>

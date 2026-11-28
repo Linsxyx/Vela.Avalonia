@@ -1,31 +1,57 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
 
-  <!-- Arc-inspired high-contrast inverted ToolTip theme for all native Avalonia ToolTips -->
-  <ControlTheme x:Key="{x:Type ToolTip}" TargetType="ToolTip">
-    <Setter Property="Foreground" Value="{DynamicResource VelaBackgroundBrush}" />
-    <Setter Property="Background" Value="{DynamicResource VelaForegroundBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderStrongBrush}" />
-    <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="CornerRadius" Value="9" />
-    <Setter Property="Padding" Value="10,6" />
+  <!--
+    Elevated card ToolTip theme for all native Avalonia ToolTips.
+    Aligns with Vela's floating surfaces (VelaPopover / VelaMenu): soft surface card, subtle
+    1px border, unclipped raised shadow margin, and a restrained spring entrance via VelaPopupSurface.
+    Apply Classes="inverted" for a high-contrast inverted ToolTip.
+  -->
+  <ControlTheme x:Key="VelaToolTipTheme" TargetType="ToolTip">
+    <Setter Property="Foreground" Value="{DynamicResource VelaForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource VelaSurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VelaBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="12,7" />
     <Setter Property="FontSize" Value="12.5" />
     <Setter Property="FontWeight" Value="Medium" />
-    <Setter Property="MaxWidth" Value="260" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="MaxWidth" Value="280" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding CornerRadius}"
-                Padding="{TemplateBinding Padding}"
-                BoxShadow="{DynamicResource VelaShadowRaised}">
-          <ContentPresenter Content="{TemplateBinding Content}"
+        <controls:VelaPopupSurface x:Name="PART_Surface"
+                                   EnterOffsetY="-3"
+                                   Margin="10,6,10,14"
+                                   Background="{TemplateBinding Background}"
+                                   BorderBrush="{TemplateBinding BorderBrush}"
+                                   BorderThickness="{TemplateBinding BorderThickness}"
+                                   CornerRadius="{TemplateBinding CornerRadius}"
+                                   Padding="{TemplateBinding Padding}"
+                                   BoxShadow="{DynamicResource VelaShadowRaised}">
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                             TextElement.Foreground="{TemplateBinding Foreground}" />
-        </Border>
+        </controls:VelaPopupSurface>
       </ControlTemplate>
     </Setter>
+
+    <!-- Optional high-contrast inverted variant -->
+    <Style Selector="^.inverted">
+      <Setter Property="Foreground" Value="{DynamicResource VelaBackgroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource VelaForegroundBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
   </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ToolTip}"
+                TargetType="ToolTip"
+                BasedOn="{StaticResource VelaToolTipTheme}" />
 
 </ResourceDictionary>
