@@ -79,7 +79,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PageCacheMode))]
     [NotifyPropertyChangedFor(nameof(TelemetrySummary))]
-    public partial int CacheModeIndex { get; set; }
+    public partial int CacheModeIndex { get; set; } = 1;
 
     public VelaPageCacheMode PageCacheMode => CacheModeIndex switch
     {

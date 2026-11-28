@@ -25,7 +25,7 @@ namespace Vela.Avalonia.Controls;
 /// - In-place submenu drill-in with smooth height morphing, checkmarks, shortcuts, and click-outside dismissal
 /// </summary>
 [PseudoClasses(":open")]
-public class VelaGlassMenu : TemplatedControl
+public class VelaGlassMenu : TemplatedControl, IVelaBackdropCacheOwner
 {
     private static Geometry? s_defaultMoreIcon;
     private static Geometry? s_checkIconGeometry;
@@ -311,6 +311,7 @@ public class VelaGlassMenu : TemplatedControl
         ActualThemeVariantChanged += OnThemeVariantChanged;
         if (IsOpen)
             AttachOutsideClickHook();
+        SyncBackdropBlur();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -321,6 +322,21 @@ public class VelaGlassMenu : TemplatedControl
         DetachOutsideClickHook();
         UnsubscribeRowItems();
         _runner.Stop();
+        VelaBackdropCacheHelper.Release(_blurBackdrop);
+    }
+
+    private bool _backdropSuspended;
+
+    void IVelaBackdropCacheOwner.SuspendBackdropCache()
+    {
+        _backdropSuspended = true;
+        VelaBackdropCacheHelper.Release(_blurBackdrop);
+    }
+
+    void IVelaBackdropCacheOwner.ResumeBackdropCache()
+    {
+        _backdropSuspended = false;
+        SyncBackdropBlur();
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -488,9 +504,8 @@ public class VelaGlassMenu : TemplatedControl
         if (_blurBackdrop is null)
             return;
 
-        _blurBackdrop.BackdropEffect = BlurBackground && BlurRadius > 0.1
-            ? new BlurEffect { Radius = Math.Clamp(BlurRadius, 0.0, 120.0) }
-            : null;
+        var enabled = !_backdropSuspended && VisualRoot is not null && BlurBackground && BlurRadius > 0.1;
+        VelaBackdropCacheHelper.ApplyBlur(_blurBackdrop, enabled, Math.Clamp(BlurRadius, 0.0, 120.0));
     }
 
     private void SyncTriggerVisual()

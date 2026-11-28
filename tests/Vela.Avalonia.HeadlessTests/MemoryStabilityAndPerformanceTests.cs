@@ -223,6 +223,126 @@ public class MemoryStabilityAndPerformanceTests
         Assert.Equal(0, allocated);
     }
 
+    [AvaloniaFact]
+    public void VelaPageDeck_DefaultPolicy_IsBoundedLruAndSuspendsInactiveBackdropCaches()
+    {
+        var deck = new VelaPageDeck();
+        Assert.Equal(VelaPageCacheMode.Lru, deck.PageCacheMode);
+        Assert.Equal(4, deck.MaxCachedPages);
+
+        var window = new Window { Width = 800, Height = 500, Content = deck };
+        try
+        {
+            window.Show();
+            HeadlessLeakVerifier.FlushLayoutAndRender(window);
+
+            VelaGlassCard? page1Card = null;
+            VelaLiquidGlass? page1Glass = null;
+
+            deck.Activate("p1", () =>
+            {
+                page1Card = new VelaGlassCard
+                {
+                    Width = 300,
+                    Height = 140,
+                    BlurBackground = true,
+                    BlurRadius = 24,
+                    Content = new TextBlock { Text = "Page 1 Glass" },
+                };
+                page1Glass = new VelaLiquidGlass
+                {
+                    Width = 240,
+                    Height = 100,
+                    BlurRadius = 16,
+                    Content = new TextBlock { Text = "Page 1 Liquid" },
+                };
+                return new StackPanel { Children = { page1Card, page1Glass } };
+            });
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            var cardBackdrop = page1Card!.GetVisualDescendants().OfType<Border>().First(b => b.Name == "PART_BlurBackdrop");
+            var liquidBackdrop = page1Glass!.GetVisualDescendants().OfType<Border>().First(b => b.Name == "PART_BackdropHost");
+            Assert.NotNull(cardBackdrop.BackdropEffectCache);
+            Assert.NotNull(liquidBackdrop.BackdropEffectCache);
+
+            // Switching away to p2 suspends p1's GPU backdrop caches immediately
+            deck.Activate("p2", () => new Border { Child = new TextBlock { Text = "Page 2" } });
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            Assert.Null(cardBackdrop.BackdropEffectCache);
+            Assert.Null(cardBackdrop.BackdropEffect);
+            Assert.Null(liquidBackdrop.BackdropEffectCache);
+            Assert.Null(liquidBackdrop.BackdropEffect);
+
+            // Returning to p1 restores them seamlessly
+            deck.Activate("p1", () => throw new InvalidOperationException("Should hit LRU cache"));
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            Assert.NotNull(cardBackdrop.BackdropEffectCache);
+            Assert.NotNull(liquidBackdrop.BackdropEffectCache);
+
+            // Visiting 8 distinct pages remains bounded by default MaxCachedPages = 4
+            for (var i = 3; i <= 8; i++)
+            {
+                var key = $"p{i}";
+                deck.Activate(key, () => new Border { Child = new TextBlock { Text = key } });
+            }
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            Assert.Equal(4, deck.CachedPageCount);
+        }
+        finally
+        {
+            window.Content = null;
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
+    }
+
+    [AvaloniaFact]
+    public void VelaBusyOverlay_WhenIdleOrDetached_ReleasesRetainedBackdropEffectCache()
+    {
+        var previousReducedMotion = VelaMotionOptions.ReducedMotion;
+        VelaMotionOptions.ReducedMotion = true;
+
+        var overlay = new VelaBusyOverlay
+        {
+            Width = 320,
+            Height = 200,
+            IsBusy = false,
+            UseBackdropBlur = true,
+            BlurRadius = 12,
+            Content = new TextBlock { Text = "Workspace" },
+        };
+        var window = new Window { Width = 400, Height = 260, Content = overlay };
+        try
+        {
+            window.Show();
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+
+            var backdrop = overlay.GetVisualDescendants().OfType<Border>().First(b => b.Name == "PART_Backdrop");
+            Assert.Null(backdrop.BackdropEffectCache);
+            Assert.Null(backdrop.BackdropEffect);
+
+            overlay.IsBusy = true;
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+            Assert.NotNull(backdrop.BackdropEffectCache);
+            Assert.NotNull(backdrop.BackdropEffect);
+
+            overlay.IsBusy = false;
+            HeadlessLeakVerifier.FlushLayoutAndRender(window, renderTicks: 1);
+            Assert.Null(backdrop.BackdropEffectCache);
+            Assert.Null(backdrop.BackdropEffect);
+        }
+        finally
+        {
+            VelaMotionOptions.ReducedMotion = previousReducedMotion;
+            window.Content = null;
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
+    }
+
     private static Control BuildCompositeDashboard()
     {
         var grid = new VelaDataGrid { Height = 180 };

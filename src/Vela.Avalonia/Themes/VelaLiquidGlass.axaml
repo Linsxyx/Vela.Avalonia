@@ -32,7 +32,6 @@
                     Background="Transparent"
                     CornerRadius="{TemplateBinding CornerRadius}"
                     ClipToBounds="True"
-                    BackdropEffectCache="Retained"
                     IsHitTestVisible="False">
               <controls:VelaLiquidGlassLens CornerRadius="{TemplateBinding CornerRadius}"
                                             BevelWidth="{TemplateBinding BevelWidth}"

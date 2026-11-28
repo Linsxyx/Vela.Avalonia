@@ -194,7 +194,7 @@ public sealed class VelaSpinnerRing : Control
 /// with spring opacity/scale entrance and exit, blocking underlying pointer hits only while busy.
 /// </summary>
 [PseudoClasses(":busy")]
-public class VelaBusyOverlay : TemplatedControl
+public class VelaBusyOverlay : TemplatedControl, IVelaBackdropCacheOwner
 {
     public static readonly StyledProperty<object?> ContentProperty =
         AvaloniaProperty.Register<VelaBusyOverlay, object?>(nameof(Content));
@@ -259,27 +259,39 @@ public class VelaBusyOverlay : TemplatedControl
         OnBusyChanged(animate: false);
     }
 
+    private bool _backdropSuspended;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ApplyBlur();
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
+        VelaBackdropCacheHelper.Release(_backdrop);
+    }
+
+    void IVelaBackdropCacheOwner.SuspendBackdropCache()
+    {
+        _backdropSuspended = true;
+        VelaBackdropCacheHelper.Release(_backdrop);
+    }
+
+    void IVelaBackdropCacheOwner.ResumeBackdropCache()
+    {
+        _backdropSuspended = false;
+        ApplyBlur();
     }
 
     private void ApplyBlur()
     {
         if (_backdrop is null) return;
-        _backdrop.BackdropEffectCache ??= new RetainedBackdropEffectCache();
-        if (UseBackdropBlur && BlurRadius > 0.5)
-        {
-            if (_backdrop.BackdropEffect is BlurEffect existing)
-                existing.Radius = BlurRadius;
-            else
-                _backdrop.BackdropEffect = new BlurEffect { Radius = BlurRadius };
-        }
-        else
-        {
-            _backdrop.BackdropEffect = null;
-        }
+        var overlayActive = IsBusy || (_overlay?.IsVisible ?? false);
+        var enabled = !_backdropSuspended && VisualRoot is not null && overlayActive && UseBackdropBlur && BlurRadius > 0.5;
+        VelaBackdropCacheHelper.ApplyBlur(_backdrop, enabled, BlurRadius);
     }
 
     private void OnBusyChanged(bool animate)
@@ -289,6 +301,8 @@ public class VelaBusyOverlay : TemplatedControl
 
         if (_overlay is not null && IsBusy)
             _overlay.IsVisible = true;
+        if (IsBusy)
+            ApplyBlur();
         if (_spinner is not null)
             _spinner.IsActive = IsBusy;
 
@@ -320,7 +334,10 @@ public class VelaBusyOverlay : TemplatedControl
         _overlay.IsHitTestVisible = IsBusy;
 
         if (!IsBusy && op <= 0.01)
+        {
             _overlay.IsVisible = false;
+            VelaBackdropCacheHelper.Release(_backdrop);
+        }
 
         if (_pillScale is not null)
         {

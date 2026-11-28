@@ -49,12 +49,11 @@
         <Border CornerRadius="{TemplateBinding CornerRadius}"
                 BoxShadow="{TemplateBinding CardShadow}">
           <Panel>
-            <!-- Layer 1: Retained high-radius GPU BackdropEffect blur + contrast tint veil -->
+            <!-- Layer 1: High-radius GPU BackdropEffect blur + contrast tint veil (cache managed dynamically) -->
             <Border x:Name="PART_BlurBackdrop"
                     IsVisible="{TemplateBinding BlurBackground}"
                     CornerRadius="{TemplateBinding CornerRadius}"
                     ClipToBounds="True"
-                    BackdropEffectCache="Retained"
                     IsHitTestVisible="False" />
 
             <!-- Layer 2: Subtle outer framing hairline (keeps light-mode glass crisp on white backgrounds) -->

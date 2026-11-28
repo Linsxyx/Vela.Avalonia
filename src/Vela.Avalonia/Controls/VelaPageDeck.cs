@@ -68,10 +68,10 @@ public readonly record struct VelaPageSwitchMetrics(
 public sealed class VelaPageDeck : Panel
 {
     public static readonly StyledProperty<VelaPageCacheMode> PageCacheModeProperty =
-        AvaloniaProperty.Register<VelaPageDeck, VelaPageCacheMode>(nameof(PageCacheMode), VelaPageCacheMode.KeepAlive);
+        AvaloniaProperty.Register<VelaPageDeck, VelaPageCacheMode>(nameof(PageCacheMode), VelaPageCacheMode.Lru);
 
     public static readonly StyledProperty<int> MaxCachedPagesProperty =
-        AvaloniaProperty.Register<VelaPageDeck, int>(nameof(MaxCachedPages), 8);
+        AvaloniaProperty.Register<VelaPageDeck, int>(nameof(MaxCachedPages), 4);
 
     public static readonly StyledProperty<VelaPageTransitionMode> TransitionModeProperty =
         AvaloniaProperty.Register<VelaPageDeck, VelaPageTransitionMode>(nameof(TransitionMode), VelaPageTransitionMode.Instant);
@@ -179,6 +179,7 @@ public sealed class VelaPageDeck : Panel
             }
             else
             {
+                VelaBackdropCacheHelper.SuspendSubtree(previous.Visual);
                 previous.Visual.IsVisible = false;
             }
         }
@@ -189,6 +190,7 @@ public sealed class VelaPageDeck : Panel
         {
             targetSlot.LastUsedTick = ++_lruCounter;
             targetSlot.Visual.IsVisible = true;
+            VelaBackdropCacheHelper.ResumeSubtree(targetSlot.Visual);
             NotifyLifecycle(targetSlot.Visual, entering: true);
             PlayCompositorTransitionIfEnabled(targetSlot.Visual);
         }
@@ -243,6 +245,7 @@ public sealed class VelaPageDeck : Panel
         }
         else
         {
+            VelaBackdropCacheHelper.SuspendSubtree(_activeSlot.Visual);
             _activeSlot.Visual.IsVisible = false;
         }
         _activeSlot = null;

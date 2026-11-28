@@ -383,7 +383,7 @@ public sealed class VelaLiquidGlassLens : Control
 /// Liquid Glass container combining Avalonia 12.2's native GPU BackdropEffect blur
 /// with <see cref="VelaLiquidGlassLens"/> optical SDF refraction, chromatic dispersion, and specular rim.
 /// </summary>
-public class VelaLiquidGlass : ContentControl
+public class VelaLiquidGlass : ContentControl, IVelaBackdropCacheOwner
 {
     public static readonly StyledProperty<double> BlurRadiusProperty =
         AvaloniaProperty.Register<VelaLiquidGlass, double>(nameof(BlurRadius), 6.0);
@@ -417,6 +417,7 @@ public class VelaLiquidGlass : ContentControl
     protected override Type StyleKeyOverride => typeof(VelaLiquidGlass);
 
     private Border? _backdropHost;
+    private bool _backdropSuspended;
 
     static VelaLiquidGlass()
     {
@@ -430,20 +431,34 @@ public class VelaLiquidGlass : ContentControl
         SyncBlurEffect();
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        SyncBlurEffect();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        VelaBackdropCacheHelper.Release(_backdropHost);
+    }
+
+    void IVelaBackdropCacheOwner.SuspendBackdropCache()
+    {
+        _backdropSuspended = true;
+        VelaBackdropCacheHelper.Release(_backdropHost);
+    }
+
+    void IVelaBackdropCacheOwner.ResumeBackdropCache()
+    {
+        _backdropSuspended = false;
+        SyncBlurEffect();
+    }
+
     private void SyncBlurEffect()
     {
         if (_backdropHost is null) return;
-        _backdropHost.BackdropEffectCache ??= new RetainedBackdropEffectCache();
-        if (BlurRadius > 0.1)
-        {
-            if (_backdropHost.BackdropEffect is BlurEffect existing)
-                existing.Radius = BlurRadius;
-            else
-                _backdropHost.BackdropEffect = new BlurEffect { Radius = BlurRadius };
-        }
-        else
-        {
-            _backdropHost.BackdropEffect = null;
-        }
+        var enabled = !_backdropSuspended && VisualRoot is not null && BlurRadius > 0.1;
+        VelaBackdropCacheHelper.ApplyBlur(_backdropHost, enabled, BlurRadius);
     }
 }

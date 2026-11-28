@@ -475,10 +475,10 @@ public class VelaNavigationView : TemplatedControl
         AvaloniaProperty.Register<VelaNavigationView, int>(nameof(SelectedIndex), 0, defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly StyledProperty<VelaPageCacheMode> PageCacheModeProperty =
-        AvaloniaProperty.Register<VelaNavigationView, VelaPageCacheMode>(nameof(PageCacheMode), VelaPageCacheMode.KeepAlive);
+        AvaloniaProperty.Register<VelaNavigationView, VelaPageCacheMode>(nameof(PageCacheMode), VelaPageCacheMode.Lru);
 
     public static readonly StyledProperty<int> MaxCachedPagesProperty =
-        AvaloniaProperty.Register<VelaNavigationView, int>(nameof(MaxCachedPages), 8);
+        AvaloniaProperty.Register<VelaNavigationView, int>(nameof(MaxCachedPages), 4);
 
     public static readonly StyledProperty<VelaPageTransitionMode> PageTransitionModeProperty =
         AvaloniaProperty.Register<VelaNavigationView, VelaPageTransitionMode>(nameof(PageTransitionMode), VelaPageTransitionMode.Instant);
@@ -697,11 +697,18 @@ public class VelaNavigationView : TemplatedControl
         }, DispatcherPriority.Loaded);
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ApplyPaneBackdrop();
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
         _runner.Stop();
         DetachTemplateHandlers();
+        VelaBackdropCacheHelper.Release(_paneBorder);
     }
 
     private void DetachTemplateHandlers()
@@ -857,10 +864,10 @@ public class VelaNavigationView : TemplatedControl
     private void ApplyPaneBackdrop()
     {
         if (_paneBorder is null) return;
-        _paneBorder.BackdropEffectCache ??= new RetainedBackdropEffectCache();
-        _paneBorder.BackdropEffect = PaneVariant == VelaNavigationPaneVariant.Frosted
-            ? new BlurEffect { Radius = 18 }
-            : null;
+        VelaBackdropCacheHelper.ApplyBlur(
+            _paneBorder,
+            enabled: PaneVariant == VelaNavigationPaneVariant.Frosted && VisualRoot is not null,
+            radius: 18.0);
     }
 
     private void OnPaneOpenChanged()

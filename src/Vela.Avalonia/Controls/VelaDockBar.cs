@@ -67,7 +67,7 @@ public class VelaDockItem : AvaloniaObject
 ///   simultaneously compacts into an active-tab return orb (and cleanly restores on Escape/close/tap)
 /// </summary>
 [PseudoClasses(":search-expanded", ":solid", ":frosted", ":glass-card", ":glass", ":vertical", ":no-shadow")]
-public class VelaDockBar : TemplatedControl
+public class VelaDockBar : TemplatedControl, IVelaBackdropCacheOwner
 {
     public static readonly StyledProperty<Orientation> OrientationProperty =
         AvaloniaProperty.Register<VelaDockBar, Orientation>(nameof(Orientation), Orientation.Horizontal);
@@ -291,10 +291,13 @@ public class VelaDockBar : TemplatedControl
         }, DispatcherPriority.Loaded);
     }
 
+    private bool _backdropSuspended;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         SyncItemSubscriptions();
+        ApplyMaterial();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -303,6 +306,21 @@ public class VelaDockBar : TemplatedControl
         _runner.Stop();
         ClearItemSubscriptions();
         DetachTemplateHandlers();
+        VelaBackdropCacheHelper.Release(_tabsBackdrop);
+        VelaBackdropCacheHelper.Release(_searchBackdrop);
+    }
+
+    void IVelaBackdropCacheOwner.SuspendBackdropCache()
+    {
+        _backdropSuspended = true;
+        VelaBackdropCacheHelper.Release(_tabsBackdrop);
+        VelaBackdropCacheHelper.Release(_searchBackdrop);
+    }
+
+    void IVelaBackdropCacheOwner.ResumeBackdropCache()
+    {
+        _backdropSuspended = false;
+        ApplyMaterial();
     }
 
     private void DetachTemplateHandlers()
@@ -753,24 +771,17 @@ public class VelaDockBar : TemplatedControl
         PseudoClasses.Set(":glass-card", Material == VelaSurfaceMaterial.GlassCard);
         PseudoClasses.Set(":glass", Material == VelaSurfaceMaterial.LiquidGlass);
 
-        var blur = Material switch
+        var blurRadius = Material switch
         {
-            VelaSurfaceMaterial.Frosted => new BlurEffect { Radius = 18 },
-            VelaSurfaceMaterial.GlassCard => new BlurEffect { Radius = 32 },
-            VelaSurfaceMaterial.LiquidGlass => new BlurEffect { Radius = 10 },
-            _ => null,
+            VelaSurfaceMaterial.Frosted => 18.0,
+            VelaSurfaceMaterial.GlassCard => 32.0,
+            VelaSurfaceMaterial.LiquidGlass => 10.0,
+            _ => 0.0,
         };
 
-        if (_tabsBackdrop is not null)
-        {
-            _tabsBackdrop.BackdropEffectCache ??= new RetainedBackdropEffectCache();
-            _tabsBackdrop.BackdropEffect = blur;
-        }
-        if (_searchBackdrop is not null)
-        {
-            _searchBackdrop.BackdropEffectCache ??= new RetainedBackdropEffectCache();
-            _searchBackdrop.BackdropEffect = blur;
-        }
+        var enableBlur = !_backdropSuspended && VisualRoot is not null && blurRadius > 0.1;
+        VelaBackdropCacheHelper.ApplyBlur(_tabsBackdrop, enableBlur, blurRadius);
+        VelaBackdropCacheHelper.ApplyBlur(_searchBackdrop, enableBlur, blurRadius);
 
         var enableLens = Material == VelaSurfaceMaterial.LiquidGlass;
         if (_tabsLens is not null) _tabsLens.IsVisible = enableLens;

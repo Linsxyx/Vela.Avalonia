@@ -36,12 +36,11 @@
                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalAlignment}">
           <Panel>
-            <!-- Layer 1: Retained GPU BackdropEffect blur + contrast tint veil -->
+            <!-- Layer 1: GPU BackdropEffect blur + contrast tint veil (cache managed dynamically) -->
             <Border x:Name="PART_BlurBackdrop"
                     IsVisible="{TemplateBinding BlurBackground}"
                     CornerRadius="{Binding CornerRadius, ElementName=PART_Shell}"
                     ClipToBounds="True"
-                    BackdropEffectCache="Retained"
                     IsHitTestVisible="False" />
 
             <!-- Layer 2: Crisp outer hairline -->
