@@ -1,0 +1,132 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="VelaGlassMenuBlurTintSubtleBrush" Color="#66FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassMenuBlurTintHighBrush" Color="#96FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassMenuSheenBrush" Color="#58FDFEFE" />
+      <SolidColorBrush x:Key="VelaGlassMenuHighlightBrush" Color="#78FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassMenuHighlightBorderBrush" Color="#99FFFFFF" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="VelaGlassMenuBlurTintSubtleBrush" Color="#94202534" />
+      <SolidColorBrush x:Key="VelaGlassMenuBlurTintHighBrush" Color="#BA202534" />
+      <SolidColorBrush x:Key="VelaGlassMenuSheenBrush" Color="#1EFFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassMenuHighlightBrush" Color="#24FFFFFF" />
+      <SolidColorBrush x:Key="VelaGlassMenuHighlightBorderBrush" Color="#34FFFFFF" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <ControlTheme x:Key="{x:Type controls:VelaGlassMenu}" TargetType="controls:VelaGlassMenu">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="RimThickness" Value="1.2" />
+    <Setter Property="MenuShadow" Value="{DynamicResource VelaShadowFloating}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Shell"
+                Width="38"
+                Height="38"
+                CornerRadius="19"
+                BoxShadow="{TemplateBinding MenuShadow}"
+                HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalAlignment}">
+          <Panel>
+            <!-- Layer 1: Retained GPU BackdropEffect blur + contrast tint veil -->
+            <Border x:Name="PART_BlurBackdrop"
+                    IsVisible="{TemplateBinding BlurBackground}"
+                    CornerRadius="{Binding CornerRadius, ElementName=PART_Shell}"
+                    ClipToBounds="True"
+                    BackdropEffectCache="Retained"
+                    IsHitTestVisible="False" />
+
+            <!-- Layer 2: Crisp outer hairline -->
+            <Border CornerRadius="{Binding CornerRadius, ElementName=PART_Shell}"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource VelaGlassCardOuterHairlineBrush}"
+                    Background="Transparent"
+                    IsHitTestVisible="False" />
+
+            <!-- Layer 3: Frosted sheen + aspect-ratio-compensated diagonal luminous specular rim -->
+            <controls:VelaGlassRimBorder x:Name="PART_RimBorder"
+                                         CornerRadius="{Binding CornerRadius, ElementName=PART_Shell}"
+                                         Background="{DynamicResource VelaGlassMenuSheenBrush}"
+                                         BorderThickness="{TemplateBinding RimThickness}"
+                                         RimStartColor="{DynamicResource VelaGlassRimStartColor}"
+                                         RimMidColor="{DynamicResource VelaGlassRimMidColor}"
+                                         RimEndColor="{DynamicResource VelaGlassRimEndColor}"
+                                         IsHitTestVisible="False" />
+
+            <!-- Layer 4: Clipped morphing foreground (glass trigger <-> menu list) -->
+            <Border CornerRadius="{Binding CornerRadius, ElementName=PART_Shell}"
+                    ClipToBounds="True">
+              <Panel>
+                <!-- Closed trigger -->
+                <Panel x:Name="PART_TriggerLayer"
+                       Background="Transparent"
+                       Cursor="Hand">
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="6"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
+                    <PathIcon x:Name="PART_TriggerIcon"
+                              Width="16"
+                              Height="16"
+                              Foreground="{DynamicResource VelaForegroundBrush}" />
+                    <TextBlock x:Name="PART_TriggerLabel"
+                               IsVisible="False"
+                               FontSize="13"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource VelaForegroundBrush}"
+                               VerticalAlignment="Center" />
+                  </StackPanel>
+                </Panel>
+
+                <!-- Expanded menu -->
+                <Grid x:Name="PART_MenuLayer"
+                      Margin="6"
+                      Opacity="0"
+                      IsVisible="False"
+                      IsHitTestVisible="False">
+                  <!-- Gliding spring highlight pill -->
+                  <Border x:Name="PART_Highlight"
+                          CornerRadius="10"
+                          Height="34"
+                          Opacity="0"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Stretch"
+                          IsHitTestVisible="False"
+                          Background="{DynamicResource VelaGlassMenuHighlightBrush}"
+                          BorderBrush="{DynamicResource VelaGlassMenuHighlightBorderBrush}"
+                          BorderThickness="0.75" />
+
+                  <!-- Menu items host -->
+                  <StackPanel x:Name="PART_ItemsHost" Spacing="2" />
+                </Grid>
+              </Panel>
+            </Border>
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^[TintLevel=None] /template/ Border#PART_BlurBackdrop">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^[TintLevel=Standard] /template/ Border#PART_BlurBackdrop">
+      <Setter Property="Background" Value="{DynamicResource VelaGlassMenuBlurTintSubtleBrush}" />
+    </Style>
+    <Style Selector="^[TintLevel=HighContrast] /template/ Border#PART_BlurBackdrop">
+      <Setter Property="Background" Value="{DynamicResource VelaGlassMenuBlurTintHighBrush}" />
+    </Style>
+
+    <Style Selector="^:focus-visible /template/ Border#PART_Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

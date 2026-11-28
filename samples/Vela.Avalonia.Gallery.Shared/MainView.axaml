@@ -240,9 +240,9 @@
                                 Icon="{DynamicResource VelaIconBell}" />
               <vela:VelaNavItem Tag="showcase"
                                 Header="{DynamicResource StrNavShowcase}"
-                                Category="PaymentFlow Payment Stripe Mastercard Bank Settlement 特色控件 支付流程"
+                                Category="PaymentFlow GlassMenu Payment Glass Morph Menu Stripe Mastercard Bank Settlement 特色控件 支付流程 玻璃菜单"
                                 Icon="{DynamicResource VelaIconSparkles}"
-                                Badge="NEW" />
+                                Badge="2" />
             </vela:VelaNavigationView>
         </vela:VelaDialogHost>
       </vela:VelaDrawerHost>

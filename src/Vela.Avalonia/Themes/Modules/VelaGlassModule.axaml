@@ -4,5 +4,6 @@
   <ResourceDictionary.MergedDictionaries>
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaLiquidGlass.axaml" />
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaGlassCard.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaGlassMenu.axaml" />
   </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

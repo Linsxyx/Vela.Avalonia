@@ -431,4 +431,7 @@
   <x:String x:Key="StrAmount">金额</x:String>
   <x:String x:Key="StrSpeed">倍速</x:String>
   <x:String x:Key="StrLoop">循环</x:String>
+  <x:String x:Key="StrGlassMenuDesc">一枚磨砂玻璃触发按钮直接形变展开为完整菜单，搭配弹簧滑动高亮胶囊与原位子菜单钻取。</x:String>
+  <x:String x:Key="StrGlassMenuHint">点击空白或按 Esc 收起 · ↑/↓ 滑动高亮 · → 进入子菜单。</x:String>
+  <x:String x:Key="StrToggleMenu">展开 / 收起</x:String>
 </ResourceDictionary>

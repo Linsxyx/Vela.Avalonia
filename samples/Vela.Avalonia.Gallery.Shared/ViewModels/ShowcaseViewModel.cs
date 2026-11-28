@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Vela.Avalonia.Controls;
+using Vela.Avalonia.Gallery.Localization;
 
 namespace Vela.Avalonia.Gallery.ViewModels;
 
@@ -29,6 +31,24 @@ public partial class ShowcaseViewModel : ViewModelBase
     [ObservableProperty]
     public partial int AmountPresetIndex { get; set; }
 
+    // Glass Menu demo state
+    [ObservableProperty]
+    public partial bool IsFavorite { get; set; } = true;
+
+    [ObservableProperty]
+    public partial string GlassMenuStatus { get; set; } = "Added to favorites";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GlassTintLevel))]
+    public partial int GlassTintIndex { get; set; } = 1;
+
+    public VelaGlassTintLevel GlassTintLevel => GlassTintIndex switch
+    {
+        0 => VelaGlassTintLevel.None,
+        2 => VelaGlassTintLevel.HighContrast,
+        _ => VelaGlassTintLevel.Standard,
+    };
+
     partial void OnAmountPresetIndexChanged(int value)
     {
         PaymentAmount = value switch
@@ -41,4 +61,22 @@ public partial class ShowcaseViewModel : ViewModelBase
 
     [RelayCommand]
     private void SelectAmountPreset(int index) => AmountPresetIndex = index;
+
+    [RelayCommand]
+    private void ToggleFavorite()
+    {
+        IsFavorite = !IsFavorite;
+        GlassMenuStatus = IsFavorite
+            ? Loc.Instance.Pick("Added to favorites", "已添加到收藏")
+            : Loc.Instance.Pick("Removed from favorites", "已取消收藏");
+    }
+
+    [RelayCommand]
+    private void RunGlassAction(string? action)
+    {
+        if (string.IsNullOrWhiteSpace(action))
+            return;
+
+        GlassMenuStatus = action;
+    }
 }

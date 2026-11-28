@@ -48,4 +48,9 @@ public partial class ShowcasePage : UserControl
         PaymentFlowControl.StepStage(1);
         UpdatePlayPauseLabel();
     }
+
+    private void OnToggleGlassMenuClick(object? sender, RoutedEventArgs e)
+    {
+        HeroGlassMenu.Toggle();
+    }
 }

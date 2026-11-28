@@ -431,4 +431,7 @@
   <x:String x:Key="StrAmount">Amount</x:String>
   <x:String x:Key="StrSpeed">Speed</x:String>
   <x:String x:Key="StrLoop">Loop</x:String>
+  <x:String x:Key="StrGlassMenuDesc">A glass trigger that morphs into its menu, with a gliding highlight and in-place submenu drill-in.</x:String>
+  <x:String x:Key="StrGlassMenuHint">Click outside or press Esc to collapse · ↑/↓ to glide · → to enter submenu.</x:String>
+  <x:String x:Key="StrToggleMenu">Toggle Menu</x:String>
 </ResourceDictionary>
