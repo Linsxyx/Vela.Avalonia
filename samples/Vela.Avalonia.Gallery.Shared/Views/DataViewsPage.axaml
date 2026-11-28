@@ -256,6 +256,145 @@
           </vela:VelaTreeTable>
         </StackPanel>
       </Border>
+
+      <!-- Section 4: VelaDragList · Kanban Board -->
+      <Border Classes="card">
+        <Border.Resources>
+          <DataTemplate x:Key="KanbanCardTemplate" x:DataType="vm:KanbanCardItem">
+            <Border Background="{DynamicResource VelaSurfaceRaisedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="12,10"
+                    BoxShadow="{DynamicResource VelaShadowResting}">
+              <StackPanel Spacing="8">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                  <TextBlock Text="{Binding Id}"
+                             FontSize="11.5"
+                             FontFamily="Cascadia Mono, JetBrains Mono, Menlo, Consolas, monospace"
+                             Foreground="{DynamicResource VelaTextMutedBrush}"
+                             VerticalAlignment="Center" />
+                  <vela:VelaBadge Grid.Column="1"
+                                  Content="{Binding Priority}"
+                                  Tone="{Binding PriorityTone}"
+                                  Size="Small"
+                                  IsPill="True" />
+                </Grid>
+
+                <TextBlock Text="{Binding Title}"
+                           FontSize="13.5"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource VelaForegroundBrush}"
+                           TextWrapping="Wrap" />
+
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                  <vela:VelaBadge Content="{Binding Tag}"
+                                  Tone="Neutral"
+                                  Size="Small" />
+                  <Border Grid.Column="2"
+                          Width="24"
+                          Height="24"
+                          CornerRadius="12"
+                          Background="{DynamicResource VelaSurfaceMutedBrush}"
+                          BorderBrush="{DynamicResource VelaBorderBrush}"
+                          BorderThickness="1">
+                    <TextBlock Text="{Binding Assignee}"
+                               FontSize="10.5"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource VelaTextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </Border.Resources>
+
+        <StackPanel Spacing="14">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="cardTitle" Text="VelaDragList · Kanban Board" />
+            <TextBlock Classes="statusText" Text="{Binding KanbanStatusText}" />
+          </StackPanel>
+
+          <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
+            <!-- Backlog -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    Padding="10">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto" Margin="4,2">
+                  <TextBlock Text="Backlog" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <vela:VelaBadge Grid.Column="1" Content="{Binding KanbanBacklog.Count}" Tone="Neutral" Size="Small" IsPill="True" />
+                </Grid>
+                <vela:VelaDragList x:Name="KanbanBacklogList"
+                                   Tag="Backlog"
+                                   MinHeight="180"
+                                   DragGroup="gallery-kanban"
+                                   ItemsSource="{Binding KanbanBacklog}"
+                                   ItemTemplate="{StaticResource KanbanCardTemplate}"
+                                   EmptyPlaceholderText="Drop cards here"
+                                   ItemReordered="OnKanbanCardMoved"
+                                   ItemTransferred="OnKanbanCardMoved"
+                                   ItemClicked="OnKanbanCardClicked" />
+              </StackPanel>
+            </Border>
+
+            <!-- In Progress -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    Padding="10">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto" Margin="4,2">
+                  <TextBlock Text="In Progress" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <vela:VelaBadge Grid.Column="1" Content="{Binding KanbanInProgress.Count}" Tone="Info" Size="Small" IsPill="True" />
+                </Grid>
+                <vela:VelaDragList x:Name="KanbanInProgressList"
+                                   Tag="In Progress"
+                                   MinHeight="180"
+                                   DragGroup="gallery-kanban"
+                                   ItemsSource="{Binding KanbanInProgress}"
+                                   ItemTemplate="{StaticResource KanbanCardTemplate}"
+                                   EmptyPlaceholderText="Drop cards here"
+                                   ItemReordered="OnKanbanCardMoved"
+                                   ItemTransferred="OnKanbanCardMoved"
+                                   ItemClicked="OnKanbanCardClicked" />
+              </StackPanel>
+            </Border>
+
+            <!-- Done -->
+            <Border Grid.Column="2"
+                    Background="{DynamicResource VelaSurfaceMutedBrush}"
+                    BorderBrush="{DynamicResource VelaBorderSubtleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    Padding="10">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto" Margin="4,2">
+                  <TextBlock Text="Done" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <vela:VelaBadge Grid.Column="1" Content="{Binding KanbanDone.Count}" Tone="Success" Size="Small" IsPill="True" />
+                </Grid>
+                <vela:VelaDragList x:Name="KanbanDoneList"
+                                   Tag="Done"
+                                   MinHeight="180"
+                                   DragGroup="gallery-kanban"
+                                   ItemsSource="{Binding KanbanDone}"
+                                   ItemTemplate="{StaticResource KanbanCardTemplate}"
+                                   EmptyPlaceholderText="Drop cards here"
+                                   ItemReordered="OnKanbanCardMoved"
+                                   ItemTransferred="OnKanbanCardMoved"
+                                   ItemClicked="OnKanbanCardClicked" />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

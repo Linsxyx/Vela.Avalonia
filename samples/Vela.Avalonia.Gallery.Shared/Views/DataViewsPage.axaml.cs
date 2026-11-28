@@ -263,4 +263,26 @@ public partial class DataViewsPage : UserControl
         if (DataContext is DataViewsViewModel vm && e.Item is ModuleHierarchyRow row)
             vm.NotifyItemInvoked("VelaTreeTable", $"{row.Name} · {row.Kind}");
     }
+
+    private void OnKanbanCardMoved(object? sender, VelaDragMovedEventArgs e)
+    {
+        if (ReferenceEquals(sender, e.TargetList) &&
+            DataContext is DataViewsViewModel vm &&
+            e.Item is KanbanCardItem card)
+        {
+            var targetColumn = e.TargetList.Tag as string ?? "Board";
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                vm.NotifyKanbanMoved(card, targetColumn, e.TargetIndex));
+        }
+    }
+
+    private void OnKanbanCardClicked(object? sender, VelaDragItemClickedEventArgs e)
+    {
+        if (sender is VelaDragList list &&
+            DataContext is DataViewsViewModel vm &&
+            e.Item is KanbanCardItem card)
+        {
+            vm.NotifyKanbanClicked(card, list.Tag as string ?? "Board");
+        }
+    }
 }

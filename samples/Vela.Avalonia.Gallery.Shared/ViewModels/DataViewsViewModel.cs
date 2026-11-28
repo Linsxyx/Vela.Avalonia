@@ -75,6 +75,32 @@ public sealed class ModuleHierarchyRow
     public ObservableCollection<ModuleHierarchyRow> Children { get; } = new();
 }
 
+public sealed class KanbanCardItem
+{
+    public KanbanCardItem(
+        string id,
+        string title,
+        string priority,
+        VelaBadgeTone priorityTone,
+        string tag,
+        string assignee)
+    {
+        Id = id;
+        Title = title;
+        Priority = priority;
+        PriorityTone = priorityTone;
+        Tag = tag;
+        Assignee = assignee;
+    }
+
+    public string Id { get; }
+    public string Title { get; }
+    public string Priority { get; }
+    public VelaBadgeTone PriorityTone { get; }
+    public string Tag { get; }
+    public string Assignee { get; }
+}
+
 public partial class DataViewsViewModel : ViewModelBase
 {
     private readonly IGalleryShellService _shell;
@@ -184,12 +210,21 @@ public partial class DataViewsViewModel : ViewModelBase
     [ObservableProperty]
     public partial string ListBoxStatusText { get; set; } = string.Empty;
 
+    // Kanban (VelaDragList) state
+    public ObservableCollection<KanbanCardItem> KanbanBacklog { get; } = new();
+    public ObservableCollection<KanbanCardItem> KanbanInProgress { get; } = new();
+    public ObservableCollection<KanbanCardItem> KanbanDone { get; } = new();
+
+    [ObservableProperty]
+    public partial string KanbanStatusText { get; set; } = string.Empty;
+
     public DataViewsViewModel(IGalleryShellService shell)
     {
         _shell = shell;
         BuildExplorerTree();
         BuildClusterRows();
         BuildModuleHierarchy();
+        BuildKanbanCards();
         UpdateDefaultStatuses();
         Loc.Instance.LanguageChanged += _ => UpdateDefaultStatuses();
     }
@@ -383,5 +418,37 @@ public partial class DataViewsViewModel : ViewModelBase
 
         ModuleRoots.Add(core);
         ModuleRoots.Add(charts);
+    }
+
+    public void NotifyKanbanMoved(KanbanCardItem card, string targetColumn, int targetIndex)
+    {
+        KanbanStatusText = Loc.Instance.IsChinese
+            ? $"已移动 {card.Id} 到「{targetColumn}」第 {targetIndex + 1} 位 · 共 {KanbanBacklog.Count}/{KanbanInProgress.Count}/{KanbanDone.Count} 张卡片"
+            : $"Moved {card.Id} to {targetColumn} #{targetIndex + 1} · Counts {KanbanBacklog.Count}/{KanbanInProgress.Count}/{KanbanDone.Count}";
+    }
+
+    public void NotifyKanbanClicked(KanbanCardItem card, string column)
+    {
+        KanbanStatusText = Loc.Instance.IsChinese
+            ? $"已选中 {card.Id}「{card.Title}」（{column} · {card.Assignee}）"
+            : $"Selected {card.Id} \"{card.Title}\" ({column} · {card.Assignee})";
+        _shell.ShowToast($"{card.Id} · {card.Title}", $"{column} · {card.Priority} · {card.Assignee}");
+    }
+
+    private void BuildKanbanCards()
+    {
+        KanbanBacklog.Add(new("VEL-104", "Design spring tilt curve for card drag", "High", VelaBadgeTone.Danger, "Motion", "AL"));
+        KanbanBacklog.Add(new("VEL-109", "Keyboard Alt+Arrow card reordering", "Medium", VelaBadgeTone.Warning, "A11y", "KS"));
+        KanbanBacklog.Add(new("VEL-112", "Add swimlane grouping header preset", "Low", VelaBadgeTone.Neutral, "Layout", "EC"));
+
+        KanbanInProgress.Add(new("VEL-101", "OverlayLayer floating ghost & FLIP shift", "Urgent", VelaBadgeTone.Danger, "Core", "MC"));
+        KanbanInProgress.Add(new("VEL-106", "Auto-scroll near ScrollViewer edges", "High", VelaBadgeTone.Info, "UX", "SL"));
+
+        KanbanDone.Add(new("VEL-098", "Coalesced TopLevel SpringRunner pump", "Medium", VelaBadgeTone.Success, "Perf", "GH"));
+        KanbanDone.Add(new("VEL-099", "AOT-safe compiled bindings audit", "Low", VelaBadgeTone.Success, "Build", "LT"));
+
+        KanbanStatusText = Loc.Instance.IsChinese
+            ? "拖拽卡片可在列内排序或跨列移动，按 Esc 取消，点击卡片查看详情。"
+            : "Drag cards to reorder or move across columns. Press Esc to cancel, or click a card.";
     }
 }

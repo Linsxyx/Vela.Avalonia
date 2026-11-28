@@ -6,5 +6,6 @@
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeView.axaml" />
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDataGrid.axaml" />
     <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaTreeTable.axaml" />
+    <ResourceInclude Source="avares://Vela.Avalonia/Themes/VelaDragList.axaml" />
   </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -1,0 +1,91 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Vela.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:VelaDragItem}" TargetType="controls:VelaDragItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource VelaRadiusItem}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_ItemSurface"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:VelaDragList}" TargetType="controls:VelaDragList">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="MinHeight" Value="52" />
+    <Setter Property="PlaceholderCornerRadius" Value="{DynamicResource VelaRadiusItem}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.14" />
+              <BrushTransition Property="BorderBrush" Duration="0:0:0.14" />
+            </Transitions>
+          </Border.Transitions>
+
+          <Grid>
+            <Border x:Name="PART_EmptyHint"
+                    IsVisible="False"
+                    IsHitTestVisible="False"
+                    CornerRadius="{TemplateBinding PlaceholderCornerRadius}"
+                    BorderBrush="{DynamicResource VelaBorderBrush}"
+                    BorderThickness="1"
+                    Padding="12,16"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center">
+              <TextBlock Text="{TemplateBinding EmptyPlaceholderText}"
+                         Foreground="{DynamicResource VelaTextMutedBrush}"
+                         FontSize="12.5"
+                         HorizontalAlignment="Center"
+                         TextAlignment="Center" />
+            </Border>
+
+            <StackPanel x:Name="PART_ItemsPanel"
+                        Orientation="{TemplateBinding Orientation}"
+                        Spacing="{TemplateBinding Spacing}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:empty /template/ Border#PART_EmptyHint">
+      <Setter Property="IsVisible" Value="{Binding $parent[controls:VelaDragList].EmptyPlaceholderText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    </Style>
+
+    <Style Selector="^:drop-active /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource VelaAccentSubtleBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource VelaAccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
