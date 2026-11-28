@@ -1,3 +1,6 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
 using Vela.Avalonia.Controls;
 using Xunit;
 
@@ -82,5 +85,30 @@ public class VelaGlassMenuTests
         menu.NavigateInto(leaf);
         Assert.False(menu.IsInSubmenu);
         Assert.Null(menu.ActiveSubmenuParent);
+    }
+
+    [Fact]
+    public void BackdropCacheHelper_AppliesAndReleasesRoundedVisualClip()
+    {
+        var border = new Border
+        {
+            CornerRadius = new CornerRadius(19),
+        };
+        border.Arrange(new Rect(0, 0, 38, 38));
+
+        VelaBackdropCacheHelper.ApplyBlur(border, enabled: true, radius: 36);
+
+        var rectClip = Assert.IsType<RectangleGeometry>(border.Clip);
+        Assert.Equal(new Rect(0, 0, 38, 38), rectClip.Rect);
+        Assert.Equal(19, rectClip.RadiusX);
+        Assert.Equal(19, rectClip.RadiusY);
+
+        border.CornerRadius = new CornerRadius(16, 0, 0, 16);
+        Assert.IsType<PathGeometry>(border.Clip);
+
+        VelaBackdropCacheHelper.Release(border);
+        Assert.Null(border.Clip);
+        Assert.Null(border.BackdropEffect);
+        Assert.Null(border.BackdropEffectCache);
     }
 }

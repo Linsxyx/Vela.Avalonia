@@ -227,15 +227,15 @@ public class VelaDrawerHost : ContentControl
             _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BorderBrushProperty, "VelaGlassCardOuterHairlineBrush"));
             _sheetBindings.Add(VelaResourceBinding.Bind(_sheet, Border.BoxShadowProperty, "VelaShadowFloating"));
             _sheet.BorderThickness = new Thickness(1);
-            _sheet.Child = new Border
+            var frostedClip = new Border
             {
                 CornerRadius = new CornerRadius(20),
                 ClipToBounds = true,
-                BackdropEffect = new BlurEffect { Radius = 14 },
-                BackdropEffectCache = new RetainedBackdropEffectCache(),
                 Child = chrome,
                 [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaLiquidGlassTintBrush"),
             };
+            VelaBackdropCacheHelper.ApplyBlur(frostedClip, enabled: true, radius: 14);
+            _sheet.Child = frostedClip;
         }
         else
         {

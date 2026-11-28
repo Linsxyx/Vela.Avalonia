@@ -584,11 +584,10 @@ public class VelaDialogHost : ContentControl
                 {
                     CornerRadius = cornerRadius,
                     ClipToBounds = true,
-                    BackdropEffect = new BlurEffect { Radius = 16 },
-                    BackdropEffectCache = new RetainedBackdropEffectCache(),
                     Child = chrome,
                     [!Border.BackgroundProperty] = VelaResourceBinding.Create("VelaLiquidGlassTintBrush"),
                 };
+                VelaBackdropCacheHelper.ApplyBlur(frostedClip, enabled: true, radius: 16);
                 _cardShell.Child = frostedClip;
                 break;
             }
