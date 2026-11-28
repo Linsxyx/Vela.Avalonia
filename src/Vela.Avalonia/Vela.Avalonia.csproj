@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Vela.Avalonia.Tests" />
+    <InternalsVisibleTo Include="Vela.Avalonia.HeadlessTests" />
+    <InternalsVisibleTo Include="Vela.Avalonia.Benchmarks" />
   </ItemGroup>
 
   <ItemGroup>

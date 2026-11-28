@@ -9,5 +9,9 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Vela.Avalonia.Tests/Vela.Avalonia.Tests.csproj" />
+    <Project Path="tests/Vela.Avalonia.HeadlessTests/Vela.Avalonia.HeadlessTests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Vela.Avalonia.Benchmarks/Vela.Avalonia.Benchmarks.csproj" />
   </Folder>
 </Solution>

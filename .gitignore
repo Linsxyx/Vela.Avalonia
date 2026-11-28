@@ -6,6 +6,7 @@ dist/
 *.nupkg
 *.snupkg
 TestResults/
+BenchmarkDotNet.Artifacts/
 
 # IDEs & Editors
 .vs/
